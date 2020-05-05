@@ -12,6 +12,7 @@ import os
 import tempfile
 
 import pytest
+from werkzeug.security import generate_password_hash
 from quizzz import create_app
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
@@ -31,8 +32,8 @@ def app():
         init_db()
         db_session = get_db_session()
         db_session.add_all([
-            User(name="bob", password="bob-password"),
-            User(name="test", password="test"),
+            User(name="bob", password_hash=generate_password_hash("bob-password")),
+            User(name="test", password_hash=generate_password_hash("test")),
         ])
         db_session.commit()
 
