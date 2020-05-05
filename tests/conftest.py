@@ -14,7 +14,7 @@ import tempfile
 import pytest
 from quizzz import create_app
 from quizzz.db import init_db, get_db_session
-from quizzz.models import User
+from quizzz.auth.models import User
 
 
 @pytest.fixture
@@ -31,8 +31,8 @@ def app():
         init_db()
         db_session = get_db_session()
         db_session.add_all([
-            User(name="bob", email="bob@example.com"),
-            User(name="alice", email="alice@example.com"),
+            User(name="bob", password="bob-password"),
+            User(name="test", password="test"),
         ])
         db_session.commit()
 
@@ -52,3 +52,23 @@ def client(app):
 def runner(app):
     """ Creates a runner that can call the Click commands registered with the application. """
     return app.test_cli_runner()
+
+
+class AuthActions:
+    def __init__(self, client):
+        self._client = client
+
+    def login(self, username='test', password='test'):
+        return self._client.post('/auth/login', data={'username': username, 'password': password})
+
+    def logout(self):
+        return self._client.get('/auth/logout')
+
+
+@pytest.fixture
+def auth(client):
+    """
+    With the auth fixture, you can call auth.login() in a test to log in
+    as the test user, which was inserted as part of the test data in the app fixture.
+    """
+    return AuthActions(client)

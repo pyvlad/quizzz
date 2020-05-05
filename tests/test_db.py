@@ -2,7 +2,7 @@ import sqlite3
 
 import pytest
 from quizzz.db import get_db_session
-from quizzz.models import User
+from quizzz.auth.models import User
 
 
 def test_session_scope(app):
@@ -22,7 +22,7 @@ def test_session_rollback_on_context_teardown(app):
 
     with app.app_context():
         db_session = get_db_session()
-        db_session.add(User(name="dodgy", email="dodgy@example.com"))
+        db_session.add(User(name="dodgy", password="secret"))
         res = db_session.query(User).all()
         assert len(res) == 3
 

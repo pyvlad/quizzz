@@ -30,9 +30,7 @@ def close_db_session(exception=None):
 
 
 def init_db():
-    # import all modules here that might define models so that
-    # they are registered properly on the metadata.
-    import quizzz.models
+    """ """
     engine = create_engine(current_app.config["DATABASE_URI"])
     Base.metadata.create_all(engine)
 
