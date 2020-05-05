@@ -1,0 +1,61 @@
+import click
+from flask import current_app, g
+from flask.cli import with_appcontext
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+
+Base = declarative_base()
+Session = None
+
+
+def get_db_session():
+    """
+    Create the request-local db session if not present, or return the existing one.
+    """
+    return Session()
+
+
+def close_db_session(exception=None):
+    """
+    The Session registry is instructed to remove the db session (if present):
+
+    Session.remove():
+      - calls Session.close() on the current Session
+      (connection is returned to the connection pool and any transactional state is rolled back)
+      - discards the Session itself.
+    """
+    Session.remove()
+
+
+def init_db():
+    # import all modules here that might define models so that
+    # they are registered properly on the metadata.
+    import quizzz.models
+    engine = create_engine(current_app.config["DATABASE_URI"])
+    Base.metadata.create_all(engine)
+
+
+@click.command('init-db')
+@with_appcontext
+def init_db_command():
+    """
+    Create new tables if they don't exist yet.
+    """
+    init_db()
+    click.echo('Initialized the database.')
+
+
+def init_app(app):
+    """
+    Configure database binding, establish session registry, register handlers.
+    """
+    global Session, Base
+
+    engine = create_engine(app.config["DATABASE_URI"])
+    Session = scoped_session(sessionmaker(bind=engine, autoflush=True, autocommit=False))
+    Base.query = Session.query_property()
+
+    app.teardown_appcontext(close_db_session)
+    app.cli.add_command(init_db_command)

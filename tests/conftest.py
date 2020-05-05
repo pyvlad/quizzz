@@ -13,6 +13,8 @@ import tempfile
 
 import pytest
 from quizzz import create_app
+from quizzz.db import init_db, get_db_session
+from quizzz.models import User
 
 
 @pytest.fixture
@@ -22,8 +24,17 @@ def app():
 
     app = create_app({
         'TESTING': True,
-        'DATABASE': db_path,
+        'DATABASE_URI': 'sqlite:///' + db_path,
     })
+
+    with app.app_context():
+        init_db()
+        db_session = get_db_session()
+        db_session.add_all([
+            User(name="bob", email="bob@example.com"),
+            User(name="alice", email="alice@example.com"),
+        ])
+        db_session.commit()
 
     yield app
 
