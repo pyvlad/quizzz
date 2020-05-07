@@ -27,9 +27,12 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    # register authentication blueprint
+    # register blueprints
     from . import auth
     app.register_blueprint(auth.bp)
+
+    from . import chat
+    app.register_blueprint(chat.bp)
 
     # an index page
     @app.route('/')

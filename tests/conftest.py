@@ -16,6 +16,7 @@ from werkzeug.security import generate_password_hash
 from quizzz import create_app
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
+from quizzz.chat.models import Message
 
 
 @pytest.fixture
@@ -31,10 +32,11 @@ def app():
     with app.app_context():
         init_db()
         db_session = get_db_session()
-        db_session.add_all([
-            User(name="bob", password_hash=generate_password_hash("bob-password")),
-            User(name="test", password_hash=generate_password_hash("test")),
-        ])
+        bob = User(name="bob", password_hash=generate_password_hash("bob-password"))
+        msg = Message(text="hello from bob", user=bob)
+        test_user = User(name="test", password_hash=generate_password_hash("test"))
+        msg2 = Message(text="hello from test", user=test_user)
+        db_session.add_all([bob, test_user])
         db_session.commit()
 
     yield app
