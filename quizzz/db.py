@@ -51,7 +51,7 @@ def init_app(app):
     """
     global Session, Base
 
-    engine = create_engine(app.config["DATABASE_URI"])
+    engine = create_engine(app.config["DATABASE_URI"], echo=True)
     Session = scoped_session(sessionmaker(bind=engine, autoflush=True, autocommit=False))
     Base.query = Session.query_property()
 

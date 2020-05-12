@@ -11,6 +11,8 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'db.sqlite'), # /// for absolute paths
+        QUESTIONS_PER_QUIZ=2,
+        OPTIONS_PER_QUESTION=4
     )
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)    # instance config if it exists
@@ -33,6 +35,9 @@ def create_app(test_config=None):
 
     from . import chat
     app.register_blueprint(chat.bp)
+
+    from . import quiz
+    app.register_blueprint(quiz.bp)
 
     # an index page
     @app.route('/')

@@ -17,6 +17,7 @@ from quizzz import create_app
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
 from quizzz.chat.models import Message
+from quizzz.quiz.models import Quiz, Question, Option
 
 
 @pytest.fixture
@@ -32,10 +33,39 @@ def app():
     with app.app_context():
         init_db()
         db_session = get_db_session()
+
         bob = User(name="bob", password_hash=generate_password_hash("bob-password"))
         msg = Message(text="hello from bob", user=bob)
+
         test_user = User(name="test", password_hash=generate_password_hash("test"))
         msg2 = Message(text="hello from test", user=test_user)
+
+        quiz = Quiz(
+            topic="Test Quiz",
+            questions=[
+                Question(
+                    text="What does 2+2 equal to?",
+                    comment="That's a toughie. But you can verify the answer with your fingers.",
+                    options=[
+                        Option(text="1"),
+                        Option(text="2"),
+                        Option(text="3"),
+                        Option(text="4", is_correct=True)
+                    ]
+                ),
+                Question(
+                    text="What does the fox say?",
+                    comment="Try searching the answer on youtube.",
+                    options=[
+                        Option(text="Meaow"),
+                        Option(text="Woof"),
+                        Option(text="Bazinga!"),
+                        Option(text="None of these", is_correct=True)
+                    ]
+                ),
+            ],
+            author=test_user
+        )
         db_session.add_all([bob, test_user])
         db_session.commit()
 
