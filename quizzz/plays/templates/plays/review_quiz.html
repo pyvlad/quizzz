@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Take Quiz{% endblock %}</h1>
+{% endblock %}
+
+{% block head %}
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .quiz-topic label {
+      margin-bottom: 20px;
+    }
+
+    .quiz-form {
+      background-color: #F6F7F8;
+      border: 1px solid #D6D9DC;
+      border-radius: 3px;
+      padding: 50px;
+    }
+
+    .quiz-question {
+      margin: 40px 0;
+      border: 1px solid #D6D9DC;
+      border-radius: 3px;
+      padding: 10px
+    }
+    .quiz-question-text {
+      font-family: "Helvetica", "Arial", sans-serif;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .quiz-question-options {
+      border: none;
+    }
+    .quiz-question-option {
+      margin-bottom: 10px;
+      margin-left: 10px;
+    }
+
+    .button-row button {
+      font-size: 16px;
+      font-weight: bold;
+
+      color: #FFFFFF;
+      background-color: #5995DA;
+
+      border: none;
+      border-radius: 3px;
+
+      padding: 10px 40px;
+      cursor: pointer;
+    }
+
+    .button-row button:hover {
+      background-color: #76AEED;
+    }
+
+    .button-row button:active {
+      background-color: #407FC7;
+    }
+
+    .button-row button.danger {
+      color: #FFFFFF;
+      background-color: red;
+      margin: 10px 50px
+    }
+    .button-row button.danger:hover {
+      background-color: darkred;
+    }
+    .button-row button.danger:active {
+      background-color: pink;
+    }
+
+    .correct {
+      color: green;
+      font-weight: bold
+    }
+    .wrong {
+      color: red;
+      font-weight: bold
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h2>"{{ (quiz and quiz.topic) or '' }}"</h2>
+  {% for qnum, (answer, question) in enumerate(zip(play.answers, quiz.questions), 1) %}
+    <div class='quiz-question'>
+      <h3 class='quiz-question-text'>
+        Question {{ qnum }}
+        {% if answer.option.is_correct %}
+        <span style='color: green'>[&#10003;]
+        {% else %}
+        <span style='color: red'>[X]
+        {% endif %}
+        </span>
+      </h3>
+      <h3 class='quiz-question-text'>{{ question.text }}</h3>
+      <div class="quiz-question-options">
+        {% for optnum, option in enumerate(question.options) %}
+          <div class="quiz-question-option {% if option.is_correct %}correct{% endif %}">
+            {% if option.is_correct and (answer.option.id == option.id) %}
+            <span style='color: green'>[&#10003;]
+            {% elif answer.option.id == option.id %}
+            <span style='color: red'>[X]
+            {% endif %}
+            </span>
+            {{ option.text }}
+          </div>
+        {% endfor %}
+      </div>
+      <p>{{ question.comment or "" }}</p>
+    </div>
+  {% endfor %}
+{% endblock %}

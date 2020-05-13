@@ -38,6 +38,9 @@ def create_app(test_config=None):
 
     from . import quiz
     app.register_blueprint(quiz.bp)
+    
+    from . import plays
+    app.register_blueprint(plays.bp)
 
     # an index page
     @app.route('/')

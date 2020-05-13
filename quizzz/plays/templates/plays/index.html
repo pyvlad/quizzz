@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>Play Zone</h1>
+{% endblock %}
+
+{% block content %}
+  {% if g.user %}
+    <section class="quizzes-played">
+      <h2>Played Quizzes</h2>
+      {% if g.user.plays %}
+        <table>
+          <tr>
+            <td>title</td>
+            <td>author</td>
+            <td>result</td>
+            <td>server time</td>
+          </tr>
+          {% for play in g.user.plays %}
+            <tr>
+              <td>{{ play.quiz.topic }}</td>
+              <td>{{ play.quiz.author.name }}</td>
+              <td>{{ play.result }}</td>
+              <td>{{ play.get_server_time() }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+      <p>You haven't played any quizzes yet.
+      {% endif %}
+    </section>
+  {% endif %}
+  <section class="quizzes-available">
+    <h2>Available Quizzes</h2>
+    {% for quiz in quizzes_available %}
+      <article class="quiz-available">
+        <h3>
+          <a class="action" href="{{ url_for('plays.take_quiz', quiz_id=quiz.id) }}">
+            {{ quiz.topic }}
+          </a>
+          <br/>
+          [by {{ quiz.author.name }}]
+        </h3>
+      </article>
+    {% endfor %}
+  </section>
+{% endblock %}
