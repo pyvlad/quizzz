@@ -25,7 +25,7 @@ def test_register(client, app):
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('', '', b'username is required'),
     ('a', '', b'password is required'),
-    ('test', 'test', b'already exists'),
+    ('bob', 'test', b'already exists'),
 ))
 def test_register_validate_input(client, username, password, message):
     """
@@ -51,12 +51,12 @@ def test_login(client, auth):
     with client:
         client.get('/')
         assert session['user_id'] == 2
-        assert g.user.name == 'test'
+        assert g.user.name == 'alice'
 
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('a', 'test', b'incorrect username'),
-    ('test', 'a', b'incorrect password'),
+    ('alice', 'a', b'incorrect password'),
 ))
 def test_login_validate_input(auth, username, password, message):
     response = auth.login(username, password)

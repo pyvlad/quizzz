@@ -12,7 +12,8 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'db.sqlite'), # /// for absolute paths
         QUESTIONS_PER_QUIZ=2,
-        OPTIONS_PER_QUESTION=4
+        OPTIONS_PER_QUESTION=4,
+        SQLALCHEMY_ECHO=False
     )
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)    # instance config if it exists
@@ -33,18 +34,18 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import groups
+    app.register_blueprint(groups.bp)
+
     from . import chat
     app.register_blueprint(chat.bp)
 
     from . import quiz
     app.register_blueprint(quiz.bp)
-    
+
     from . import plays
     app.register_blueprint(plays.bp)
 
-    # an index page
-    @app.route('/')
-    def index():
-        return render_template("index.html")
+    app.add_url_rule('/', endpoint='index')
 
     return app

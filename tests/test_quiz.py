@@ -37,16 +37,17 @@ def test_models(app):
 
 def test_index(client, auth):
     """
-    The index view should display information about the quiz that was added with the test data.
-    When logged in as the author, there should be a link to edit/view the quiz.
+    The index view should display quizzes that the author added.
+    There should be a link to edit/view the quiz.
     """
-    response = client.get('/quiz/')
+    response = client.get('/group/1/quiz/')
+    assert response.status_code == 400
     assert b'Test Quiz' not in response.data
 
     auth.login()
-    response = client.get('/quiz/')
+    response = client.get('/group/1/quiz/')
     assert b'Test Quiz' in response.data
-    assert b'href="/quiz/1/update"' in response.data
+    assert b'href="/group/1/quiz/1/update"' in response.data
 
 
 
@@ -56,16 +57,16 @@ def test_author_required(app, client, auth):
     a. bob user can't modify other user's post
     b. bob user doesn't see edit link
     """
-    auth.login(username='bob', password='bob-password')
-    assert client.post('/quiz/1/update').status_code == 403
-    assert client.post('/quiz/1/delete').status_code == 403
-    assert b'href="/quiz/1/update"' not in client.get('/quiz/').data
+    auth.login(username='bob', password='dog')
+    assert client.post('/group/1/quiz/1/update').status_code == 403
+    assert client.post('/group/1/quiz/1/delete').status_code == 403
+    assert b'href="/group/1/quiz/1/update"' not in client.get('/group/1/quiz/').data
 
 
 
 @pytest.mark.parametrize('path', (
-    '/quiz/3/update',
-    '/quiz/3/delete',
+    '/group/1/quiz/3/update',
+    '/group/1/quiz/3/delete',
 ))
 def test_exists_required(client, auth, path):
     """
@@ -82,10 +83,10 @@ def test_create(client, auth, app):
     a. render and return a 200 OK status for a GET request.
     b. insert the new quiz data into the database when valid data is sent in a POST request.
     """
-    auth.login(username='bob', password='bob-password')
-    assert client.get('/quiz/create').status_code == 200
-    response = client.post('/quiz/create', data=REQUEST_PAYLOAD)
-    assert 'http://localhost/quiz/2/update' == response.headers['Location']
+    auth.login(username='bob', password='dog')
+    assert client.get('/group/1/quiz/create').status_code == 200
+    response = client.post('/group/1/quiz/create', data=REQUEST_PAYLOAD)
+    assert 'http://localhost/group/1/quiz/2/update' == response.headers['Location']
 
     with app.app_context():
         db = get_db_session()
@@ -105,8 +106,8 @@ def test_delete(client, auth, app):
         assert quiz is not None
 
     auth.login()
-    response = client.post('/quiz/1/delete')
-    assert response.headers['Location'] == 'http://localhost/quiz/'
+    response = client.post('/group/1/quiz/1/delete')
+    assert response.headers['Location'] == 'http://localhost/group/1/quiz/'
 
     with app.app_context():
         db = get_db_session()
@@ -129,9 +130,9 @@ def test_update(client, auth, app):
     request_payload["quiz_topic"] = "New Topic"
 
     auth.login()
-    assert client.get('/quiz/1/update').status_code == 200
-    response = client.post('/quiz/1/update', data=request_payload)
-    assert 'http://localhost/quiz/2/update' == response.headers['Location']
+    assert client.get('/group/1/quiz/1/update').status_code == 200
+    response = client.post('/group/1/quiz/1/update', data=request_payload)
+    assert 'http://localhost/group/1/quiz/2/update' == response.headers['Location']
 
     with app.app_context():
         db = get_db_session()
@@ -143,8 +144,8 @@ def test_update(client, auth, app):
 
 
 @pytest.mark.parametrize('path', (
-    '/quiz/create',
-    '/quiz/1/update',
+    '/group/1/quiz/create',
+    '/group/1/quiz/1/update',
 ))
 def test_create_update_validate(client, auth, path):
     """

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Home Page{% endblock %}</h1>
+  {% if g.user %}
+  <h2>Your Groups</h2>
+  <form action="{{ url_for('groups.join') }}" method="get">
+    <label for="group_invitation_code">Group Invitation Code: </label>
+    <input id="group_invitation_code" name="invitation_code" type="text" />
+    <button>Submit</button>
+  </form>
+  <ul>
+  {% for membership in g.user.memberships %}
+    <li>
+      <a href="{{ url_for('groups.show_single', group_id=membership.group.id) }}">
+        {{ membership.group.name }}
+      </a>
+    </li>
+  {% endfor %}
+  </ul>
+  {% endif %}
+{% endblock %}

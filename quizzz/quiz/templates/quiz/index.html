@@ -9,8 +9,7 @@
 {% endblock %}
 
 {% block content %}
-  {% for quiz in quizzes %}
-    {% if g.user.id == quiz.author_id %}
+  {% for quiz in your_quizzes %}
     <article class="message">
       <a class="action" href="{{ url_for('quiz.update', quiz_id=quiz.id) }}">
         <h3>{{ quiz.topic }}</h3>
@@ -32,7 +31,6 @@
         {% endif %}
       </div>
     </article>
-    {% endif %}
     {% if not loop.last %}
       <hr>
     {% endif %}

@@ -9,9 +9,14 @@ from quizzz.db import get_db_session
 def index():
     """ Get list of quizzes of logged in user. """
     db = get_db_session()
-    quizzes = (db.query(Quiz).filter(Quiz.author_id == g.user.id).order_by(Quiz.created.desc()).all()
-        if g.user else [])
-    return render_template('quiz/index.html', quizzes=quizzes)
+    if not g.user or not g.group:
+        abort(400)
+    your_quizzes = db.query(Quiz)\
+        .filter(Quiz.author_id == g.user.id)\
+        .filter(Quiz.group_id == g.group.id)\
+        .order_by(Quiz.created.desc())\
+        .all()
+    return render_template('quiz/index.html', your_quizzes=your_quizzes)
 
 
 
@@ -20,6 +25,10 @@ def create():
     quiz = None
 
     if request.method == 'POST':
+        if not g.user:
+            abort(403)
+        if not g.group:
+            abort(400)
         quiz = Quiz.from_request_form(request.form)
 
         db = get_db_session()
@@ -48,6 +57,8 @@ def get_quiz_by_id(quiz_id, check_author=True):
     quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
     if quiz is None:
         abort(404, "quiz doesn't exist")
+    if not g.user:
+        abort(403, "need to be logged in!")
     if check_author and quiz.author_id != g.user.id:
         abort(403, "what do you think you're doing?")
 

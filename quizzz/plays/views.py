@@ -10,13 +10,11 @@ from quizzz.db import get_db_session
 def index():
     """ Get list of available and played quizzes of logged in user. """
     db = get_db_session()
-    quizzes_available = (
-        db.query(Quiz).order_by(Quiz.created.desc()).all()
-        if g.user else []
-    )
+    quizzes_available = db.query(Quiz)\
+        .filter(Quiz.group_id == g.group.id)\
+        .order_by(Quiz.created.desc())\
+        .all()
     return render_template('plays/index.html', quizzes_available=quizzes_available)
-
-
 
 
 @bp.route('/<int:quiz_id>/play', methods=('GET', 'POST'))

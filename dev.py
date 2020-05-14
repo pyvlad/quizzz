@@ -4,6 +4,7 @@ Create dev DB with some data.
 from werkzeug.security import generate_password_hash
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
+from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
 from quizzz.quiz.models import Quiz, Question, Option
 from quizzz import create_app
@@ -18,11 +19,22 @@ with app.app_context():
     bob = User(name="bob", password_hash=generate_password_hash("dog"))
     alice = User(name="alice", password_hash=generate_password_hash("cat"))
 
+    # add some groups
+    main_group = Group(
+        name="main",
+        invitation_code="hello",
+        members = [
+            Member(user=bob, is_admin=True),
+            Member(user=alice)
+        ]
+    )
+    other_group = Group(name="other", invitation_code="no")
+
     # add some messages to chat
     messages = [
-        Message(text="Hello, world!", user=bob),
-        Message(text="This is a great chat!", user=alice),
-        Message(text="Pretty lame. All I gotta say.", user=alice)
+        Message(text="Hello, world!", user=bob, group=main_group),
+        Message(text="This is a great chat!", user=alice, group=main_group),
+        Message(text="Pretty lame. All I gotta say.", user=alice, group=main_group)
     ]
 
     # add a few quizzes
@@ -51,7 +63,8 @@ with app.app_context():
                     ]
                 ),
             ],
-            author=bob
+            author=bob,
+            group=main_group
         ),
         Quiz(
             topic="Cities",
@@ -75,10 +88,11 @@ with app.app_context():
                     ]
                 ),
             ],
-            author=bob
+            author=bob,
+            group=other_group
         ),
         Quiz(
-            topic="Cities",
+            topic="Programming",
             questions=[
                 Question(
                     text="Which of these is a programming language?",
@@ -99,7 +113,8 @@ with app.app_context():
                     ]
                 ),
             ],
-            author=bob
+            author=bob,
+            group=main_group
         ),
         Quiz(
             topic="Definitions of Things",
@@ -123,9 +138,10 @@ with app.app_context():
                     ]
                 ),
             ],
-            author=alice
+            author=alice,
+            group=main_group
         )
     ]
 
-    db_session.add_all([bob, alice])
+    db_session.add_all([main_group, other_group])
     db_session.commit()

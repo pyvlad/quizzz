@@ -16,14 +16,17 @@ class Quiz(Base):
     updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     author_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
+    group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
+
     author = relationship("User", backref="quizzes")
+    group = relationship("Group", backref="quizzes")
 
     def __repr__(self):
         return "<Quiz (%r) by (%r)>" % (self.topic, self.author.name)
 
     @classmethod
     def from_request_form(cls, request_form):
-        quiz = cls(topic=request_form['quiz_topic'], author=g.user)
+        quiz = cls(topic=request_form['quiz_topic'], author=g.user, group=g.group)
 
         questions = []
         for qnum in range(1, current_app.config["QUESTIONS_PER_QUIZ"] + 1):

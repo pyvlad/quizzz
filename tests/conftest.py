@@ -16,6 +16,7 @@ from werkzeug.security import generate_password_hash
 from quizzz import create_app
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
+from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
 from quizzz.quiz.models import Quiz, Question, Option
 
@@ -28,18 +29,42 @@ def app():
     app = create_app({
         'TESTING': True,
         'DATABASE_URI': 'sqlite:///' + db_path,
+        'SQLALCHEMY_ECHO': False
     })
 
     with app.app_context():
         init_db()
         db_session = get_db_session()
 
-        bob = User(name="bob", password_hash=generate_password_hash("bob-password"))
-        msg = Message(text="hello from bob", user=bob)
+        # add some users
+        bob = User(name="bob", password_hash=generate_password_hash("dog"))
+        alice = User(name="alice", password_hash=generate_password_hash("cat"))
 
-        test_user = User(name="test", password_hash=generate_password_hash("test"))
-        msg2 = Message(text="hello from test", user=test_user)
+        # add some groups
+        group1 = Group(
+            name="group1",
+            invitation_code="code1",
+            members = [
+                Member(user=bob, is_admin=True),
+                Member(user=alice)
+            ]
+        )
+        group2 = Group(
+            name="group2",
+            invitation_code="no",
+            members=[
+                Member(user=alice)
+            ]
+        )
 
+        # add some messages
+        messages = [
+            Message(text="hello from bob", user=bob, group=group1, id=1),
+            Message(text="hello from alice", user=alice, group=group1, id=2),
+            Message(text="hello again from alice", user=alice, group=group2, id=3)
+        ]
+
+        # add a quiz
         quiz = Quiz(
             topic="Test Quiz",
             questions=[
@@ -64,9 +89,10 @@ def app():
                     ]
                 ),
             ],
-            author=test_user
+            author=alice,
+            group=group1
         )
-        db_session.add_all([bob, test_user])
+        db_session.add_all([bob, alice])
         db_session.commit()
 
     yield app
@@ -91,7 +117,7 @@ class AuthActions:
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='test', password='test'):
+    def login(self, username='alice', password='cat'):
         return self._client.post('/auth/login', data={'username': username, 'password': password})
 
     def logout(self):

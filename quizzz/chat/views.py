@@ -1,4 +1,4 @@
-from flask import render_template, flash, request, g, redirect, url_for, abort
+from flask import g, request, render_template, flash, redirect, url_for, abort
 from . import bp
 from .models import Message
 from quizzz.db import get_db_session
@@ -7,7 +7,10 @@ from quizzz.db import get_db_session
 @bp.route('/')
 def index():
     db = get_db_session()
-    messages = db.query(Message).order_by(Message.created.desc()).all()
+    messages = db.query(Message)\
+        .filter(Message.group == g.group)\
+        .order_by(Message.created.desc())\
+        .all()
     return render_template('chat/index.html', messages=messages)
 
 
@@ -24,7 +27,7 @@ def create():
             flash(error)
         else:
             db = get_db_session()
-            msg = Message(text=text, user=g.user)
+            msg = Message(text=text, user=g.user, group=g.group)
             db.add(msg)
             db.commit()
             return redirect(url_for('chat.index'))
