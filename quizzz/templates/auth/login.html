@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}Login{% endblock %}{% endblock %}
+
+{% block content %}
+  <form method="post" class="b-form">
+    <div class="b-form__header">
+      Log In Form
+    </div>
+
+    <div class="b-form__helper-text">
+      In order to sign in, please enter your credentials below.
+    </div>
+
+    <div class="b-form__row">
+      <div class="b-form__label">
+        <label for="username">Username</label>
+      </div>
+      <input class="b-form__input"
+        name="username"
+        id="username"
+        required
+      />
+    </div>
+
+    <div class="b-form__row">
+      <div class="b-form__label">
+        <label for="password">Password</label>
+      </div>
+      <input class="b-form__input"
+        type="password"
+        name="password"
+        id="password"
+        required
+      />
+    </div>
+
+    <div class="b-form__row">
+      <input class="button button_action"
+        type="submit"
+        value="Log In"
+      />
+    </div>
+  </form>
+{% endblock %}

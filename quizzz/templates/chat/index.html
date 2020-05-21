@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}Posts{% endblock %}{% endblock %}
+
+{% block content %}
+  {% if g.user %}
+    <a href="{{ url_for('chat.create') }}">
+      <button class="button button_action my_md">New Message</button>
+    </a>
+  {% endif %}
+  {% for msg in messages %}
+    <article class="message {% if g.user.id == msg.user_id %}message_own{% endif %}">
+      <div class="message__details">
+        <div class="message__details-item">{{ msg.user.name }}</div>
+        <div class="message__details-item">{{ msg.created.strftime('%Y-%m-%d') }}</div>
+        {% if msg.updated %}
+          <div class="message__details-item">
+            edited at {{ msg.updated.strftime('%Y-%m-%d') }}
+          </div>
+        {% endif %}
+        {% if g.user.id == msg.user_id %}
+          <a class="message__details-item" href="{{ url_for('chat.update', id=msg.id) }}">Edit</a>
+        {% endif %}
+      </div>
+      <p class="message__text">{{ msg.text }}</p>
+    </article>
+  {% endfor %}
+{% endblock %}

@@ -3,7 +3,7 @@ from quizzz.db import get_db_session
 from quizzz.groups.models import Group
 
 
-bp = Blueprint('quiz', __name__, url_prefix='/group/<int:group_id>/quiz', template_folder="templates")
+bp = Blueprint('quiz', __name__, url_prefix='/groups/<int:group_id>/quiz', template_folder="templates")
 
 
 @bp.url_defaults

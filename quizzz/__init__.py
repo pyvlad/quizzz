@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, g, redirect, url_for
 
 
 def create_app(test_config=None):
@@ -31,6 +31,9 @@ def create_app(test_config=None):
     db.init_app(app)
 
     # register blueprints
+    from . import home
+    app.register_blueprint(home.bp)
+
     from . import auth
     app.register_blueprint(auth.bp)
 

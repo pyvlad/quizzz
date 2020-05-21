@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}New Quiz{% endblock %}{% endblock %}
+
+{% block content %}
+  <div class="quiz-form">
+
+    <div class="quiz-form__header">
+      Create New Quiz
+    </div>
+
+    <div class="quiz-form__helper-text">
+      Please fill in the form below and hit 'save'.<br/>
+      A saved quiz will remain available for updates until you 'submit' it for a group competition.
+    </div>
+
+    <form action="" method="post">
+
+      <div class="quiz-form__item">
+        <div class="quiz-form__row">
+          <div class="quiz-form__label">
+            <label for="quiz_topic">Quiz Topic</label>
+          </div>
+        </div>
+        <div class="quiz-form__row">
+          <input class="quiz-form__input"
+            name="quiz_topic"
+            id="quiz_topic"
+            type="text"
+            value="{{ (quiz and quiz.topic) or '' }}"
+            maxlength="1000"
+            required
+          />
+        </div>
+      </div>
+
+      {% for qnum in range(1, config["QUESTIONS_PER_QUIZ"] + 1) %}
+        <div class="quiz-form__item">
+          <div class="quiz-form__row">
+            <div class="quiz-form__label">
+              <label for="{{'question_%s' % qnum}}">Question {{ qnum }}</label>
+            </div>
+          </div>
+          <div class="quiz-form__row">
+            <textarea class="quiz-form__textarea"
+              name="{{'question_%s' % qnum}}"
+              id="{{'question_%s' % qnum}}"
+              maxlength="1000"
+              required>{{ (quiz and quiz.questions[qnum-1].text) or '' }}</textarea
+            >
+          </div>
+          <div class="quiz-form__row">
+            <fieldset class="quiz-form__fieldset">
+              {% for optnum in range(1, config["OPTIONS_PER_QUESTION"] + 1) %}
+                <div class="quiz-form__fieldset-item">
+                  <input
+                    type='radio'
+                    id="{{'question_%s_option_%s_radio' % (qnum, optnum)}}"
+                    name="{{'question_%s_answer' % qnum }}"
+                    value='{{ optnum }}'
+                    {{ (quiz and quiz.questions[qnum-1].options[optnum-1].is_correct and 'checked') or '' }}
+                    required
+                  />
+                  <label class="quiz-form__fieldset-item-input"
+                         for="{{'question_%s_option_%s_radio' % (qnum, optnum)}}">
+                    <input class="quiz-form__input"
+                      type='text'
+                      id="{{'question_%s_option_%s' % (qnum, optnum)}}"
+                      name="{{'question_%s_option_%s' % (qnum, optnum)}}"
+                      value="{{ (quiz and quiz.questions[qnum-1].options[optnum-1].text) or '' }}"
+                      maxlength="200"
+                      required
+                    />
+                  </label>
+                </div>
+              {% endfor %}
+            </fieldset>
+          </div>
+        </div>
+      {% endfor %}
+
+      <div class='quiz-form__item'>
+        <button class="button button_action">Save</button>
+      </div>
+
+    </form>
+
+    {% if quiz %}
+    <form action="{{ url_for('quiz.delete', quiz_id=quiz.id) }}" method="post">
+      <div class='quiz-form__item'>
+        <button class="button button_danger"
+                onclick="return confirm('Are you sure?');">
+          Delete
+        </button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+{% endblock %}

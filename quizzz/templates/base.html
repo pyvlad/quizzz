@@ -1,29 +1,63 @@
 <!DOCTYPE html>
+<html lang='en'>
 <head>
-  <title>{% block title %}{% endblock %} - Quizzz</title>
+  <meta charset='utf-8'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel='stylesheet' href="{{ url_for('static', filename='styles.css') }}"/>
+  <title>{% block title %}{% endblock %} | Quizzz</title>
   {% block head %}{% endblock %}
 </head>
 
 <body>
-  <nav>
-    <h1><a href="{{ url_for('index') }}">Quizzz</a></h1>
-    <ul>
-      {% if g.user %}
-        <li><span>Hello, {{ g.user.name }}!</span></li>
-        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-      {% else %}
-        <li><a href="{{ url_for('auth.register') }}">Register</a></li>
-        <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-      {% endif %}
-    </ul>
-  </nav>
-  <section class="content">
-    <header>
-      {% block header %}{% endblock %}
-    </header>
-    {% for message in get_flashed_messages() %}
-      <div class="flash">{{ message }}</div>
-    {% endfor %}
-    {% block content %}{% endblock %}
+<div class="page">
+  <header class="page__item page__item_header">
+    <div class="page__item-content site-header">
+      <div class="site-logo">
+        <a href="{{ url_for('index') }}" class="site-logo__link site-logo__container">
+          <img src="{{ url_for('static', filename='images/logo.svg') }}"
+               alt="Website Logo Cat"
+               class="site-logo__image"
+          />
+          <h1 class="site-logo__text">Quizzz</h1>
+        </a>
+      </div>
+      <nav class="user-menu user-menu__container">
+          {% if g.user %}
+            <div class="user-menu__item user-menu__item_username">{{ g.user.name }}</div>
+            <a class="user-menu__item user-menu__item_link"
+               href="{{ url_for('auth.logout') }}">
+               Log Out
+            </a>
+          {% else %}
+            <a class="user-menu__item user-menu__item_link"
+               href="{{ url_for('auth.register') }}">Register</a>
+            <a class="user-menu__item user-menu__item_link"
+               href="{{ url_for('auth.login') }}">Login</a>
+          {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <section class="page__item page__item_content page__item_stretching">
+    <div class="page__item-content">
+      <header class="page-info">
+        <div class="page-info__title">
+          {% block header %}{% endblock %}
+        </div>
+        <div class="page-info__messages">
+        {% for message in get_flashed_messages() %}
+          <div class="page-info__messages-item">{{ message }}</div>
+        {% endfor %}
+      </header>
+      {% block content %}{% endblock %}
+    </div>
   </section>
+
+  <footer class="page__item page__item_footer">
+    <div class="page__item-content">
+      <p>(c) 2020</p>
+    </div>
+  </footer>
+</div>
 </body>
+</html>

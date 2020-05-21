@@ -29,6 +29,7 @@ def register():
             user = User(name=username, password_hash=generate_password_hash(password))
             db_session.add(user)
             db_session.commit()
+            flash("user %s has been successfully created" % username)
             return redirect(url_for('auth.login'))
 
         flash(error)

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}Take Quiz{% endblock %}{% endblock %}
+
+{% block content %}
+  <div class="quiz-form">
+    <form action="" method="post">
+      <div class="quiz-form__item">
+        <div class="quiz-form__header">
+          "{{ (quiz and quiz.topic) or '' }}"
+        </div>
+      </div>
+
+      {% for qnum, question in enumerate(quiz.questions, 1) %}
+        <div class='quiz-form__item quiz-form__item_outlined'>
+          <div class="quiz-form__row">
+            <div class='quiz-form__helper-text'>
+              Question {{ qnum }}
+            </div>
+          </div>
+          <div class="quiz-form__row">
+            <div class='quiz-form__label'>
+              {{ question.text }}
+            </div>
+          </div>
+          <div class="quiz-form__row">
+            <fieldset class="quiz-form__fieldset">
+              {% for optnum, option in enumerate(question.options) %}
+                <div class="quiz-form__fieldset-item">
+                  <input type='radio'
+                    id="{{'question_%s_option_%s_radio' % (qnum, optnum)}}"
+                    name="{{ 'q%s' % question.id }}"
+                    value='{{ option.id }}'
+                    required
+                  />
+                  <label class="quiz-form__fieldset-item-input"
+                         for="{{'question_%s_option_%s_radio' % (qnum, optnum)}}">
+                    {{ option.text }}
+                  </label>
+                </div>
+              {% endfor %}
+            </fieldset>
+          </div>
+        </div>
+      {% endfor %}
+      <div class='quiz-form__row'>
+        <button class="button button_action">Submit</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

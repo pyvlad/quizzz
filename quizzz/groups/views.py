@@ -9,7 +9,7 @@ def show_all():
     return render_template('groups/all.html')
 
 
-@bp.route('/group/<int:group_id>/')
+@bp.route('/<int:group_id>/')
 def show_single(group_id):
     db = get_db_session()
 

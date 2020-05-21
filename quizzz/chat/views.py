@@ -32,7 +32,7 @@ def create():
             db.commit()
             return redirect(url_for('chat.index'))
 
-    return render_template('chat/create.html')
+    return render_template('chat/edit.html')
 
 
 
@@ -69,7 +69,7 @@ def update(id):
             db.commit()
             return redirect(url_for('chat.index'))
 
-    return render_template('chat/update.html', msg=msg)
+    return render_template('chat/edit.html', msg=msg)
 
 
 

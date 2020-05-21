@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}
+  {% if msg %}Edit Message{% else %}New Message{% endif %}
+{% endblock %}{% endblock %}
+
+{% block content %}
+  <form method="post" class="b-form">
+
+    <div class="b-form__header">
+      {% if msg %}Edit Your Message{% else %}Create New Message{% endif %}
+    </div>
+
+    <div class="b-form__helper-text">
+      Please enter your message below.
+    </div>
+
+    <div class="b-form__row">
+      <textarea class="b-form__textarea b-form__textarea_md"
+        name="text"
+        id="message_text"
+        required
+      >{{ request.form['text'] or (msg and msg.text) }}</textarea>
+    </div>
+
+    <div class="b-form__row">
+      <input class="button button_action"
+        type="submit"
+        value="Send"
+      />
+    </div>
+  </form>
+  {% if msg %}
+    <form class="b-form"
+          action="{{ url_for('chat.delete', id=msg.id) }}"
+          method="post">
+      <div class="b-form__row">
+        <input class="button button_danger"
+          type="submit"
+          value="Delete"
+          onclick="return confirm('Are you sure?');"
+        />
+      </div>
+    </form>
+  {% endif %}
+{% endblock %}
