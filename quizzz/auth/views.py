@@ -6,9 +6,24 @@ from .models import User
 from quizzz.db import get_db_session
 
 
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+
+    if user_id is None:
+        g.user = None
+    else:
+        db = get_db_session()
+        g.user = db.query(User).filter(User.id == user_id).one()
+
+
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
+    # redirect logged in users to home page
+    if g.user:
+        return redirect(url_for("index"))
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -40,6 +55,10 @@ def register():
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
+    # redirect logged in users to home page
+    if g.user:
+        return redirect(url_for("index"))
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -69,15 +88,3 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
-
-
-@bp.before_app_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-
-    if user_id is None:
-        g.user = None
-    else:
-        db = get_db_session()
-        g.user = db.query(User).filter(User.id == user_id).one()

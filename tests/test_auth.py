@@ -70,3 +70,20 @@ def test_logout(client, auth):
     with client:
         auth.logout()
         assert 'user_id' not in session
+
+
+
+def test_redirect_if_logged_in(client, auth):
+    auth.login()
+
+    response = client.get('/auth/login')
+    assert response.status_code == 302
+    assert 'http://localhost/' == response.headers['Location']
+
+    assert client.post('/auth/login', data={}).status_code == 302
+
+    response = client.get('/auth/register')
+    assert response.status_code == 302
+    assert 'http://localhost/' == response.headers['Location']
+
+    assert client.post('/auth/register', data={}).status_code == 302

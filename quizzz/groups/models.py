@@ -30,5 +30,7 @@ class Member(Base):
     user = relationship("User", backref="memberships")
     group = relationship("Group", backref="members")
 
+    __table_args__ = (sa.UniqueConstraint('user_id', 'group_id', name='_user_group_uc'),)
+
     def __repr__(self):
         return "<Member %r of group %r>" % (self.user.name, self.group.name)

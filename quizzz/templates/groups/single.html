@@ -3,20 +3,18 @@
 {% block header %}{% block title %}Group Page: {{ group.name }}{% endblock %}{% endblock %}
 
 {% block content %}
-  {% if g.user %}
-    <ul class="list">
-      <a class="list__item-link"
-          href="{{ url_for('chat.index', group_id=group.id) }}">
-        <li class="list__item">Chat</li>
-      </a>
-      <a class="list__item-link"
-         href="{{ url_for('quiz.index', group_id=group.id) }}">
-        <li class="list__item">Quizzes</li>
-      </a>
-      <a class="list__item-link"
-         href="{{ url_for('plays.index', group_id=group.id) }}">
-        <li class="list__item">Plays</li>
-      </a>
-    </ul>
-  {% endif %}
+  <ul class="list">
+    <a class="list__item-link"
+        href="{{ url_for('chat.index', group_id=group.id) }}">
+      <li class="list__item">Chat</li>
+    </a>
+    <a class="list__item-link"
+       href="{{ url_for('quiz.index', group_id=group.id) }}">
+      <li class="list__item">Quizzes</li>
+    </a>
+    <a class="list__item-link"
+       href="{{ url_for('plays.index', group_id=group.id) }}">
+      <li class="list__item">Plays</li>
+    </a>
+  </ul>
 {% endblock %}

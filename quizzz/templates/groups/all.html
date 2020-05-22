@@ -3,16 +3,15 @@
 {% block header %}{% block title %}Your Groups{% endblock %}{% endblock %}
 
 {% block content %}
-{% if g.user %}
   <ul class="list">
-  {% for membership in g.user.memberships %}
-    <a class="list__item-link"
-       href="{{ url_for('groups.show_single', group_id=membership.group.id) }}">
-      <li class="list__item">
-        <div class="list__text-primary">{{ membership.group.name }}</div>
-      </li>
-    </a>
-  {% endfor %}
+    {% for membership in user_memberships %}
+      <a class="list__item-link"
+         href="{{ url_for('groups.show_single', group_id=membership.group.id) }}">
+        <li class="list__item">
+          <div class="list__text-primary">{{ membership.group.name }}</div>
+        </li>
+      </a>
+    {% endfor %}
   </ul>
   <form class="b-form my_md"
         action="{{ url_for('groups.join') }}"
@@ -33,5 +32,4 @@
     />
     <button class="button button_action">Submit</button>
   </form>
-{% endif %}
 {% endblock %}
