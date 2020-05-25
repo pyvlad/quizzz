@@ -308,6 +308,13 @@
   padding: 2px 10px;
   border: 1px solid #bca;
 }
+.results-table__cell-link {
+  text-decoration: none;
+  color: #420;
+}
+.results-table__cell-link:hover {
+  color: brown;
+}
 .results-table__row {
 }
 .results-table__row_odd {

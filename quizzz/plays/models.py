@@ -1,7 +1,7 @@
 import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.sql import func
+# from sqlalchemy.sql import func, text
 from quizzz.db import Base
 from flask import current_app, g
 
@@ -16,8 +16,14 @@ class Play(Base):
     is_submitted = sa.Column(sa.Boolean, default=False)
     result = sa.Column(sa.Integer)
 
-    server_started = sa.Column(sa.DateTime, server_default=func.now())
-    server_updated = sa.Column(sa.DateTime, onupdate=func.now())
+    server_started = sa.Column(sa.DateTime, default=datetime.datetime.utcnow)
+    server_updated = sa.Column(sa.DateTime, onupdate=datetime.datetime.utcnow)
+    # alternative 1 (sqlite only):
+    # server_started = sa.Column(sa.DateTime, server_default=text("(STRFTIME('%Y-%m-%d %H:%M:%f000', 'NOW'))"))
+    # server_updated = sa.Column(sa.DateTime, onupdate=text("STRFTIME('%Y-%m-%d %H:%M:%f000', 'NOW')"))
+    # alternative 2 (lacks precision):
+    # server_started = sa.Column(sa.DateTime, server_default=func.now())
+    # server_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     client_started = sa.Column(sa.DateTime)
     client_updated = sa.Column(sa.DateTime)

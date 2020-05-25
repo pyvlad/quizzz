@@ -4,41 +4,48 @@
 
 {% block content %}
   <section class="my_lg">
-    {% if g.user %}
-      <h2 class="item-header item-header_main">Played Quizzes</h2>
-      {% if g.user.plays %}
-        <table class="results-table">
-          <tr class="results-table__header-row">
-            <td class="results-table__header-cell">title</td>
-            <td class="results-table__header-cell">author</td>
-            <td class="results-table__header-cell">result</td>
-            <td class="results-table__header-cell">server time</td>
+    <h2 class="item-header item-header_main">Played Quizzes</h2>
+    {% if data.played_quizzes %}
+      <table class="results-table">
+        <tr class="results-table__header-row">
+          <td class="results-table__header-cell">title</td>
+          <td class="results-table__header-cell">author</td>
+          <td class="results-table__header-cell">result</td>
+          <td class="results-table__header-cell">time</td>
+        </tr>
+        {% for obj in data.played_quizzes %}
+          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}">
+            <td class="results-table__cell">
+                <a class="results-table__cell-link"
+                   href="{{ url_for('plays.review_quiz', quiz_id=obj.id) }}">
+                  {{ obj.topic }}
+                </a>
+            </td>
+            <td class="results-table__cell">{{ obj.author }}</td>
+            <td class="results-table__cell">{{ obj.result }}</td>
+            <td class="results-table__cell">{{ obj.time }}</td>
           </tr>
-          {% for play in g.user.plays %}
-            <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}">
-              <td class="results-table__cell">{{ play.quiz.topic }}</td>
-              <td class="results-table__cell">{{ play.quiz.author.name }}</td>
-              <td class="results-table__cell">{{ play.result }}</td>
-              <td class="results-table__cell">{{ play.get_server_time() }}</td>
-            </tr>
-          {% endfor %}
-        </table>
-      {% else %}
-        <p>You haven't played any quizzes yet.</p>
-      {% endif %}
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>You haven't played any quizzes yet.</p>
     {% endif %}
   </section>
   <section class="my_lg">
     <h2 class="item-header item-header_main">Available Quizzes</h2>
-    <ul class="list">
-    {% for quiz in quizzes_available %}
-      <a class="list__item-link" href="{{ url_for('plays.take_quiz', quiz_id=quiz.id) }}">
-        <li class="list__item">
-          <div class="list__text-primary">{{ quiz.topic }}</div>
-          <div class="list__text-secondary">[by {{ quiz.author.name }}]</div>
-        </li>
-      </a>
-    {% endfor %}
-    </ul>
+    {% if data.available_quizzes %}
+      <ul class="list">
+        {% for obj in data.available_quizzes %}
+          <a class="list__item-link" href="{{ url_for('plays.take_quiz', quiz_id=obj.id) }}">
+            <li class="list__item">
+              <div class="list__text-primary">{{ obj.topic }}</div>
+              <div class="list__text-secondary">[by {{ obj.author }}]</div>
+            </li>
+          </a>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are no available quizzes.</p>
+    {% endif %}
   </section>
 {% endblock %}

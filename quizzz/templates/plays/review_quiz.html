@@ -6,16 +6,16 @@
   <div class="quiz-form">
     <div class="quiz-form__item">
       <div class="quiz-form__header">
-        "{{ (quiz and quiz.topic) or '' }}"
+        "{{ data.quiz_topic }}"
       </div>
     </div>
 
-    {% for qnum, (answer, question) in enumerate(zip(play.answers, quiz.questions), 1) %}
+    {% for question in data.questions %}
       <div class='quiz-form__item quiz-form__item_outlined
-          quiz-form__item_{% if answer.option.is_correct %}correct{% else %}wrong{% endif %}'>
+          quiz-form__item_{% if question.answer.is_correct %}correct{% else %}wrong{% endif %}'>
         <div class="quiz-form__row">
           <div class='quiz-form__helper-text'>
-            Question {{ qnum }}
+            Question {{ question.number }}
           </div>
         </div>
 
@@ -27,18 +27,18 @@
 
         <div class="quiz-form__row">
           <table>
-            {% for optnum, option in enumerate(question.options) %}
+            {% for option in question.options %}
               {% if option.is_correct %}
                 <tr class="correct">
-              {% elif (answer.option.id == option.id) %}
+              {% elif (question.answer.option_id == option.id) %}
                 <tr class="wrong">
               {% else %}
                 <tr>
               {% endif %}
                 <td class="pr_sm">
-                  {% if option.is_correct and (answer.option.id == option.id) %}
+                  {% if option.is_correct and (question.answer.option_id == option.id) %}
                     [&#10003;]
-                  {% elif (answer.option.id == option.id) %}
+                  {% elif (question.answer.option_id == option.id) %}
                     [X]
                   {% endif %}
                 </td>
