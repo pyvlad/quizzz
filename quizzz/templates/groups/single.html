@@ -6,15 +6,19 @@
   <ul class="list">
     <a class="list__item-link"
         href="{{ url_for('chat.index', group_id=group.id) }}">
-      <li class="list__item">Chat</li>
+      <li class="list__item">Group Chat</li>
     </a>
     <a class="list__item-link"
        href="{{ url_for('quiz.index', group_id=group.id) }}">
-      <li class="list__item">Quizzes</li>
+      <li class="list__item">My Quizzes</li>
     </a>
     <a class="list__item-link"
        href="{{ url_for('plays.index', group_id=group.id) }}">
-      <li class="list__item">Plays</li>
+      <li class="list__item">My Plays</li>
+    </a>
+    <a class="list__item-link"
+       href="{{ url_for('tournaments.index', group_id=group.id) }}">
+      <li class="list__item">Group Tournaments</li>
     </a>
   </ul>
 {% endblock %}

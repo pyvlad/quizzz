@@ -380,6 +380,9 @@
   margin: 1em 0;
   padding: 1em;
 }
+.list__item_active {
+  background-color: rgba(0,255,0,0.5);
+}
 .list__item-link {
   text-decoration: none;
   color: inherit;

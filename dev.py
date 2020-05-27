@@ -7,6 +7,7 @@ from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
 from quizzz.quiz.models import Quiz, Question, Option
+from quizzz.tournaments.models import Tournament, Round
 from quizzz import create_app
 
 
@@ -142,6 +143,16 @@ with app.app_context():
             group=main_group
         )
     ]
+
+    tournament = Tournament(
+        name="First Tournament",
+        group=main_group,
+        rounds=[
+            Round(quiz=quizzes[0]),
+            Round(quiz=quizzes[2]),
+            Round(quiz=quizzes[3])
+        ]
+    )
 
     db_session.add_all([main_group, other_group])
     db_session.commit()

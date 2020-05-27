@@ -49,6 +49,9 @@ def create_app(test_config=None):
     from . import plays
     app.register_blueprint(plays.bp)
 
+    from . import tournaments
+    app.register_blueprint(tournaments.bp)
+
     app.add_url_rule('/', endpoint='index')
 
     return app

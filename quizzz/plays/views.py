@@ -35,6 +35,8 @@ def index():
                 "id": play.quiz.id,
                 "topic": play.quiz.topic,
                 "author": play.quiz.author.name,
+                "tournament": play.quiz.round.tournament.name if play.quiz.round else "",
+                "date": str(play.server_started.date()) + " " + str(play.server_started.time())[:5],
                 "result": play.result,
                 "time": play.get_server_time()
             }

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}Tournament: {{ data.tournament.name }}{% endblock %}{% endblock %}
+
+{% block content %}
+  <section class="my_lg">
+    {% if not data.is_taken %}
+      <a href="{{ url_for('plays.take_quiz', quiz_id=data.quiz.id) }}">
+        <h2>Take Quiz</h2>
+      </a>
+    {% endif %}
+    <h3>{{ data.quiz.topic }} [by {{ data.quiz.author }}]</h3>
+  </section>
+
+  <section class="my_lg">
+    <h2 class="item-header item-header_main">Standings</h2>
+    {% if data.quiz.plays %}
+      <table class="results-table">
+        <tr class="results-table__header-row">
+          <td class="results-table__header-cell">user</td>
+          <td class="results-table__header-cell">result</td>
+          <td class="results-table__header-cell">time</td>
+        </tr>
+        {% for obj in data.quiz.plays %}
+          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}">
+            <td class="results-table__cell">{{ obj.user }}</td>
+            <td class="results-table__cell">{{ obj.result }}</td>
+            <td class="results-table__cell">{{ obj.time }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No one has taken this quiz yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

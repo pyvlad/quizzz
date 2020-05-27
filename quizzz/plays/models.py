@@ -10,12 +10,9 @@ class Play(Base):
     __tablename__ = "plays"
 
     id = sa.Column(sa.Integer, primary_key=True)
-    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
-    quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'), nullable=False)
 
     is_submitted = sa.Column(sa.Boolean, default=False)
     result = sa.Column(sa.Integer)
-
     server_started = sa.Column(sa.DateTime, default=datetime.datetime.utcnow)
     server_updated = sa.Column(sa.DateTime, onupdate=datetime.datetime.utcnow)
     # alternative 1 (sqlite only):
@@ -28,11 +25,14 @@ class Play(Base):
     client_started = sa.Column(sa.DateTime)
     client_updated = sa.Column(sa.DateTime)
 
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     user = relationship("User", backref="plays")
+
+    quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'), nullable=False)
     quiz = relationship("Quiz", backref="plays")
 
     def __repr__(self):
-        return "<QuizPlayed %r by %r>" % (self.quiz_id, self.user_id)
+        return "<RoundPlayed %r by %r>" % (self.round_id, self.user_id)
 
     def get_server_time(self):
         return (self.server_updated - self.server_started).total_seconds()

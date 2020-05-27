@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}Group Tournaments{% endblock %}{% endblock %}
+
+{% block content %}
+  <ul class="list">
+    {% for tournament in data.tournaments %}
+      <a class="list__item-link"
+         href="{{ url_for('tournaments.show_tournament', tournament_id=tournament.id) }}">
+        <li class="list__item">
+          <div class="list__text-primary">{{ tournament.name }}</div>
+        </li>
+      </a>
+    {% endfor %}
+  </ul>
+{% endblock %}

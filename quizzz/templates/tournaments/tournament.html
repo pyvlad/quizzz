@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block header %}{% block title %}Tournament: {{ data.tournament.name }}{% endblock %}{% endblock %}
+
+{% block content %}
+  <ul class="list">
+    {% for round in data.tournament.rounds %}
+      <a class="list__item-link"
+         href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
+        <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
+          <div class="list__text-primary">{{ round.quiz.topic }}</div>
+          <div class="list__text-secondary">by {{ round.quiz.author }}</div>
+          <div class="list__text-secondary">{{ round.start_time }} - {{ round.finish_time }}</div>
+        </li>
+      </a>
+    {% endfor %}
+  </ul>
+{% endblock %}
