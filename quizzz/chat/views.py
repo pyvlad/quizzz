@@ -21,7 +21,7 @@ def create():
 
         error = None
         if not text:
-            error = 'empty message'
+            error = "Message must not be empty."
 
         if error is not None:
             flash(error)
@@ -41,9 +41,9 @@ def get_message_by_id(id, check_author=True):
 
     msg = db.query(Message).filter(Message.id == id).first()
     if msg is None:
-        abort(404, "message doesn't exist")
+        abort(404, "Message doesn't exist.")
     if check_author and msg.user_id != g.user.id:
-        abort(403, "what do you think you're doing?")
+        abort(403, "What do you think you're doing?")
 
     return msg
 
@@ -58,7 +58,7 @@ def update(id):
 
         error = None
         if not text:
-            error = 'empty message'
+            error = "Message must not be empty."
 
         if error is not None:
             flash(error)

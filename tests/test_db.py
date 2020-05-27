@@ -1,37 +1,39 @@
 import sqlite3
 
 import pytest
-from werkzeug.security import generate_password_hash
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
 
+from .data import USERS
+
 
 def test_session_scope(app):
+    """
+    <get_db_session> should return the same session object within one app_context.
+    """
     with app.app_context():
-        db_session = get_db_session()
-        assert db_session is get_db_session()
+        db = get_db_session()
+        assert db is get_db_session()
 
     with app.app_context():
-        assert db_session is not get_db_session()
+        assert db is not get_db_session()
 
 
 def test_session_rollback_on_context_teardown(app):
+    """
+    Commit in a different app_context should not work.
+    """
     with app.app_context():
-        db_session = get_db_session()
-        res = db_session.query(User).all()
-        assert len(res) == 2
+        db = get_db_session()
+        db.add(User.from_credentials(name="dodgy", password="secret"))
+        res = db.query(User).all()
+        assert len(res) == len(USERS) + 1
 
     with app.app_context():
-        db_session = get_db_session()
-        db_session.add(User(name="dodgy", password_hash=generate_password_hash("secret")))
-        res = db_session.query(User).all()
-        assert len(res) == 3
-
-    with app.app_context():
-        db_session = get_db_session()
-        db_session.commit()
-        res = db_session.query(User).all()
-        assert len(res) == 2
+        db = get_db_session()
+        db.commit()
+        res = db.query(User).all()
+        assert len(res) == len(USERS)
 
 
 def test_init_db_command(runner, monkeypatch):

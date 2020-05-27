@@ -1,6 +1,5 @@
 import sqlalchemy as sa
 from flask import request, session, g, redirect, url_for, flash, render_template
-from werkzeug.security import check_password_hash, generate_password_hash
 from . import bp
 from .models import User
 from quizzz.db import get_db_session
@@ -32,22 +31,23 @@ def register():
 
         error = None
         if not username:
-            error = 'username is required'
+            error = 'Username is required.'
         elif not password:
-            error = 'password is required'
+            error = 'Password is required.'
         else:
             user = db_session.query(User).filter(User.name == username).first()
             if user is not None:
-                error = f'user {username} already exists'
+                error = f'User {username} already exists.'
 
         if error is None:
-            user = User(name=username, password_hash=generate_password_hash(password))
+            user = User(name=username)
+            user.set_password_hash(password)
             db_session.add(user)
             db_session.commit()
-            flash("user %s has been successfully created" % username)
+            flash(f"User {username} has been successfully created.")
             return redirect(url_for('auth.login'))
-
-        flash(error)
+        else:
+            flash(error)
 
     return render_template('auth/register.html')
 
@@ -69,9 +69,9 @@ def login():
 
         user = db_session.query(User).filter(User.name == username).first()
         if user is None:
-            error = 'incorrect username'
-        elif not check_password_hash(user.password_hash, password):
-            error = 'incorrect password'
+            error = 'Incorrect username.'
+        elif not user.check_password(password):
+            error = 'Incorrect password.'
 
         if error is None:
             session.clear()

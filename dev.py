@@ -1,7 +1,6 @@
 """
 Create dev DB with some data.
 """
-from werkzeug.security import generate_password_hash
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
@@ -17,8 +16,8 @@ with app.app_context():
     db_session = get_db_session()
 
     # add some users
-    bob = User(name="bob", password_hash=generate_password_hash("dog"))
-    alice = User(name="alice", password_hash=generate_password_hash("cat"))
+    bob = User.from_credentials(name="bob", password="dog")
+    alice = User.from_credentials(name="alice", password="cat")
 
     # add some groups
     main_group = Group(

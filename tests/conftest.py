@@ -12,13 +12,15 @@ import os
 import tempfile
 
 import pytest
-from werkzeug.security import generate_password_hash
 from quizzz import create_app
 from quizzz.db import init_db, get_db_session
+
 from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
 from quizzz.quiz.models import Quiz, Question, Option
+
+from . import data
 
 
 @pytest.fixture
@@ -34,66 +36,20 @@ def app():
 
     with app.app_context():
         init_db()
-        db_session = get_db_session()
 
-        # add some users
-        bob = User(name="bob", password_hash=generate_password_hash("dog"))
-        alice = User(name="alice", password_hash=generate_password_hash("cat"))
-
-        # add some groups
-        group1 = Group(
-            name="group1",
-            invitation_code="code1",
-            members = [
-                Member(user=bob, is_admin=True),
-                Member(user=alice)
-            ]
-        )
-        group2 = Group(
-            name="group2",
-            invitation_code="no",
-            members=[
-                Member(user=alice)
-            ]
-        )
-
-        # add some messages
-        messages = [
-            Message(text="hello from bob", user=bob, group=group1, id=1),
-            Message(text="hello from alice", user=alice, group=group1, id=2),
-            Message(text="hello again from alice", user=alice, group=group2, id=3)
+        objects = [
+            *[User.from_credentials(**user) for user in data.USERS.values()],
+            *[Group(**group) for group in data.GROUPS.values()],
+            *[Member(**member) for member in data.MEMBERSHIPS],
+            *[Message(**message) for message in data.MESSAGES],
+            *[Quiz(**quiz) for quiz in data.QUIZZES.values()],
+            *[Question(**question) for question in data.QUIZ_QUESTIONS.values()],
+            *[Option(**option) for option in data.QUESTION_OPTIONS]
         ]
 
-        # add a quiz
-        quiz = Quiz(
-            topic="Test Quiz",
-            questions=[
-                Question(
-                    text="What does 2+2 equal to?",
-                    comment="That's a toughie. But you can verify the answer with your fingers.",
-                    options=[
-                        Option(text="1"),
-                        Option(text="2"),
-                        Option(text="3"),
-                        Option(text="4", is_correct=True)
-                    ]
-                ),
-                Question(
-                    text="What does the fox say?",
-                    comment="Try searching the answer on youtube.",
-                    options=[
-                        Option(text="Meaow"),
-                        Option(text="Woof"),
-                        Option(text="Bazinga!"),
-                        Option(text="None of these", is_correct=True)
-                    ]
-                ),
-            ],
-            author=alice,
-            group=group1
-        )
-        db_session.add_all([bob, alice])
-        db_session.commit()
+        db = get_db_session()
+        db.add_all(objects)
+        db.commit()
 
     yield app
 
@@ -117,8 +73,11 @@ class AuthActions:
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='alice', password='cat'):
+    def login(self, username, password):
         return self._client.post('/auth/login', data={'username': username, 'password': password})
+
+    def login_as(self, username):
+        return self.login(data.USERS[username]["name"], data.USERS[username]["password"])
 
     def logout(self):
         return self._client.get('/auth/logout')
