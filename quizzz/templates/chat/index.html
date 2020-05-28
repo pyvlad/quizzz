@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Posts{% endblock %}{% endblock %}
+{% block title %}Chat - {{ g.group.name }}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("Chat", "")
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   {% if g.user %}

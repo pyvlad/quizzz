@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Your Quizzes{% endblock %}{% endblock %}
+{% block title %}My Quizzes - {{g.group.name}}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("My Quizzes", url_for("quiz.index"))
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   {% if g.user %}

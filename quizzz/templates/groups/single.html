@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Group Page: {{ group.name }}{% endblock %}{% endblock %}
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (group.name, ""),
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   <ul class="list">

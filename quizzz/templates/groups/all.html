@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Your Groups{% endblock %}{% endblock %}
+{% block title %}Groups{% endblock %}
+
+{% block header %}
+  {{ render_header([('Groups', "")]) }}
+{% endblock %}
 
 {% block content %}
   <ul class="list">

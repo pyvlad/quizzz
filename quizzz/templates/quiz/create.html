@@ -1,6 +1,20 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}New Quiz{% endblock %}{% endblock %}
+{% block title %}
+  {% if quiz %}Edit Quiz{% else %}New Quiz{% endif %}
+  - {{ g.group.name }}
+{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("My Quizzes", url_for("quiz.index", group_id=g.group.id)),
+      ((quiz and "Edit Quiz") or "New Quiz", "")
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   <div class="quiz-form">

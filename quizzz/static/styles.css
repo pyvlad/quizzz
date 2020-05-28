@@ -102,17 +102,19 @@
   flex-wrap: wrap;
   align-items: flex-start;
 }
-.page-info__title {
+.page-info__item {
   padding: 2px 20px;
+  margin: 0 10px 0 0;
   background-color: #352000;
   color: white;
   border-radius: 10px;
   font-weight: bold;
 }
-.page-info__messages {
-  margin-left: 20px;
+
+.page-messages {
+  margin: 15px 0;
 }
-.page-info__messages-item {
+.page-messages__item {
   background-color: #eee;
   padding: 0.2em 0.5em;
   color: maroon;

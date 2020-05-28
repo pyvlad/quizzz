@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Home{% endblock %}{% endblock %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+  {{ render_header([('Home', "/")]) }}
+{% endblock %}
 
 {% block content %}
   <img src="{{ url_for('static', filename='images/logo.svg') }}" class="logo-home-page"/>

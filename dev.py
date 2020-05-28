@@ -21,14 +21,14 @@ with app.app_context():
 
     # add some groups
     main_group = Group(
-        name="main",
+        name="Main",
         invitation_code="hello",
         members = [
             Member(user=bob, is_admin=True),
             Member(user=alice)
         ]
     )
-    other_group = Group(name="other", invitation_code="no")
+    other_group = Group(name="Other", invitation_code="no")
 
     # add some messages to chat
     messages = [

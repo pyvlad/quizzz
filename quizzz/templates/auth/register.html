@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Register{% endblock %}{% endblock %}
+{% block title %}Register{% endblock %}
+
+{% block header %}
+  {{ render_header([("Register", "")]) }}
+{% endblock %}
 
 {% block content %}
   <form method="post" class="b-form">

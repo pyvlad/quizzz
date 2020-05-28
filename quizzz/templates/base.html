@@ -1,3 +1,13 @@
+{% macro render_header(items) -%}
+  <header class="page-info">
+  {% for (text, link) in items %}
+    <div class="page-info__item">
+      <a style="color: #e7e7e7; text-decoration:none;" href="{{ link }}">{{ text }}</a>
+    </div>
+  {% endfor %}
+  </header>
+{%- endmacro %}
+
 <!DOCTYPE html>
 <html lang='en'>
 <head>
@@ -40,15 +50,12 @@
 
   <section class="page__item page__item_content page__item_stretching">
     <div class="page__item-content">
-      <header class="page-info">
-        <div class="page-info__title">
-          {% block header %}{% endblock %}
-        </div>
-        <div class="page-info__messages">
+      {% block header %}{% endblock %}
+      <section class="page-messages">
         {% for message in get_flashed_messages() %}
-          <div class="page-info__messages-item">{{ message }}</div>
+          <div class="page-messages__item">{{ message }}</div>
         {% endfor %}
-      </header>
+      </section>
       {% block content %}{% endblock %}
     </div>
   </section>

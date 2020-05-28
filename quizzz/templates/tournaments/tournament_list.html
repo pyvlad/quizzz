@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Group Tournaments{% endblock %}{% endblock %}
+{% block title %}Tournaments - {{g.group.name}}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("Tournaments", "")
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   <ul class="list">

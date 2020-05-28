@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}Tournament: {{ data.tournament.name }}{% endblock %}{% endblock %}
+{% block title %}{{ data.tournament.name }} Round - {{g.group.name}}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("Tournaments", url_for("tournaments.index")),
+      (data.tournament.name, url_for("tournaments.show_tournament", tournament_id=data.tournament.id)),
+      (data.round.name or "Round %s" % data.round.id, "")
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   <section class="my_lg">

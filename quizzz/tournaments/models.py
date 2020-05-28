@@ -36,4 +36,4 @@ class Round(Base):
     tournament = relationship("Tournament", backref=backref("rounds", cascade="all, delete-orphan"))
 
     def __repr__(self):
-        return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tounament_id)
+        return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)

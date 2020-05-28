@@ -1,8 +1,20 @@
 {% extends 'base.html' %}
 
-{% block header %}{% block title %}
-  {% if msg %}Edit Message{% else %}New Message{% endif %}
-{% endblock %}{% endblock %}
+{% block title %}
+  Chat: {% if msg %}Edit Message{% else %}New Message{% endif %}
+  - {{ g.group.name }}
+{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("Chat", url_for("chat.index")),
+      ("Message", "")
+    ])
+  }}
+{% endblock %}
 
 {% block content %}
   <form method="post" class="b-form">
@@ -26,7 +38,7 @@
     <div class="b-form__row">
       <input class="button button_action"
         type="submit"
-        value="Send"
+        value="Submit"
       />
     </div>
   </form>
