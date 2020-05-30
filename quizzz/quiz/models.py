@@ -43,6 +43,8 @@ class Quiz(Base):
                     question=question
                 )]
 
+        quiz.is_finalized = True if request_form['is_finalized'] == '1' else False
+
         return quiz
 
 

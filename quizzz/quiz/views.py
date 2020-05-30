@@ -14,6 +14,7 @@ def index():
     your_quizzes = db.query(Quiz)\
         .filter(Quiz.author_id == g.user.id)\
         .filter(Quiz.group_id == g.group.id)\
+        .order_by(Quiz.is_finalized.asc())\
         .order_by(Quiz.created.desc())\
         .all()
     return render_template('quiz/index.html', your_quizzes=your_quizzes)
@@ -71,6 +72,9 @@ def update(quiz_id):
     quiz = get_quiz_by_id(quiz_id)
 
     if request.method == 'POST':
+        if quiz.is_finalized:
+            abort(403, "Can not update submitted quiz.")
+
         new_quiz = Quiz.from_request_form(request.form)
 
         db = get_db_session()
@@ -97,7 +101,12 @@ def update(quiz_id):
 @bp.route('/<int:quiz_id>/delete', methods=('POST',))
 def delete(quiz_id):
     quiz = get_quiz_by_id(quiz_id)
+
+    if quiz.is_finalized:
+        abort(403, "Can not delete submitted quiz.")
+
     db = get_db_session()
     db.delete(quiz)
     db.commit()
+
     return redirect(url_for('quiz.index'))

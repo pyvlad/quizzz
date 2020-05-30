@@ -44,6 +44,7 @@
             value="{{ (quiz and quiz.topic) or '' }}"
             maxlength="1000"
             required
+            {{ (quiz and quiz.is_finalized and 'disabled') or '' }}
           />
         </div>
       </div>
@@ -60,11 +61,12 @@
               name="{{'question_%s' % qnum}}"
               id="{{'question_%s' % qnum}}"
               maxlength="1000"
+              {{ (quiz and quiz.is_finalized and 'disabled') or '' }}
               required>{{ (quiz and quiz.questions[qnum-1].text) or '' }}</textarea
             >
           </div>
           <div class="quiz-form__row">
-            <fieldset class="quiz-form__fieldset">
+            <fieldset class="quiz-form__fieldset" {{ (quiz and quiz.is_finalized and 'disabled') or '' }}>
               {% for optnum in range(1, config["OPTIONS_PER_QUESTION"] + 1) %}
                 <div class="quiz-form__fieldset-item">
                   <input
@@ -93,13 +95,54 @@
         </div>
       {% endfor %}
 
-      <div class='quiz-form__item'>
-        <button class="button button_action">Save</button>
+
+      <div class="quiz-form__item">
+        <div class="quiz-form__row">
+          <div class="quiz-form__label">
+            <label for="{{'question_%s' % qnum}}">Submit Quiz?</label>
+          </div>
+        </div>
+        <div class="quiz-form__row">
+          <fieldset class="quiz-form__fieldset" {{ (quiz and quiz.is_finalized and 'disabled') or '' }}>
+            <div class="quiz-form__fieldset-item">
+              <input
+                type='radio'
+                id="is_finalized_no"
+                name="is_finalized"
+                value='0'
+                {{ (quiz and quiz.is_finalized and '') or 'checked' }}
+              />
+              <label class="quiz-form__fieldset-item-input"
+                     for="is_finalized_no">
+                No, I am not finished yet and want to review/update it later.
+              </label>
+            </div>
+            <div class="quiz-form__fieldset-item">
+              <input
+                type='radio'
+                id="is_finalized_yes"
+                name="is_finalized"
+                value='1'
+                {{ (quiz and quiz.is_finalized and 'checked') or '' }}
+              />
+              <label class="quiz-form__fieldset-item-input"
+                     for="is_finalized_yes">
+                Yes, the quiz is finished and checked and I want it added to the group's quiz pool.
+              </label>
+            </div>
+          </fieldset>
+        </div>
       </div>
+
+      {% if not quiz or (quiz and not quiz.is_finalized) %}
+        <div class='quiz-form__item'>
+          <button class="button button_action">Save</button>
+        </div>
+      {% endif %}
 
     </form>
 
-    {% if quiz %}
+    {% if quiz and not quiz.is_finalized %}
     <form action="{{ url_for('quiz.delete', quiz_id=quiz.id) }}" method="post">
       <div class='quiz-form__item'>
         <button class="button button_danger"

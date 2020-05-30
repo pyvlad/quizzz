@@ -64,7 +64,8 @@ with app.app_context():
                 ),
             ],
             author=bob,
-            group=main_group
+            group=main_group,
+            is_finalized=True
         ),
         Quiz(
             topic="Cities",
@@ -139,7 +140,8 @@ with app.app_context():
                 ),
             ],
             author=alice,
-            group=main_group
+            group=main_group,
+            is_finalized=True
         )
     ]
 
@@ -148,7 +150,6 @@ with app.app_context():
         group=main_group,
         rounds=[
             Round(quiz=quizzes[0]),
-            Round(quiz=quizzes[2]),
             Round(quiz=quizzes[3])
         ]
     )

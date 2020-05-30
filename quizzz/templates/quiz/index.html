@@ -21,7 +21,7 @@
   <ul class="list">
   {% for quiz in your_quizzes %}
     <a class="list__item-link" href="{{ url_for('quiz.update', quiz_id=quiz.id) }}">
-      <li class="list__item">
+      <li class="list__item {{ not quiz.is_finalized and 'list__item_active' }}">
         <div class="list__text-primary">{{ quiz.topic }}</div>
         <div class="list__text-secondary my_sm">
           {% if quiz.is_finalized %}
