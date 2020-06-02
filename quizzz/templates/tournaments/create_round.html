@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {% if tournament %}Edit Round{% else %}New Round{% endif %}
+  - {{ g.group.name }}
+{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_all")),
+      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("Tournaments", url_for("tournaments.index")),
+      (tournament.name, url_for("tournaments.show_tournament", tournament_id=tournament.id)),
+      ("Edit Round", "")
+    ])
+  }}
+{% endblock %}
+
+{% block content %}
+  <div class="b-form">
+
+    <div class="b-form__header">
+      {{ (round and "Edit Round") or "New Round" }}
+    </div>
+
+    <div class="b-form__helper-text">
+      Please fill in the form below and hit 'save'.<br/>
+    </div>
+
+    <form action="" method="post">
+
+      <div class="b-form__row">
+        <div class="b-form__label">
+          <label for="tournament_name">Tournament Name</label>
+        </div>
+      </div>
+      <div class="b-form__row">
+        <input class="b-form__input"
+          name="tournament_name"
+          id="tournament_name"
+          type="text"
+          value="{{ (tournament and tournament.name) or '' }}"
+          maxlength="100"
+          disabled
+        />
+      </div>
+
+      <div class='b-form__row'>
+        <label for='quiz_id'>Select Quiz</label>
+        <select id='quiz_id' name='quiz_id'>
+          {% if round.quiz %}
+            <option selected value='{{ round.quiz.id }}'>{{ round.quiz.topic }} by {{ round.quiz.author.name }}</option>
+          {% endif %}
+          {% for quiz in quiz_pool %}
+            <option value='{{ quiz.id }}'>{{ quiz.topic }} by {{ quiz.author.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+
+      <div class="b-form__row">
+        <div class="b-form__label">
+          <label for="start_time">Start Time</label>
+        </div>
+      </div>
+      <div class="b-form__row">
+        <input class="b-form__input"
+          name="start_time"
+          id="start_time"
+          type="date"
+          value="{{ ((round and round.start_time)|string)[:10] or '' }}"
+          maxlength="100"
+        />
+      </div>
+
+      <div class="b-form__row">
+        <div class="b-form__label">
+          <label for="finish_time">Finish Time</label>
+        </div>
+      </div>
+      <div class="b-form__row">
+        <input class="b-form__input"
+          name="finish_time"
+          id="finish_time"
+          type="date"
+          value="{{ ((round and round.finish_time)|string)[:10] or '' }}"
+          maxlength="100"
+        />
+      </div>
+
+      <div class='b-form-row'>
+        <button class="button button_action">Save</button>
+      </div>
+
+    </form>
+
+    {% if round %}
+      <form action="{{ url_for('tournaments.delete_round', round_id=round.id) }}"
+            method="post">
+        <div class='b-form__row'>
+          <button class="button button_danger"
+                  onclick="return confirm('Are you sure?');">
+            Delete
+          </button>
+        </div>
+      </form>
+    {% endif %}
+
+  </div>
+{% endblock %}

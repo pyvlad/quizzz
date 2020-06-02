@@ -21,6 +21,7 @@ REQUEST_PAYLOAD = {
     "question_2_option_2": "lalalala",
     "question_2_option_3": "lala-lalala-la-lalala",
     "question_2_option_4": "all of these",
+    "is_finalized": "0"
 }
 
 

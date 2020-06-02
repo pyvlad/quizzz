@@ -13,12 +13,26 @@
 {% endblock %}
 
 {% block content %}
+  {% if data.has_edit_permissions %}
+    <h2 style="color:red;">
+      <a href="{{ url_for('tournaments.create_tournament') }}">
+        New Tournament
+      </a>
+    </h2>
+  {% endif %}
   <ul class="list">
     {% for tournament in data.tournaments %}
       <a class="list__item-link"
          href="{{ url_for('tournaments.show_tournament', tournament_id=tournament.id) }}">
         <li class="list__item">
           <div class="list__text-primary">{{ tournament.name }}</div>
+          {% if data.has_edit_permissions %}
+            <div class="list__text-secondary">
+              <a href="{{ url_for('tournaments.update_tournament', tournament_id=tournament.id) }}">
+                Edit
+              </a>
+            </div>
+          {% endif %}
         </li>
       </a>
     {% endfor %}

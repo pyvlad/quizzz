@@ -26,4 +26,5 @@ def pull_group(endpoint, values):
 
 
 from . import models
-from . import views
+from . import views_tournaments
+from . import views_rounds
