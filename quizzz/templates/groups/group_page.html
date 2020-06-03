@@ -1,32 +1,35 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ group.name }}{% endblock %}
+{% block title %}{{ data.group.name }}{% endblock %}
 
 {% block header %}
   {{
     render_header([
-      ("Groups", url_for("groups.show_all")),
-      (group.name, ""),
+      ("Groups", url_for("groups.show_user_groups")),
+      (data.group.name, ""),
     ])
   }}
 {% endblock %}
 
 {% block content %}
+  <h2 class="item-header item-header_main">
+    {{ data.group.name }} Group
+  </h2>
   <ul class="list">
     <a class="list__item-link"
-        href="{{ url_for('chat.index', group_id=group.id) }}">
+        href="{{ url_for('chat.index', group_id=data.group.id) }}">
       <li class="list__item">Group Chat</li>
     </a>
     <a class="list__item-link"
-       href="{{ url_for('quiz.index', group_id=group.id) }}">
+       href="{{ url_for('quiz.index', group_id=data.group.id) }}">
       <li class="list__item">My Quizzes</li>
     </a>
     <a class="list__item-link"
-       href="{{ url_for('plays.index', group_id=group.id) }}">
+       href="{{ url_for('plays.index', group_id=data.group.id) }}">
       <li class="list__item">My Plays</li>
     </a>
     <a class="list__item-link"
-       href="{{ url_for('tournaments.index', group_id=group.id) }}">
+       href="{{ url_for('tournaments.index', group_id=data.group.id) }}">
       <li class="list__item">Group Tournaments</li>
     </a>
   </ul>

@@ -7,31 +7,33 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post" class="b-form">
-    <div class="b-form__header">
+  <form method="post" class="form">
+    <div class="form__header">
       Log In Form
     </div>
 
-    <div class="b-form__helper-text">
-      In order to sign in, please enter your credentials below.
+    <div class="form__item">
+      <div class="form__help">
+        In order to sign in, please enter your credentials below.
+      </div>
     </div>
 
-    <div class="b-form__row">
-      <div class="b-form__label">
+    <div class="form__item">
+      <div class="form__label">
         <label for="username">Username</label>
       </div>
-      <input class="b-form__input"
+      <input class="form__input"
         name="username"
         id="username"
         required
       />
     </div>
 
-    <div class="b-form__row">
-      <div class="b-form__label">
+    <div class="form__item">
+      <div class="form__label">
         <label for="password">Password</label>
       </div>
-      <input class="b-form__input"
+      <input class="form__input"
         type="password"
         name="password"
         id="password"
@@ -39,7 +41,7 @@
       />
     </div>
 
-    <div class="b-form__row">
+    <div class="form__item">
       <input class="button button_action"
         type="submit"
         value="Log In"

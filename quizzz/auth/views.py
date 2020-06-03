@@ -1,19 +1,10 @@
 import sqlalchemy as sa
 from flask import request, session, g, redirect, url_for, flash, render_template
-from . import bp
-from .models import User
+
 from quizzz.db import get_db_session
 
-
-@bp.before_app_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-
-    if user_id is None:
-        g.user = None
-    else:
-        db = get_db_session()
-        g.user = db.query(User).filter(User.id == user_id).one()
+from . import bp
+from .models import User
 
 
 
@@ -24,7 +15,7 @@ def register():
         return redirect(url_for("index"))
 
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].lower()
         password = request.form['password']
 
         db_session = get_db_session()
@@ -60,7 +51,7 @@ def login():
         return redirect(url_for("index"))
 
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].lower()
         password = request.form['password']
 
         db_session = get_db_session()

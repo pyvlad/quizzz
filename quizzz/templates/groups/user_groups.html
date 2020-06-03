@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Groups{% endblock %}
+
+{% block header %}
+  {{ render_header([('Groups', "")]) }}
+{% endblock %}
+
+{% block content %}
+  <ul class="list">
+    {% for group in data.user_groups %}
+      <a class="list__item-link"
+         href="{{ url_for('groups.show_group_page', group_id=group.id) }}">
+        <li class="list__item">
+          <div class="list__text-primary">{{ group.name }}</div>
+        </li>
+      </a>
+    {% endfor %}
+  </ul>
+  <form class="form my_md"
+        action="{{ url_for('groups.join') }}"
+        method="post">
+    <div class="form__header">Join Group</div>
+    <div class="form__item">
+      <div class="form__help">
+        You need to know invitation code to join an existing group.
+      </div>
+    </div>
+    <div class="form__item">
+      <label class="form__label"
+        for="group_invitation_code">
+        Invitation Code
+      </label>
+      <input class="form__input"
+        type="text"
+        id="group_invitation_code"
+        name="invitation_code"
+        required
+      />
+    </div>
+    <div class="form__item">
+      <button class="button button_action">Submit</button>
+    </div>
+  </form>
+{% endblock %}

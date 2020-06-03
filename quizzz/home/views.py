@@ -5,5 +5,5 @@ from . import bp
 @bp.route("/")
 def index():
     if g.user:
-        return redirect(url_for('groups.show_all'))
+        return redirect(url_for('groups.show_user_groups'))
     return render_template("home/index.html")

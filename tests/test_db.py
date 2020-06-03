@@ -1,6 +1,7 @@
 import sqlite3
 
 import pytest
+
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
 
@@ -25,7 +26,7 @@ def test_session_rollback_on_context_teardown(app):
     """
     with app.app_context():
         db = get_db_session()
-        db.add(User.from_credentials(name="dodgy", password="secret"))
+        db.add(User.from_credentials(name="some_user", password="some_pass"))
         res = db.query(User).all()
         assert len(res) == len(USERS) + 1
 

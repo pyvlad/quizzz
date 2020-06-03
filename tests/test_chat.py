@@ -1,5 +1,5 @@
 import pytest
-from flask import g, session
+
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
 from quizzz.chat.models import Message

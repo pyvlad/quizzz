@@ -5,4 +5,5 @@ bp = Blueprint('groups', __name__, url_prefix='/groups', template_folder="templa
 
 
 from . import models
+from .decorators import membership_required
 from . import views

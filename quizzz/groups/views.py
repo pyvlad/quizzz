@@ -1,52 +1,74 @@
+from sqlalchemy.orm import selectinload
 from flask import g, flash, request, redirect, url_for, abort, render_template
+
+from quizzz.db import get_db_session
+from quizzz.auth import login_required
+
 from . import bp
 from .models import Group, Member
-from quizzz.db import get_db_session
+from .decorators import membership_required
+
 
 
 @bp.route('/')
-def show_all():
-    if not g.user:
-        abort(403, "You're not logged in.")
-    return render_template('groups/all.html', user_memberships=g.user.memberships)
+@login_required
+def show_user_groups():
+    db = get_db_session()
+    user_groups = db.query(Member, Group)\
+        .filter(Member.user_id == g.user.id)\
+        .filter(Member.group_id == Group.id)\
+        .all()
+
+    data = {
+        "user_groups": [
+            {
+                "id": group.id,
+                "name": group.name,
+                "is_admin": m.is_admin
+            } for m, group in user_groups
+        ]
+    }
+    return render_template('groups/user_groups.html', data=data)
+
 
 
 @bp.route('/<int:group_id>/')
-def show_single(group_id):
-    if not g.user:
-        abort(403, "You're not logged in.")
-
-    user_group_ids = { m.group_id for m in g.user.memberships }
-    if group_id not in user_group_ids:
-        abort(403, "You're not a member of this group.")
-
+@login_required
+@membership_required
+def show_group_page(group_id):
     db = get_db_session()
     group = db.query(Group).filter(Group.id == group_id).first()
     if not group:
         abort(404, "This group doesn't exist.")
 
-    return render_template('groups/single.html', group=group)
+    data = {
+        "group": {
+            "id": group.id,
+            "name": group.name
+        }
+    }
+
+    return render_template('groups/group_page.html', data=data)
 
 
-@bp.route('/join_group/')
+
+@bp.route('/join_group/', methods=("POST",))
+@login_required
 def join():
-    if not g.user:
-        abort(403, "You're not logged in.")
-
-    invitation_code = request.args.get("invitation_code")
+    invitation_code = request.form["invitation_code"]
 
     db = get_db_session()
     group = db.query(Group).filter(Group.invitation_code == invitation_code).first()
     if not group:
         flash("Invalid invitation code!")
     else:
-        user_group_ids = [m.group_id for m in g.user.memberships]
+        user_group_ids = { m.group_id for m in g.user.memberships }
         if group.id not in user_group_ids:
             member = Member(group=group, user=g.user)
             db.add(member)
             db.commit()
             flash("Joined!")
         else:
-            flash("You're already a member of this group!")
+            flash("You are already a member of this group!")
 
-    return redirect(url_for('index'))
+    return redirect(url_for('groups.show_user_groups'))

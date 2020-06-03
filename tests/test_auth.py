@@ -1,9 +1,29 @@
 import pytest
+
 from flask import g, session
+
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
 
 from .data import USERS
+
+
+
+def test_base_template(client, auth):
+    """
+    Test that menu updates according to login status.
+    """
+    response = client.get('/')
+    assert b"Login" in response.data
+    assert b"Register" in response.data
+    assert b"Log Out" not in response.data
+
+    auth.login_as("bob")
+    response = client.get('/', follow_redirects=True)
+    assert b"Login" not in response.data
+    assert b"Register" not in response.data
+    assert b'Log Out' in response.data
+
 
 
 def test_register(client, app):
@@ -28,7 +48,8 @@ def test_register(client, app):
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('', '', b'Username is required.'),
     ('a', '', b'Password is required.'),
-    (USERS["bob"]["name"], 'test', f'User {USERS["bob"]["name"]} already exists.'.encode()),
+    (USERS["bob"]["name"], 'some_pass', f'User {USERS["bob"]["name"]} already exists.'.encode()),
+    (USERS["bob"]["name"].upper(), 'some_pass', f'User {USERS["bob"]["name"]} already exists.'.encode()),
 ))
 def test_register_validate_input(client, username, password, message):
     """
@@ -55,6 +76,17 @@ def test_login(client, auth):
         client.get('/')
         assert session['user_id'] == USERS["bob"]["id"]
         assert g.user.name == USERS["bob"]["name"]
+
+    auth.logout()
+
+    # log in user even if username was entered in different case
+    response = auth.login(USERS["alice"]["name"].upper(), USERS["alice"]["password"])
+    assert response.headers['Location'] == 'http://localhost/'
+
+    with client:
+        client.get('/')
+        assert session['user_id'] == USERS["alice"]["id"]
+        assert g.user.name == USERS["alice"]["name"]
 
 
 
@@ -101,20 +133,3 @@ def test_redirect_if_logged_in(client, auth):
     assert 'http://localhost/' == response.headers['Location']
 
     assert client.post('/auth/register', data={}).status_code == 302
-
-
-
-def test_base_template(client, auth):
-    """
-    Test that menu updates according to login status.
-    """
-    response = client.get('/')
-    assert b"Login" in response.data
-    assert b"Register" in response.data
-    assert b"Log Out" not in response.data
-
-    auth.login_as("bob")
-    response = client.get('/', follow_redirects=True)
-    assert b"Login" not in response.data
-    assert b"Register" not in response.data
-    assert b'Log Out' in response.data

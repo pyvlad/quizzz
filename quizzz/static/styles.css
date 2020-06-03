@@ -123,56 +123,77 @@
 
 
 /* Login and registration forms */
-.b-form {
+.form {
   background-color: #F6F7F8;
   border: 1px solid #D6D9DC;
   border-radius: 3px;
   padding: 10px;
 }
-.b-form__header {
+.form__header {
   font-weight: bold;
   font-family: "Helvetica", "Arial", sans-serif;
   font-size: 1.2em;
-  margin-bottom: 10px;
   border-bottom: 2px solid #D6D9DC;
 }
-.b-form__helper-text {
+.form__help {
   font-family: "Helvetica", "Arial", sans-serif;
   font-size: 0.9em;
-  margin-bottom: 10px;
   color: #444;
 }
-.b-form__row {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.form__item {
+  margin: 1em 0;
 }
-.b-form__label {
+.form__label {
   font-family: "Helvetica", "Arial", sans-serif;
   font-size: 1em;
   font-weight: bold;
 }
-.b-form__input {
+.form__input-help {
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-size: 0.8em;
+  font-style: italic;
+  color: #444;
+}
+.form__input {
   background-color: #FFFFFF;
   border: 1px solid #D6D9DC;
   border-radius: 3px;
   padding: 7px;
   font-size: 18px;
+  margin: 0.25em 0;
 }
-.b-form__textarea {
+.form__textarea {
   font-family: "Helvetica", "Arial", sans-serif;
   resize: none;
   padding: 7px;
   font-size: 18px;
   height: 60px;
   width: 100%;
+  margin: 0.25em 0;
 }
-.b-form__textarea_sm {
+.form__input:valid,
+.form__textarea:valid {
+  background-color: rgba(200,255,200,0.5);
+}
+.form__input:invalid,
+.form__textarea:invalid {
+  box-shadow: none;
+}
+.form__input:focus,
+.form__textarea:focus {
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.form__input:focus:invalid,
+.form__textarea:focus:invalid {
+  box-shadow: 0 0 10px rgba(255,0,0,0.5);
+}
+.form__textarea_sm {
   height: 150px;
 }
-.b-form__textarea_lg {
+.form__textarea_lg {
   height: 250px;
 }
-.b-form__textarea_md {
+.form__textarea_md {
   height: 150px;
 }
 

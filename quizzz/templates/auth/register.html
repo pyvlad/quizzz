@@ -7,39 +7,53 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post" class="b-form">
-    <div class="b-form__header">
+  <form method="post" class="form">
+    <div class="form__header">
       Registration Form
     </div>
 
-    <div class="b-form__helper-text">
-      In order to create an account, please fill the form below.
+    <div class="form__item form__help">
+      <div class="form__help">
+        In order to create an account, please fill the form below.
+      </div>
     </div>
 
-    <div class="b-form__row">
-      <div class="b-form__label">
+    <div class="form__item">
+      <div class="form__label">
         <label for="username">Username</label>
       </div>
-      <input class="b-form__input"
+      <input class="form__input"
+        type="text"
         name="username"
         id="username"
+        placeholder="username"
+        pattern="^[a-zA-Z][a-zA-Z0-9_\.]{1,20}$"
         required
       />
+      <div class="form__input-help">
+        Please use English letters, numbers, ".", or "_". From 2 to 20 letters.
+      </div>
     </div>
 
-    <div class="b-form__row">
-      <div class="b-form__label">
+    <div class="form__item">
+      <div class="form__label">
         <label for="password">Password</label>
       </div>
-      <input class="b-form__input"
+      <input class="form__input"
         type="password"
         name="password"
         id="password"
+        placeholder="password"
+        minlength=6
+        maxlength=50
         required
       />
+      <div class="form__input-help">
+        Minimum 6 letters.
+      </div>
     </div>
 
-    <div class="b-form__row">
+    <div class="form__item">
       <input class="button button_action"
         type="submit"
         value="Register"

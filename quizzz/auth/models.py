@@ -1,5 +1,6 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy as sa
+
 from quizzz.db import Base
 
 

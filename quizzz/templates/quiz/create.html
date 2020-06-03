@@ -8,8 +8,8 @@
 {% block header %}
   {{
     render_header([
-      ("Groups", url_for("groups.show_all")),
-      (g.group.name, url_for("groups.show_single", group_id=g.group.id)),
+      ("Groups", url_for("groups.show_user_groups")),
+      (g.group.name, url_for("groups.show_group_page", group_id=g.group.id)),
       ("My Quizzes", url_for("quiz.index", group_id=g.group.id)),
       ((quiz and "Edit Quiz") or "New Quiz", "")
     ])
