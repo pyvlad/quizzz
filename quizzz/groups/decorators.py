@@ -13,7 +13,7 @@ def membership_required(view):
         db = get_db_session()
         user_group_ids = set(gid for (gid,) in
             db.query(Member.group_id).filter(Member.user_id == g.user.id).all())
-        if request.view_args["group_id"] not in user_group_ids:
+        if g.group.id not in user_group_ids:
             abort(403, "You're not a member of this group.")
 
         return view(**kwargs)

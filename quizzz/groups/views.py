@@ -35,19 +35,13 @@ def show_user_groups():
 @bp.route('/<int:group_id>/')
 @login_required
 @membership_required
-def show_group_page(group_id):
-    db = get_db_session()
-    group = db.query(Group).filter(Group.id == group_id).first()
-    if not group:
-        abort(404, "This group doesn't exist.")
-
+def show_group_page():
     data = {
         "group": {
-            "id": group.id,
-            "name": group.name
+            "id": g.group.id,
+            "name": g.group.name
         }
     }
-
     return render_template('groups/group_page.html', data=data)
 
 
