@@ -6,30 +6,31 @@
   {{
     render_header([
       ("Groups", url_for("groups.show_user_groups")),
-      (g.group.name, url_for("groups.show_group_page", group_id=g.group.id)),
+      (g.group.name, url_for("groups.show_group_page")),
       ("Chat", "")
     ])
   }}
 {% endblock %}
 
 {% block content %}
-  {% if g.user %}
-    <a href="{{ url_for('chat.create') }}">
-      <button class="button button_action my_md">New Message</button>
-    </a>
-  {% endif %}
-  {% for msg in messages %}
-    <article class="message {% if g.user.id == msg.user_id %}message_own{% endif %}">
+  <a href="{{ url_for('chat.create') }}">
+    <button class="button button_action my_md">New Message</button>
+  </a>
+  {% for msg in data.messages %}
+    <article class="message {% if msg.is_own %}message_own{% endif %}">
       <div class="message__details">
-        <div class="message__details-item">{{ msg.user.name }}</div>
-        <div class="message__details-item">{{ msg.created.strftime('%Y-%m-%d') }}</div>
-        {% if msg.updated %}
+        <div class="message__details-item">{{ msg.user_name }}</div>
+        <div class="message__details-item">{{ msg.time_created.strftime('%Y-%m-%d %H:%M') }}</div>
+        {% if msg.time_updated %}
           <div class="message__details-item">
-            edited at {{ msg.updated.strftime('%Y-%m-%d') }}
+            edited at {{ msg.time_updated.strftime('%Y-%m-%d %H:%M') }}
           </div>
         {% endif %}
-        {% if g.user.id == msg.user_id %}
-          <a class="message__details-item" href="{{ url_for('chat.update', id=msg.id) }}">Edit</a>
+        {% if msg.is_own %}
+          <a class="message__details-item"
+             href="{{ url_for('chat.update', id=msg.id) }}">
+             Edit
+          </a>
         {% endif %}
       </div>
       <p class="message__text">{{ msg.text }}</p>

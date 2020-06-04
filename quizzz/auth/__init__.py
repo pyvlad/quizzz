@@ -1,4 +1,4 @@
-from flask import Blueprint, session, g
+from flask import Blueprint, session, g, request
 
 from quizzz.db import get_db_session
 
@@ -16,6 +16,10 @@ def load_logged_in_user():
     """
     Load user from DB if 'user_id' is in session.
     """
+    # TODO delete this in production
+    if '/static/' in request.path:
+        return
+
     user_id = session.get('user_id')
 
     if user_id is None:

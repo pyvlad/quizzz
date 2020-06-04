@@ -309,6 +309,7 @@
 }
 .message__text {
   padding: 0.5em 1em;
+  white-space: pre-wrap;
 }
 
 

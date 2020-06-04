@@ -25,12 +25,14 @@ def init_app(app):
             group_id = values.pop('group_id')
         else:
             return
+
         db = get_db_session()
         group = db.query(Group).filter(Group.id == group_id).first()
         if group:
             g.group = group
         else:
             abort(400, "Group doesn't exist.")
+
 
     @app.url_defaults
     def add_group_id(endpoint, values):
@@ -45,5 +47,6 @@ def init_app(app):
             return
         if app.url_map.is_endpoint_expecting(endpoint, 'group_id'):
             values['group_id'] = g.group.id
+
 
     return app

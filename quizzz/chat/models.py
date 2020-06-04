@@ -10,8 +10,9 @@ class Message(Base):
     id = sa.Column(sa.Integer, primary_key=True)
 
     text = sa.Column(sa.String(1000), nullable=False)
-    created = sa.Column(sa.DateTime, server_default=func.now())
-    updated = sa.Column(sa.DateTime, onupdate=func.now())
+    
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
