@@ -4,14 +4,11 @@ I don't want to handle <group_id> in every single function.
 What do I want instead?
 1. Every time there is <group_id> in URL:
     a. it is popped from view args;
-    b. Group object is loaded from DB and added as g.group.
+    b. it is added as g.group_id.
 2. When <url_for> is used, all endpoints that expect <group_id>
-    should receive it automatically from g.group.
+    should receive it automatically from g.group_id.
 """
-from flask import g, abort
-
-from .db import get_db_session
-from quizzz.groups.models import Group
+from flask import g
 
 
 def init_app(app):
@@ -21,17 +18,10 @@ def init_app(app):
         Executed right after the request was matched based on the URL values.
         """
         # on 404 urls "values" is None
-        if values and "group_id" in values:
-            group_id = values.pop('group_id')
-        else:
+        if not values or "group_id" not in values:
             return
 
-        db = get_db_session()
-        group = db.query(Group).filter(Group.id == group_id).first()
-        if group:
-            g.group = group
-        else:
-            abort(400, "Group doesn't exist.")
+        g.group_id = values.pop('group_id')
 
 
     @app.url_defaults
@@ -43,10 +33,10 @@ def init_app(app):
                 i.e. don't include it for home page or logout links.
             c. if <group_id> is not yet in dict of URL values provided in url_for() call.
         """
-        if not "group" in g or 'group_id' in values:
+        if not "group_id" in g or 'group_id' in values:
             return
         if app.url_map.is_endpoint_expecting(endpoint, 'group_id'):
-            values['group_id'] = g.group.id
+            values['group_id'] = g.group_id
 
 
     return app

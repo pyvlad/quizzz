@@ -1,9 +1,7 @@
 from flask import g, request, render_template, flash, redirect, url_for, abort
 
 from quizzz.db import get_db_session
-from quizzz.auth import login_required
 from quizzz.auth.models import User
-from quizzz.groups import membership_required
 
 from . import bp
 from .models import Message
@@ -57,8 +55,6 @@ def get_message_by_id(id):
 
 # *** VIEWS ****
 @bp.route('/')
-@login_required
-@membership_required
 def index():
     data = {
         "messages": get_chat_messages()
@@ -68,8 +64,6 @@ def index():
 
 
 @bp.route('/create', methods=('GET', 'POST'))
-@login_required
-@membership_required
 def create():
     if request.method == 'POST':
         text = request.form['text']
@@ -92,8 +86,6 @@ def create():
 
 
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
-@login_required
-@membership_required
 def update(id):
     msg = get_message_by_id(id)
 
@@ -118,8 +110,6 @@ def update(id):
 
 
 @bp.route('/<int:id>/delete', methods=('POST',))
-@login_required
-@membership_required
 def delete(id):
     msg = get_message_by_id(id)
     db = get_db_session()

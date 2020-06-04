@@ -6,7 +6,6 @@ from quizzz.auth import login_required
 
 from . import bp
 from .models import Group, Member
-from .decorators import membership_required
 
 
 
@@ -33,8 +32,6 @@ def show_user_groups():
 
 
 @bp.route('/<int:group_id>/')
-@login_required
-@membership_required
 def show_group_page():
     data = {
         "group": {

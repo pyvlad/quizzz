@@ -47,21 +47,26 @@ def test_index(client, auth):
     a. it should display quizzes added by logged in user;
     b. there should be a link to edit/view the quiz.
     """
-    response = client.get('/groups/1/quiz/')
-    assert response.status_code == 400
+    response = client.get('/groups/2/quiz/')
+    assert response.status_code == 401
+    
+    auth.login_as("bob")
+    response = client.get('/groups/2/quiz/')
+    assert response.status_code == 403
 
     # the only quiz's topic
     quiz_topic = QUIZZES["quiz1"]["topic"].encode()
     update_link = b'href="/groups/1/quiz/1/update"'
 
     # alice doesn't have any quizzes
+    auth.logout()
     auth.login_as("alice")
     response = client.get('/groups/1/quiz/')
     assert quiz_topic not in response.data
     assert update_link not in response.data
-    auth.logout()
 
     # bob does have the only quiz
+    auth.logout()
     auth.login_as("bob")
     response = client.get('/groups/1/quiz/')
     assert quiz_topic in response.data

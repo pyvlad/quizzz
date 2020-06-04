@@ -19,7 +19,7 @@ def load_logged_in_user():
     # TODO delete this in production
     if '/static/' in request.path:
         return
-
+        
     user_id = session.get('user_id')
 
     if user_id is None:
