@@ -46,8 +46,8 @@ def create_app(test_config=None):
     from . import chat
     app.register_blueprint(chat.bp)
 
-    from . import quiz
-    app.register_blueprint(quiz.bp)
+    from . import quizzes
+    app.register_blueprint(quizzes.bp)
 
     from . import plays
     app.register_blueprint(plays.bp)

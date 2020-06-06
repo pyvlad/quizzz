@@ -6,7 +6,7 @@ from . import bp
 from .models import Tournament, Round
 from .user_permissions import USER, check_user_permissions
 from quizzz.db import get_db_session
-from quizzz.quiz.models import Quiz
+from quizzz.quizzes.models import Quiz
 
 
 

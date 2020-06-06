@@ -2,13 +2,14 @@ import pytest
 from flask import g, session
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
-from quizzz.quiz.models import Quiz, Question, Option
+from quizzz.quizzes.models import Quiz, Question, Option
 
 from .data import USERS, QUIZZES, QUIZ_QUESTIONS, QUESTION_OPTIONS
 
 
 REQUEST_PAYLOAD = {
-    "quiz_topic": "Quiz 2",
+    "topic": "Quiz 2",
+    "is_finalized": "0",
     "question_1": "What is love?",
     "question_1_answer": "4",
     "question_1_option_1": "baby, don't hurt me",
@@ -20,8 +21,7 @@ REQUEST_PAYLOAD = {
     "question_2_option_1": "lala-lalala-la-la",
     "question_2_option_2": "lalalala",
     "question_2_option_3": "lala-lalala-la-lalala",
-    "question_2_option_4": "all of these",
-    "is_finalized": "0"
+    "question_2_option_4": "all of these"
 }
 
 
@@ -47,28 +47,28 @@ def test_index(client, auth):
     a. it should display quizzes added by logged in user;
     b. there should be a link to edit/view the quiz.
     """
-    response = client.get('/groups/2/quiz/')
+    response = client.get('/groups/2/quizzes/')
     assert response.status_code == 401
-    
+
     auth.login_as("bob")
-    response = client.get('/groups/2/quiz/')
+    response = client.get('/groups/2/quizzes/')
     assert response.status_code == 403
 
     # the only quiz's topic
     quiz_topic = QUIZZES["quiz1"]["topic"].encode()
-    update_link = b'href="/groups/1/quiz/1/update"'
+    update_link = b'href="/groups/1/quizzes/1/edit"'
 
     # alice doesn't have any quizzes
     auth.logout()
     auth.login_as("alice")
-    response = client.get('/groups/1/quiz/')
+    response = client.get('/groups/1/quizzes/')
     assert quiz_topic not in response.data
     assert update_link not in response.data
 
     # bob does have the only quiz
     auth.logout()
     auth.login_as("bob")
-    response = client.get('/groups/1/quiz/')
+    response = client.get('/groups/1/quizzes/')
     assert quiz_topic in response.data
     assert update_link in response.data
 
@@ -81,14 +81,14 @@ def test_author_required(app, client, auth):
     """
     # the first quiz is ben's:
     auth.login_as('alice')
-    assert client.post('/groups/1/quiz/1/update').status_code == 403
-    assert client.post('/groups/1/quiz/1/delete').status_code == 403
+    assert client.post('/groups/1/quizzes/1/edit').status_code == 403
+    assert client.post('/groups/1/quizzes/1/delete').status_code == 403
 
 
 
 @pytest.mark.parametrize('path', (
-    f'/groups/1/quiz/{len(QUIZZES)+1}/update',
-    f'/groups/1/quiz/{len(QUIZZES)+1}/delete',
+    f'/groups/1/quizzes/{len(QUIZZES)+1}/edit',
+    f'/groups/1/quizzes/{len(QUIZZES)+1}/delete',
 ))
 def test_exists_required(client, auth, path):
     """
@@ -108,17 +108,17 @@ def test_create(client, auth, app):
     auth.login_as('bob')
 
     # GET request should return the form to fill
-    response = client.get('/groups/1/quiz/create')
+    response = client.get('/groups/1/quizzes/0/edit')
     assert response.status_code == 200
 
     # POST request should rdirect to <update> view
-    response = client.post('/groups/1/quiz/create', data=REQUEST_PAYLOAD)
-    assert f'http://localhost/groups/1/quiz/{len(QUIZZES)+1}/update' == response.headers['Location']
+    response = client.post('/groups/1/quizzes/0/edit', data=REQUEST_PAYLOAD)
+    assert f'http://localhost/groups/1/quizzes/{len(QUIZZES)+1}/edit' == response.headers['Location']
 
     # new quiz should be in database now
     with app.app_context():
         db = get_db_session()
-        quiz = db.query(Quiz).filter(Quiz.topic == REQUEST_PAYLOAD["quiz_topic"]).first()
+        quiz = db.query(Quiz).filter(Quiz.topic == REQUEST_PAYLOAD["topic"]).first()
         assert quiz is not None
 
 
@@ -134,8 +134,8 @@ def test_delete(client, auth, app):
         assert quiz is not None
 
     auth.login_as("bob")
-    response = client.post('/groups/1/quiz/1/delete')
-    assert response.headers['Location'] == 'http://localhost/groups/1/quiz/'
+    response = client.post('/groups/1/quizzes/1/delete')
+    assert response.headers['Location'] == 'http://localhost/groups/1/quizzes/'
 
     with app.app_context():
         db = get_db_session()
@@ -154,31 +154,31 @@ def test_update(client, auth, app):
     a. render and return a 200 OK status for a GET request.
     b. update existing quiz data in the database when valid data is sent in a POST request.
     """
+    new_topic = "New Topic"
+    quiz_id = 1
+
     # use new quiz data to update first quiz:
     request_payload = REQUEST_PAYLOAD.copy()
-    request_payload["quiz_topic"] = "New Topic"
+    request_payload["topic"] = new_topic
 
     auth.login_as("bob")
 
-    response = client.get('/groups/1/quiz/1/update')
+    response = client.get(f'/groups/1/quizzes/{quiz_id}/edit')
     assert response.status_code == 200
 
-    # updating is done by deleting old one and adding the updated version as a new quiz
-    response = client.post('/groups/1/quiz/1/update', data=request_payload)
-    assert 'http://localhost/groups/1/quiz/2/update' == response.headers['Location']
+    response = client.post(f'/groups/1/quizzes/{quiz_id}/edit', data=request_payload)
+    assert f'http://localhost/groups/1/quizzes/{quiz_id}/edit' == response.headers['Location']
 
     with app.app_context():
         db = get_db_session()
-        quiz_old = db.query(Quiz).filter(Quiz.id == 1).first()
-        assert quiz_old is None
-        quiz = db.query(Quiz).filter(Quiz.id == 2).first()
-        assert quiz is not None
+        quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
+        assert quiz.topic == new_topic
 
 
 
 @pytest.mark.parametrize('path', (
-    '/groups/1/quiz/create',
-    '/groups/1/quiz/1/update',
+    '/groups/1/quizzes/0/edit',
+    '/groups/1/quizzes/1/edit',
 ))
 def test_create_update_validate(client, auth, path):
     """
@@ -187,7 +187,35 @@ def test_create_update_validate(client, auth, path):
     auth.login_as("bob")
 
     request_payload = REQUEST_PAYLOAD.copy()
-    del request_payload["quiz_topic"] # will raise key error on request.form['quiz_topic']
+    del request_payload["topic"] # will raise key error on request.form['topic']
 
     response = client.post(path, data=request_payload)
     assert response.status_code == 400
+
+
+
+
+def test_update_finalized(client, auth, app):
+    """
+    An error should be returned when
+    a user tries to update or delete a finalized quiz.
+    """
+    quiz_id = 1
+
+    auth.login_as("bob")
+
+    # use new quiz data to update first quiz:
+    request_payload = REQUEST_PAYLOAD.copy()
+    request_payload["is_finalized"] = "1"
+    response = client.post(f'/groups/1/quizzes/{quiz_id}/edit', data=request_payload)
+
+    # try modifying it:
+    request_payload = REQUEST_PAYLOAD.copy()
+    request_payload["is_finalized"] = "0"
+    request_payload["topic"] = "blablabla"
+
+    response = client.post(f'/groups/1/quizzes/{quiz_id}/edit', data=request_payload)
+    assert response.status_code == 403
+
+    response = client.post(f'/groups/1/quizzes/{quiz_id}/delete')
+    assert response.status_code == 403

@@ -1,8 +1,9 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import func
-from quizzz.db import Base
 from flask import current_app, g
+
+from quizzz.db import Base
 
 
 class Quiz(Base):
@@ -12,40 +13,43 @@ class Quiz(Base):
     topic = sa.Column(sa.String(100), nullable=False)
     is_finalized = sa.Column(sa.Boolean, default=False)
 
-    created = sa.Column(sa.DateTime, server_default=func.now())
-    updated = sa.Column(sa.DateTime, onupdate=func.now())
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     author_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
 
     author = relationship("User", backref="quizzes")
     group = relationship("Group", backref="quizzes")
+    questions = relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
 
     def __repr__(self):
         return "<Quiz (%r) by (%r)>" % (self.topic, self.author.name)
 
-    @classmethod
-    def from_request_form(cls, request_form):
-        quiz = cls(topic=request_form['quiz_topic'], author=g.user, group=g.group)
+    def populate_from_request_form(self, request_form):
+        self.author = g.user
+        self.group = g.group
 
-        questions = []
+        self.topic = request_form['topic']
+        self.is_finalized = True if request_form['is_finalized'] == '1' else False
+
+        if not self.questions:
+            self.init_questions()
+
+        for qnum, question in enumerate(self.questions, 1):
+            question.text = request_form['question_%s' % qnum]
+            for optnum, option in enumerate(question.options, 1):
+                option.text = request_form['question_%s_option_%s' % (qnum, optnum)]
+                option.is_correct = (request_form['question_%s_answer' % qnum] == str(optnum))
+
+        return self
+
+    def init_questions(self):
         for qnum in range(1, current_app.config["QUESTIONS_PER_QUIZ"] + 1):
-            question = Question(
-                text=request_form['question_%s' % qnum],
-                quiz=quiz
-            )
-
-            options = []
+            question = Question(quiz=self)
             for optnum in range(1, current_app.config["OPTIONS_PER_QUESTION"] + 1):
-                options += [Option(
-                    text=request_form['question_%s_option_%s' % (qnum, optnum)],
-                    is_correct=(request_form['question_%s_answer' % qnum] == str(optnum)),
-                    question=question
-                )]
+                option = Option(question=question)
 
-        quiz.is_finalized = True if request_form['is_finalized'] == '1' else False
-
-        return quiz
 
 
 class Question(Base):
@@ -55,14 +59,17 @@ class Question(Base):
     text = sa.Column(sa.String(1000), nullable=False)
     comment = sa.Column(sa.String(1000))
 
-    created = sa.Column(sa.DateTime, server_default=func.now())
-    updated = sa.Column(sa.DateTime, onupdate=func.now())
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'), nullable=False)
-    quiz = relationship("Quiz", backref=backref("questions", cascade="all, delete-orphan"))
+
+    quiz = relationship("Quiz", back_populates="questions")
+    options = relationship("Option", back_populates="question", cascade="all, delete-orphan")
 
     def __repr__(self):
         return "<Question (%r) from quiz id (%r)>" % (self.text[:20], self.quiz_id)
+
 
 
 class Option(Base):
@@ -72,11 +79,12 @@ class Option(Base):
     text = sa.Column(sa.String(100), nullable=False)
     is_correct = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    created = sa.Column(sa.DateTime, server_default=func.now())
-    updated = sa.Column(sa.DateTime, onupdate=func.now())
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id'), nullable=False)
-    question = relationship("Question", backref=backref("options", cascade="all, delete-orphan"))
+
+    question = relationship("Question", back_populates="options")
 
     def __repr__(self):
         return "<Option (%r)%r>" % (self.text[:20], " (correct)" if self.is_correct else "")

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  {% if quiz %}Edit Quiz{% else %}New Quiz{% endif %}
+  {% if data.quiz_id %}Edit Quiz{% else %}New Quiz{% endif %}
   - {{ g.group.name }}
 {% endblock %}
 
@@ -9,9 +9,9 @@
   {{
     render_header([
       ("Groups", url_for("groups.show_user_groups")),
-      (g.group.name, url_for("groups.show_group_page", group_id=g.group.id)),
-      ("My Quizzes", url_for("quiz.index", group_id=g.group.id)),
-      ((quiz and "Edit Quiz") or "New Quiz", "")
+      (g.group.name, url_for("groups.show_group_page")),
+      ("My Quizzes", url_for("quizzes.index")),
+      ((data.quiz_id and "Edit Quiz") or "New Quiz", "")
     ])
   }}
 {% endblock %}
@@ -38,18 +38,18 @@
         </div>
         <div class="quiz-form__row">
           <input class="quiz-form__input"
-            name="quiz_topic"
+            name="topic"
             id="quiz_topic"
             type="text"
-            value="{{ (quiz and quiz.topic) or '' }}"
+            value="{{ data.quiz.topic or ''}}"
             maxlength="1000"
             required
-            {{ (quiz and quiz.is_finalized and 'disabled') or '' }}
+            {{ (data.read_only and 'disabled') or '' }}
           />
         </div>
       </div>
 
-      {% for qnum in range(1, config["QUESTIONS_PER_QUIZ"] + 1) %}
+      {% for qnum in range(1, data.num_questions + 1) %}
         <div class="quiz-form__item">
           <div class="quiz-form__row">
             <div class="quiz-form__label">
@@ -61,20 +61,20 @@
               name="{{'question_%s' % qnum}}"
               id="{{'question_%s' % qnum}}"
               maxlength="1000"
-              {{ (quiz and quiz.is_finalized and 'disabled') or '' }}
-              required>{{ (quiz and quiz.questions[qnum-1].text) or '' }}</textarea
+              {{ (data.read_only and 'disabled') or '' }}
+              required>{{ data.quiz["question_%s" % qnum] or ''}}</textarea
             >
           </div>
           <div class="quiz-form__row">
-            <fieldset class="quiz-form__fieldset" {{ (quiz and quiz.is_finalized and 'disabled') or '' }}>
-              {% for optnum in range(1, config["OPTIONS_PER_QUESTION"] + 1) %}
+            <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
+              {% for optnum in range(1, data.num_options + 1) %}
                 <div class="quiz-form__fieldset-item">
                   <input
                     type='radio'
                     id="{{'question_%s_option_%s_radio' % (qnum, optnum)}}"
                     name="{{'question_%s_answer' % qnum }}"
                     value='{{ optnum }}'
-                    {{ (quiz and quiz.questions[qnum-1].options[optnum-1].is_correct and 'checked') or '' }}
+                    {{ ((data.quiz['question_%s_answer' % qnum] == optnum|string) and 'checked') or '' }}
                     required
                   />
                   <label class="quiz-form__fieldset-item-input"
@@ -83,7 +83,7 @@
                       type='text'
                       id="{{'question_%s_option_%s' % (qnum, optnum)}}"
                       name="{{'question_%s_option_%s' % (qnum, optnum)}}"
-                      value="{{ (quiz and quiz.questions[qnum-1].options[optnum-1].text) or '' }}"
+                      value="{{ data.quiz['question_%s_option_%s' % (qnum, optnum)] or '' }}"
                       maxlength="200"
                       required
                     />
@@ -99,18 +99,18 @@
       <div class="quiz-form__item">
         <div class="quiz-form__row">
           <div class="quiz-form__label">
-            <label for="{{'question_%s' % qnum}}">Submit Quiz?</label>
+            Submit Quiz?
           </div>
         </div>
         <div class="quiz-form__row">
-          <fieldset class="quiz-form__fieldset" {{ (quiz and quiz.is_finalized and 'disabled') or '' }}>
+          <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
             <div class="quiz-form__fieldset-item">
               <input
                 type='radio'
                 id="is_finalized_no"
                 name="is_finalized"
                 value='0'
-                {{ (quiz and quiz.is_finalized and '') or 'checked' }}
+                {{ (not data.quiz.is_finalized and 'checked') or '' }}
               />
               <label class="quiz-form__fieldset-item-input"
                      for="is_finalized_no">
@@ -123,7 +123,7 @@
                 id="is_finalized_yes"
                 name="is_finalized"
                 value='1'
-                {{ (quiz and quiz.is_finalized and 'checked') or '' }}
+                {{ (data.quiz.is_finalized and 'checked') or '' }}
               />
               <label class="quiz-form__fieldset-item-input"
                      for="is_finalized_yes">
@@ -134,7 +134,7 @@
         </div>
       </div>
 
-      {% if not quiz or (quiz and not quiz.is_finalized) %}
+      {% if not data.read_only %}
         <div class='quiz-form__item'>
           <button class="button button_action">Save</button>
         </div>
@@ -142,8 +142,8 @@
 
     </form>
 
-    {% if quiz and not quiz.is_finalized %}
-    <form action="{{ url_for('quiz.delete', quiz_id=quiz.id) }}" method="post">
+    {% if data.quiz_id and not data.read_only %}
+    <form action="{{ url_for('quizzes.delete', quiz_id=data.quiz_id) }}" method="post">
       <div class='quiz-form__item'>
         <button class="button button_danger"
                 onclick="return confirm('Are you sure?');">

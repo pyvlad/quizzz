@@ -5,7 +5,7 @@ from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
-from quizzz.quiz.models import Quiz, Question, Option
+from quizzz.quizzes.models import Quiz, Question, Option
 from quizzz.tournaments.models import Tournament, Round
 from quizzz import create_app
 

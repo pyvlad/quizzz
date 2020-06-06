@@ -2,7 +2,7 @@ import traceback
 from flask import current_app, render_template, g, flash, request, redirect, url_for, abort
 from . import bp
 from .models import Play, PlayAnswer
-from quizzz.quiz.models import Quiz
+from quizzz.quizzes.models import Quiz
 from quizzz.db import get_db_session
 
 
@@ -23,7 +23,7 @@ def index():
     group_quizzes = db.query(Quiz)\
         .filter(Quiz.group_id == g.group.id)\
         .filter(Quiz.author_id != g.user.id)\
-        .order_by(Quiz.created.desc())\
+        .order_by(Quiz.time_created.desc())\
         .all()
     played_quizzes = [p for p in g.user.plays if p.is_submitted]
     played_quiz_ids = {p.quiz_id for p in played_quizzes}

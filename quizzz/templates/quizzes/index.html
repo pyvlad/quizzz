@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}My Quizzes - {{g.group.name}}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_user_groups")),
+      (g.group.name, url_for("groups.show_group_page")),
+      ("My Quizzes", url_for("quizzes.index"))
+    ])
+  }}
+{% endblock %}
+
+{% block content %}
+  {% if g.user %}
+    <a href="{{ url_for('quizzes.edit', quiz_id=0) }}">
+      <button class="button button_action my_md">New Quiz</button>
+    </a>
+  {% endif %}
+  <h3>To Be Finished</h3>
+  <ul class="list">
+    {% for quiz in data.user_quizzes_in_progress %}
+      <a class="list__item-link" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
+        <li class="list__item list__item_active">
+          <div class="list__text-primary">{{ quiz.topic }}</div>
+          <div class="list__text-secondary my_sm">
+            {% if quiz.time_updated %}
+              <span>last updated at {{ quiz.time_updated.strftime('%Y-%m-%d') }}</span>
+            {% endif %}
+          </div>
+        </li>
+      </a>
+    {% endfor %}
+  </ul>
+  <h3>Submitted Quizzes</h3>
+  <ul class="list">
+    {% for quiz in data.user_quizzes_finalized %}
+      <a class="list__item-link" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
+        <li class="list__item">
+          <div class="list__text-primary">{{ quiz.topic }}</div>
+          <div class="list__text-secondary my_sm">
+            {% if quiz.time_updated %}
+              {{ quiz.time_updated.strftime('%Y-%m-%d') }}
+            {% else %}
+              {{ quiz.time_created.strftime('%Y-%m-%d') }}
+            {% endif %}
+          </div>
+        </li>
+      </a>
+    {% endfor %}
+  </ul>
+{% endblock %}
