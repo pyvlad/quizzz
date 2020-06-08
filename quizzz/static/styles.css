@@ -384,6 +384,21 @@
   background-color: pink;
 }
 
+
+/* ADMIN ACTIONS */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+}
+.actions__item {
+  display: block;
+  margin-right: 1em;
+}
+.actions__item_last {
+  margin-right: 0;
+}
+
+
 /* Headers */
 .item-header {
   font-weight: bold;

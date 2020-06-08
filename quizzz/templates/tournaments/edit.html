@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  {% if tournament %}Edit Tournament{% else %}New Tournament{% endif %}
+  {% if data.tournament.id %}Edit Tournament{% else %}New Tournament{% endif %}
   - {{ g.group.name }}
 {% endblock %}
 
@@ -9,7 +9,7 @@
   {{
     render_header([
       ("Groups", url_for("groups.show_user_groups")),
-      (g.group.name, url_for("groups.show_group_page", group_id=g.group.id)),
+      (g.group.name, url_for("groups.show_group_page")),
       ("Tournaments", url_for("tournaments.index")),
       ((tournament and "Edit Tournament") or "New Tournament", "")
     ])
@@ -17,68 +17,68 @@
 {% endblock %}
 
 {% block content %}
-  <div class="b-form">
+  <div class="form">
 
-    <div class="b-form__header">
+    <div class="form__header">
       {{ (tournament and "Edit Tournament") or "New Tournament" }}
     </div>
 
-    <div class="b-form__helper-text">
-      Please fill in the form below and hit 'save'.<br/>
+    <div class="form__item">
+      <div class="form__help">
+        Please fill in the form below and hit 'save'.<br/>
+      </div>
     </div>
 
     <form action="" method="post">
 
-      <div class="b-form__row">
-        <div class="b-form__label">
+      <div class="form__item">
+        <div class="form__label">
           <label for="tournament_name">Tournament Name</label>
         </div>
-      </div>
-      <div class="b-form__row">
-        <input class="b-form__input"
+        <input class="form__input"
           name="tournament_name"
           id="tournament_name"
           type="text"
-          value="{{ (tournament and tournament.name) or '' }}"
+          value="{{ data.tournament.name or '' }}"
           maxlength="100"
           required
         />
       </div>
 
-      <div class='b-form-row'>
+      <div class='form__item'>
         <label for='has_started'>
           <input id='has_started'
                  name='has_started'
                  type='checkbox'
                  value='1'
-                 {{ (tournament and tournament.has_started and "checked") or '' }}
+                 {{ (data.tournament.has_started and "checked") or '' }}
           />
           <span>Launch tournament?</span>
         </label>
       </div>
 
-      <div class='b-form-row'>
+      <div class='form__item'>
         <label for='has_finished'>
           <input id='has_finished'
                  name='has_finished'
                  type='checkbox'
                  value='1'
-                 {{ (tournament and tournament.has_finished and "checked") or '' }}
+                 {{ (data.tournament.has_finished and "checked") or '' }}
           />
           <span>Finish tournament?</span>
         </label>
       </div>
 
-      <div class='b-form-row'>
+      <div class='form__item'>
         <button class="button button_action">Save</button>
       </div>
 
     </form>
 
-    {% if tournament %}
-      <form action="{{ url_for('tournaments.delete_tournament', tournament_id=tournament.id) }}"
+    {% if data.tournament.id %}
+      <form action="{{ url_for('tournaments.delete_tournament', tournament_id=data.tournament.id) }}"
             method="post">
-        <div class='b-form__row'>
+        <div class='form__item'>
           <button class="button button_danger"
                   onclick="return confirm('Are you sure?');">
             Delete

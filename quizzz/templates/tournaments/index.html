@@ -6,7 +6,7 @@
   {{
     render_header([
       ("Groups", url_for("groups.show_user_groups")),
-      (g.group.name, url_for("groups.show_group_page", group_id=g.group.id)),
+      (g.group.name, url_for("groups.show_group_page")),
       ("Tournaments", "")
     ])
   }}
@@ -14,11 +14,11 @@
 
 {% block content %}
   {% if data.has_edit_permissions %}
-    <h2 style="color:red;">
-      <a href="{{ url_for('tournaments.create_tournament') }}">
-        New Tournament
+    <div class="actions">
+      <a class="actions__item" href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
+        <button class="button button_action my_md">New Tournament</button>
       </a>
-    </h2>
+    </div>
   {% endif %}
   <ul class="list">
     {% for tournament in data.tournaments %}
@@ -28,7 +28,8 @@
           <div class="list__text-primary">{{ tournament.name }}</div>
           {% if data.has_edit_permissions %}
             <div class="list__text-secondary">
-              <a href="{{ url_for('tournaments.update_tournament', tournament_id=tournament.id) }}">
+              <a class="list__item-link"
+                href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}">
                 Edit
               </a>
             </div>

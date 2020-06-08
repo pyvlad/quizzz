@@ -1,6 +1,10 @@
+import datetime
+
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import func
+from flask import g, request
+
 from quizzz.db import Base
 
 
@@ -18,6 +22,15 @@ class Tournament(Base):
 
     def __repr__(self):
         return "<Tournament (%r) in (%r)>" % (self.name, self.group_id)
+
+    def populate_from_request_form(self, request_form):
+        self.group = g.group
+
+        self.name = request.form["tournament_name"]
+        self.has_started = bool(request.form.get("has_started"))
+        self.has_finished = bool(request.form.get("has_finished"))
+
+        return self
 
 
 
@@ -37,3 +50,12 @@ class Round(Base):
 
     def __repr__(self):
         return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)
+
+    def populate_from_request_form(self, request_form, tournament_id):
+        self.tournament_id = tournament_id
+        self.quiz_id = int(request.form["quiz_id"])
+        if request.form.get("start_time"):
+            self.start_time = datetime.datetime.strptime(request.form["start_time"], '%Y-%m-%d')
+        if request.form.get("finish_time"):
+            self.finish_time = datetime.datetime.strptime(request.form["finish_time"], '%Y-%m-%d')
+        return self

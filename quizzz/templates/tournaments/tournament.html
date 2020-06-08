@@ -6,7 +6,7 @@
   {{
     render_header([
       ("Groups", url_for("groups.show_user_groups")),
-      (g.group.name, url_for("groups.show_group_page", group_id=g.group.id)),
+      (g.group.name, url_for("groups.show_group_page")),
       ("Tournaments", url_for("tournaments.index")),
       (data.tournament.name, "")
     ])
@@ -14,6 +14,18 @@
 {% endblock %}
 
 {% block content %}
+  {% if data.has_edit_permissions %}
+    <div class="actions">
+      <a class="actions__item"
+         href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
+        <button class="button button_action my_md">Add Round</button>
+      </a>
+      <a class="actions__item actions__item_last"
+         href="{{ url_for('tournaments.edit_tournament', tournament_id=data.tournament.id) }}">
+        <button class="button button_action my_md">Edit Tournament</button>
+      </a>
+    </div>
+  {% endif %}
   <ul class="list">
     {% for round in data.tournament.rounds %}
       <a class="list__item-link"
@@ -23,7 +35,7 @@
           <div class="list__text-secondary">by {{ round.quiz.author }}</div>
           <div class="list__text-secondary">{{ round.start_time }} - {{ round.finish_time }}</div>
           {% if data.has_edit_permissions %}
-            <a href="{{ url_for('tournaments.update_round', tournament_id=data.tournament.id, round_id=round.id) }}">
+            <a href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=round.id) }}">
               Edit Round
             </a>
           {% endif %}
@@ -31,16 +43,4 @@
       </a>
     {% endfor %}
   </ul>
-  {% if data.has_edit_permissions %}
-    <h2 style="color:pink;">
-      <a href="{{ url_for('tournaments.create_round', tournament_id=data.tournament.id) }}">
-        Add Round
-      </a>
-    </h2>
-    <h2 style="color:red;">
-      <a href="{{ url_for('tournaments.update_tournament', tournament_id=data.tournament.id) }}">
-        Edit Tournament
-      </a>
-    </h2>
-  {% endif %}
 {% endblock %}

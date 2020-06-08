@@ -110,3 +110,12 @@ QUESTION_OPTIONS = [
     {"text": "Bazinga!", "question_id": QUIZ_QUESTIONS["question2"]["id"]},
     {"text": "None of these", "question_id": QUIZ_QUESTIONS["question2"]["id"], "is_correct": True}
 ]
+
+
+TOURNAMENTS = {
+    "tournament1": {
+        "id": 1,
+        "name": "Tournament1",
+        "group_id": GROUPS["group1"]["id"]
+    }
+}

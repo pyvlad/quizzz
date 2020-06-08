@@ -14,13 +14,9 @@ def check_user_permissions(level):
             abort(403, "You're not logged in.")
 
     if level >= USER.IS_GROUP_MEMBER:
-        user_group_ids = { m.group_id for m in g.user.memberships }
-        if g.group.id not in user_group_ids:
+        if not g.group_membership or not g.group_membership:
             abort(403, "You're not a member of this group.")
 
     if level >= USER.IS_GROUP_ADMIN:
-        group_memberships = list(g.group.members)
-        group_member_user_ids = [m.user_id for m in group_memberships]
-        membership = group_memberships[group_member_user_ids.index(g.user.id)]
-        if not membership.is_admin:
+        if not g.group_membership or not g.group_membership.is_admin:
             abort(403, "You're not an admin of this group.")

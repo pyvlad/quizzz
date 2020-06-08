@@ -5,5 +5,4 @@ bp = Blueprint('tournaments', __name__, url_prefix='/groups/<int:group_id>/tourn
 
 
 from . import models
-from . import views_tournaments
-from . import views_rounds
+from . import views

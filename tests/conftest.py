@@ -19,6 +19,7 @@ from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
 from quizzz.quizzes.models import Quiz, Question, Option
+from quizzz.tournaments.models import Tournament
 
 from . import data
 
@@ -44,7 +45,8 @@ def app():
             *[Message(**message) for message in data.MESSAGES],
             *[Quiz(**quiz) for quiz in data.QUIZZES.values()],
             *[Question(**question) for question in data.QUIZ_QUESTIONS.values()],
-            *[Option(**option) for option in data.QUESTION_OPTIONS]
+            *[Option(**option) for option in data.QUESTION_OPTIONS],
+            *[Tournament(**tournament) for tournament in data.TOURNAMENTS.values()]
         ]
 
         db = get_db_session()
