@@ -15,8 +15,9 @@
 {% block content %}
   {% if data.has_edit_permissions %}
     <div class="actions">
-      <a class="actions__item" href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
-        <button class="button button_action my_md">New Tournament</button>
+      <a class="actions__item button button_action my_md"
+         href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
+        New Tournament
       </a>
     </div>
   {% endif %}

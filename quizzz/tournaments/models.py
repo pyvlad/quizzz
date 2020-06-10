@@ -59,3 +59,77 @@ class Round(Base):
         if request.form.get("finish_time"):
             self.finish_time = datetime.datetime.strptime(request.form["finish_time"], '%Y-%m-%d')
         return self
+
+
+
+class Play(Base):
+    __tablename__ = "plays"
+
+    id = sa.Column(sa.Integer, primary_key=True)
+
+    is_submitted = sa.Column(sa.Boolean, default=False)
+    result = sa.Column(sa.Integer)
+    server_started = sa.Column(sa.DateTime, default=datetime.datetime.utcnow)
+    server_updated = sa.Column(sa.DateTime, onupdate=datetime.datetime.utcnow)
+    # alternative 1 (sqlite only):
+    # server_started = sa.Column(sa.DateTime, server_default=text("(STRFTIME('%Y-%m-%d %H:%M:%f000', 'NOW'))"))
+    # server_updated = sa.Column(sa.DateTime, onupdate=text("STRFTIME('%Y-%m-%d %H:%M:%f000', 'NOW')"))
+    # alternative 2 (lacks precision):
+    # server_started = sa.Column(sa.DateTime, server_default=func.now())
+    # server_updated = sa.Column(sa.DateTime, onupdate=func.now())
+
+    client_started = sa.Column(sa.DateTime)
+    client_updated = sa.Column(sa.DateTime)
+
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
+    user = relationship("User", backref="plays")
+
+    round_id = sa.Column(sa.Integer, sa.ForeignKey('rounds.id'), nullable=False)
+    round = relationship("Round", backref="plays")
+
+    def __repr__(self):
+        return "<RoundPlayed %r by %r>" % (self.round_id, self.user_id)
+
+    def get_server_time(self):
+        return (self.server_updated - self.server_started).total_seconds()
+
+    def get_client_time(self):
+        return (self.client_updated - self.client_started).total_seconds()
+
+    def get_result(self):
+        return len(answer.option.is_correct for answer in self.answers)
+
+    def populate_from_request_form(self, request_form):
+        quiz = self.round.quiz
+
+        answers = []
+        for question in quiz.questions:
+            options_by_id = { option.id: option for option in question.options }
+
+            selected_option_id = int(request.form["q%s" % question.id])
+            selected_option = options_by_id.get(selected_option_id)
+
+            answers += [PlayAnswer(play=self, option=selected_option)]
+
+        self.answers = answers
+        self.is_submitted = True
+        self.result = len([answer for answer in answers if answer.option.is_correct])
+
+        return self
+
+
+
+class PlayAnswer(Base):
+    __tablename__ = "answers"
+
+    id = sa.Column(sa.Integer, primary_key=True)
+
+    play_id = sa.Column(sa.Integer, sa.ForeignKey('plays.id'), nullable=False)
+    option_id = sa.Column(sa.Integer, sa.ForeignKey('options.id'), nullable=False)
+
+    play = relationship("Play", backref="answers")
+    option = relationship("Option", backref="answers")
+
+    def __repr__(self):
+        return "<AnswerSelected [%r] %r by %r>" % (
+            "V" if self.option.is_correct else "X", self.option.text, self.play.user.name)

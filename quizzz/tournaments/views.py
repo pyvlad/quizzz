@@ -1,53 +1,22 @@
-import traceback
-
 from sqlalchemy.orm import joinedload
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
 from quizzz.db import get_db_session
-from quizzz.permissions import USER, check_user_permissions
-from quizzz.auth.models import User
-from quizzz.quizzes.models import Quiz
 
 from . import bp
-from .models import Tournament, Round
+from .models import Play
+from .queries import (
+    get_tournament_by_id,
+    get_round_by_id,
+    get_round_with_quiz_by_id,
+    get_round_with_details_by_id,
+    get_quiz_pool,
+    get_play_by_round_id,
+    get_played_rounds_by_tournament_id
+)
 
 
-
-# *** HELPERS ***
-def get_tournament_by_id(tournament_id, with_rounds=False):
-    db = get_db_session()
-
-    if with_rounds:
-        tournament = db.query(Tournament)\
-            .options(joinedload(Tournament.rounds).joinedload(Round.quiz))\
-            .filter(Tournament.id == tournament_id)\
-            .first()
-    else:
-        tournament = db.query(Tournament).filter(Tournament.id == tournament_id).first()
-
-    if tournament is None:
-        abort(404, "Tournament doesn't exist.")
-
-    return tournament
-
-
-def get_quiz_pool(group_id):
-    db = get_db_session()
-
-    quiz_pool = db.query(Quiz, User.id, User.name)\
-        .join(User, Quiz.author_id == User.id)\
-        .filter(Quiz.group_id == group_id)\
-        .filter(Quiz.is_finalized == True)\
-        .filter(Quiz.round == None)\
-        .order_by(Quiz.time_created.desc())\
-        .all()
-
-    return quiz_pool
-
-
-
-# *** VIEWS ***
-@bp.route('/')
+@bp.route('/tournaments/')
 def index():
     """
     Get list of group tournaments.
@@ -66,67 +35,13 @@ def index():
 
 
 
-@bp.route('/<int:tournament_id>/edit', methods=('GET', 'POST'))
-def edit_tournament(tournament_id):
-    """
-    Edit group tournament.
-    """
-    check_user_permissions(USER.IS_GROUP_ADMIN)
-
-    tournament = (Tournament() if not tournament_id else get_tournament_by_id(tournament_id))
-
-    if request.method == 'POST':
-        tournament.populate_from_request_form(request.form)
-
-        db = get_db_session()
-        try:
-            db.add(tournament)
-            db.commit()
-        except:
-            traceback.print_exc()
-            db.rollback()
-            flash("Tournament could not be created!")
-        else:
-            flash("Tournament successfully created/updated.")
-            return redirect(url_for('tournaments.show_tournament', tournament_id=tournament.id))
-
-    data = {
-        "tournament": {
-            "id": tournament.id,
-            "name": tournament.name,
-            "has_started": tournament.has_started,
-            "has_finished": tournament.has_finished
-        }
-    }
-
-    return render_template('tournaments/edit.html', data=data)
-
-
-
-@bp.route('/<int:tournament_id>/delete', methods=('POST',))
-def delete_tournament(tournament_id):
-    """
-    Delete group tournament.
-    """
-    check_user_permissions(USER.IS_GROUP_ADMIN)
-
-    tournament = get_tournament_by_id(tournament_id)
-
-    db = get_db_session()
-    db.delete(tournament)
-    db.commit()
-    flash("Tournament has been deleted.")
-
-    return redirect(url_for('tournaments.index'))
-
-
-
-@bp.route('/<int:tournament_id>/')
+@bp.route('/tournaments/<int:tournament_id>/')
 def show_tournament(tournament_id):
     """
     Show tournament details.
     """
     tournament = get_tournament_by_id(tournament_id, with_rounds=True)
+    played_round_ids = get_played_rounds_by_tournament_id(tournament_id)
 
     data = {
         "tournament": {
@@ -142,7 +57,7 @@ def show_tournament(tournament_id):
                     },
                     "start_time": round.start_time or "",
                     "finish_time": round.finish_time or "",
-                    "is_taken": round.quiz.id in { play.quiz_id for play in g.user.plays }
+                    "is_taken": round.id in played_round_ids
                 }
                 for round in tournament.rounds
             ]
@@ -156,22 +71,13 @@ def show_tournament(tournament_id):
 
 
 
-
 @bp.route('/rounds/<int:round_id>/')
 def show_round(round_id):
     """
     Show round details.
     """
-    check_user_permissions(USER.IS_GROUP_MEMBER)
-
-    db = get_db_session()
-    round = db.query(Round)\
-        .options(joinedload(Round.quiz).joinedload(Quiz.author))\
-        .options(joinedload(Round.tournament))\
-        .filter(Round.id == round_id)\
-        .first()
-    if not round:
-        abort(404, "This round doesn't exist.")
+    round = get_round_with_details_by_id(round_id)
+    users_played = set(play.user.id for play in round.plays)
 
     data = {
         "tournament": {
@@ -189,86 +95,129 @@ def show_round(round_id):
                     "result": play.result,
                     "time": play.get_server_time()
                 }
-                for play in round.quiz.plays
+                for play in round.plays
             ]
         },
         "round": {
             "id": round.id,
         },
-        "is_taken": g.user.id in { play.user.id for play in round.quiz.plays }
+        "is_taken": g.user.id in users_played
     }
 
     return render_template('tournaments/round.html', data=data)
 
 
 
-@bp.route("/<int:tournament_id>/rounds/<int:round_id>/edit", methods=("GET", "POST"))
-def edit_round(tournament_id, round_id):
-    check_user_permissions(USER.IS_GROUP_ADMIN)
-
-    tournament = get_tournament_by_id(tournament_id)
-    quiz_pool = get_quiz_pool(g.group_id)
-
+@bp.route('/rounds/<int:round_id>/start', methods=('POST',))
+def start_round(round_id):
     db = get_db_session()
 
-    if round_id:
-        round = db.query(Round).filter(Round.id == round_id).first()
-        if not round:
-            abort(404, "Round doesn't exist.")
-    else:
-        round = Round()
+    round = get_round_by_id(round_id)
+    play = get_play_by_round_id(round_id)
+
+    if play is None:
+        play = Play(user=g.user, round=round)
+        db.add(play)
+        db.commit()
+
+    if play.is_submitted:
+        abort(403, "You have already played this round.")
+
+    return redirect(url_for("tournaments.play_round", play_id=play.id))
+
+
+
+@bp.route('/plays/<int:play_id>/', methods=('GET', 'POST'))
+def play_round(play_id):
+    """
+    Take the round's quiz.
+    """
+    db = get_db_session()
+
+    play = db.query(Play).filter(Play.id == play_id).first()
+    if not play or play.user_id != g.user.id:
+        abort(403)
+    if play.is_submitted:
+        abort(403, "You have already played this round.")
+
+    round = get_round_with_quiz_by_id(play.round_id)
+    round_id = play.round_id
+    quiz = round.quiz
 
     if request.method == 'POST':
-        round.populate_from_request_form(request.form, tournament_id)
-
-        try:
-            db.add(round)
-            db.commit()
-        except:
-            traceback.print_exc()
-            db.rollback()
-            flash("Quiz Round could not be updated!")
-        else:
-            flash("Quiz Round has been created/updated.")
-            return redirect(url_for('tournaments.show_tournament', tournament_id=tournament_id))
+        # TODO: handle sqlalchemy errors rather than let application fail
+        play.populate_from_request_form(request.form)
+        db.commit()
+        return redirect(url_for("tournaments.review_round", round_id=round_id))
 
     data = {
+        "quiz_topic": quiz.topic,
+        "questions": [
+            {
+                "number": qnum,
+                "id": question.id,
+                "text": question.text,
+                "options": [
+                    {
+                        "number": optnum,
+                        "id": option.id,
+                        "text": option.text
+                    }
+                    for optnum, option in enumerate(question.options)
+                ]
+            }
+            for qnum, question in enumerate(quiz.questions, 1)
+        ]
+    }
+
+    return render_template('tournaments/play_round.html', data=data)
+
+
+
+
+@bp.route('/rounds/<int:round_id>/review', methods=('GET',))
+def review_round(round_id):
+    """
+    Review the round's quiz.
+    """
+    round = get_round_with_quiz_by_id(round_id)
+    play = get_play_by_round_id(round_id, with_answers=True)
+    tournament = get_tournament_by_id(round.tournament_id)
+
+    if not play or not play.is_submitted:
+        abort(403, "You can't review a quiz before you take it!")
+
+    data = {
+        "quiz_topic": round.quiz.topic,
+        "questions": [
+            {
+                "number": qnum + 1,
+                "id": question.id,
+                "text": question.text,
+                "options": [
+                    {
+                        "number": optnum,
+                        "id": option.id,
+                        "text": option.text,
+                        "is_correct": option.is_correct
+                    }
+                    for optnum, option in enumerate(question.options)
+                ],
+                "answer": {
+                    "option_id": play.answers[qnum].option.id,
+                    "is_correct": play.answers[qnum].option.is_correct
+                },
+                "comment": question.comment
+            }
+            for qnum, question in enumerate(round.quiz.questions)
+        ],
         "tournament": {
             "id": tournament.id,
             "name": tournament.name
         },
-        "quiz_pool": [{
-            "id": quiz.id,
-            "topic": quiz.topic,
-            "author_name": author_name
-        } for quiz, author_id, author_name in quiz_pool],
         "round": {
-            "id": round.id,
-            "start_time": round.start_time,
-            "finish_time": round.finish_time,
-            "quiz": {
-                "id": round.quiz.id,
-                "topic": round.quiz.topic,
-                "author_name": round.quiz.author.name
-            } if round.quiz else None
+            "id": round.id
         }
     }
 
-    return render_template('tournaments/edit_round.html', data=data)
-
-
-
-@bp.route('/rounds/<int:round_id>/delete', methods=('POST',))
-def delete_round(round_id):
-    check_user_permissions(USER.IS_GROUP_ADMIN)
-
-    db = get_db_session()
-    round = db.query(Round).filter(Round.id == round_id).first()
-    if round:
-        db.delete(round)
-        flash("Quiz round has been deleted.")
-    else:
-        abort(404, "Quiz round doesn't exist.")
-    db.commit()
-
-    return redirect(url_for('tournaments.index'))
+    return render_template('tournaments/review_round.html', data=data)

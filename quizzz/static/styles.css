@@ -354,6 +354,8 @@
 /* Generic Styling Elements */
 /* Buttons */
 .button {
+  display: block;
+  text-decoration: none;
   padding: 10px 40px;
   font-weight: bold;
   min-width: 100px;

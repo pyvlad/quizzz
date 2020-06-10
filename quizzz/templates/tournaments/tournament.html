@@ -16,13 +16,13 @@
 {% block content %}
   {% if data.has_edit_permissions %}
     <div class="actions">
-      <a class="actions__item"
+      <a class="actions__item button button_action my_md"
          href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
-        <button class="button button_action my_md">Add Round</button>
+        Add Round
       </a>
-      <a class="actions__item actions__item_last"
+      <a class="actions__item actions__item_last button button_action my_md"
          href="{{ url_for('tournaments.edit_tournament', tournament_id=data.tournament.id) }}">
-        <button class="button button_action my_md">Edit Tournament</button>
+         Edit Tournament
       </a>
     </div>
   {% endif %}

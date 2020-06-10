@@ -16,11 +16,24 @@
 
 {% block content %}
   <section class="my_lg">
-    {% if not data.is_taken %}
-      <a href="{{ url_for('plays.take_quiz', quiz_id=data.quiz.id) }}">
-        <h2>Take Quiz</h2>
-      </a>
-    {% endif %}
+    <div class="actions">
+      {% if not data.is_taken %}
+        <div class="actions__item">
+          <form action="{{ url_for('tournaments.start_round', round_id=data.round.id) }}" method="post">
+            <button class="button button_action my_md">
+              Take Quiz
+            </button>
+          <form>
+        </div>
+      {% else %}
+        <div class="actions__item">
+          <a class="button button_action my_md"
+             href="{{ url_for('tournaments.review_round', round_id=data.round.id) }}">
+            Review Quiz
+          </a>
+        </div>
+      {% endif %}
+    </div>
     <h3>{{ data.quiz.topic }} [by {{ data.quiz.author }}]</h3>
   </section>
 

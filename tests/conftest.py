@@ -79,6 +79,7 @@ class AuthActions:
         return self._client.post('/auth/login', data={'username': username, 'password': password})
 
     def login_as(self, username):
+        self.logout()
         return self.login(data.USERS[username]["name"], data.USERS[username]["password"])
 
     def logout(self):

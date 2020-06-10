@@ -13,9 +13,11 @@
 {% endblock %}
 
 {% block content %}
-  <a href="{{ url_for('chat.create') }}">
-    <button class="button button_action my_md">New Message</button>
-  </a>
+  <section class="actions">
+    <a class="button button_action my_md" href="{{ url_for('chat.create') }}">
+      New Message
+    </a>
+  </section>
   {% for msg in data.messages %}
     <article class="message {% if msg.is_own %}message_own{% endif %}">
       <div class="message__details">

@@ -49,9 +49,6 @@ def create_app(test_config=None):
     from . import quizzes
     app.register_blueprint(quizzes.bp)
 
-    from . import plays
-    app.register_blueprint(plays.bp)
-
     from . import tournaments
     app.register_blueprint(tournaments.bp)
 

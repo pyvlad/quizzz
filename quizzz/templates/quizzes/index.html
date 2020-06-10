@@ -14,9 +14,11 @@
 
 {% block content %}
   {% if g.user %}
-    <a href="{{ url_for('quizzes.edit', quiz_id=0) }}">
-      <button class="button button_action my_md">New Quiz</button>
-    </a>
+    <section class="actions">
+      <a class="button button_action my_md" href="{{ url_for('quizzes.edit', quiz_id=0) }}">
+        New Quiz
+      </a>
+    </section>
   {% endif %}
   <h3>To Be Finished</h3>
   <ul class="list">
