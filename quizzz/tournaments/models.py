@@ -95,9 +95,13 @@ class Play(Base):
         return "<RoundPlayed %r by %r>" % (self.round_id, self.user_id)
 
     def get_server_time(self):
+        if self.server_updated is None or self.server_started is None:
+            return None
         return (self.server_updated - self.server_started).total_seconds()
 
     def get_client_time(self):
+        if self.client_updated is None or self.client_started is None:
+            return None
         return (self.client_updated - self.client_started).total_seconds()
 
     def get_result(self):
