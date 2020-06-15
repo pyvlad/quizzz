@@ -36,7 +36,7 @@ def get_chat_messages(quiz_id=None):
 
 
 
-def get_message_by_id(id):
+def get_own_message_by_id(id):
     """
     Helper function.
     Get message by given id.
@@ -87,7 +87,7 @@ def create():
 
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 def update(id):
-    msg = get_message_by_id(id)
+    msg = get_own_message_by_id(id)
 
     if request.method == 'POST':
         text = request.form['text']
@@ -111,7 +111,7 @@ def update(id):
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
-    msg = get_message_by_id(id)
+    msg = get_own_message_by_id(id)
     db = get_db_session()
     db.delete(msg)
     db.commit()
