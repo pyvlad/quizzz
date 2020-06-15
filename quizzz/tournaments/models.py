@@ -50,6 +50,7 @@ class Round(Base):
     quiz = relationship("Quiz", back_populates="round")
     tournament = relationship("Tournament", back_populates="rounds")
     plays = relationship("Play", back_populates="round")
+    messages = relationship("Message", back_populates="round")
 
     def __repr__(self):
         return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)

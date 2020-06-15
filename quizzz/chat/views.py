@@ -8,17 +8,17 @@ from .models import Message
 
 
 # *** HELPERS ***
-def get_chat_messages(quiz_id=None):
+def get_chat_messages(round_id=None):
     """
     Helper function.
     Get messages for given chat.
-    "quiz_id=None" means common group chat.
+    "round_id=None" means common group chat.
     """
     db = get_db_session()
     messages = db.query(Message, User.id, User.name)\
         .join(User, Message.user_id == User.id)\
         .filter(Message.group_id == g.group.id)\
-        .filter(Message.quiz_id == quiz_id)\
+        .filter(Message.round_id == round_id)\
         .order_by(Message.time_created.desc())\
         .all()
 

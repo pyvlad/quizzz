@@ -22,7 +22,6 @@ class Quiz(Base):
     author = relationship("User", back_populates="quizzes")
     group = relationship("Group", back_populates="quizzes")
     questions = relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
-    messages = relationship("Message", back_populates="quiz")
     round = relationship("Round", back_populates="quiz", uselist=False)
 
     def __repr__(self):
