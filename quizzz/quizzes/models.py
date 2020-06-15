@@ -60,9 +60,6 @@ class Question(Base):
     text = sa.Column(sa.String(1000), nullable=False)
     comment = sa.Column(sa.String(1000))
 
-    time_created = sa.Column(sa.DateTime, server_default=func.now())
-    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
-
     quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'), nullable=False)
 
     quiz = relationship("Quiz", back_populates="questions")
@@ -79,9 +76,6 @@ class Option(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     text = sa.Column(sa.String(100), nullable=False)
     is_correct = sa.Column(sa.Boolean, nullable=False, default=False)
-
-    time_created = sa.Column(sa.DateTime, server_default=func.now())
-    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id'), nullable=False)
 
