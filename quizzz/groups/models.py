@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from quizzz.db import Base
 
@@ -14,6 +14,11 @@ class Group(Base):
     invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
     confirmation_needed = sa.Column(sa.Boolean, default=False)
 
+    members = relationship("Member", back_populates="group")
+    messages = relationship("Message", back_populates="group")
+    quizzes = relationship("Quiz", back_populates="group")
+    tournaments = relationship("Tournament", back_populates="group")
+
     def __repr__(self):
         return "<Group %r>" % self.name
 
@@ -27,8 +32,8 @@ class Member(Base):
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
     is_admin = sa.Column(sa.Boolean, default=False)
 
-    user = relationship("User", backref="memberships")
-    group = relationship("Group", backref="members")
+    user = relationship("User", back_populates="memberships")
+    group = relationship("Group", back_populates="members")
 
     __table_args__ = (sa.UniqueConstraint('user_id', 'group_id', name='_user_group_uc'),)
 

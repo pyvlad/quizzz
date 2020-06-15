@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask import current_app, g
 
@@ -19,9 +19,11 @@ class Quiz(Base):
     author_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
 
-    author = relationship("User", backref="quizzes")
-    group = relationship("Group", backref="quizzes")
+    author = relationship("User", back_populates="quizzes")
+    group = relationship("Group", back_populates="quizzes")
     questions = relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
+    messages = relationship("Message", back_populates="quiz")
+    round = relationship("Round", back_populates="quiz", uselist=False)
 
     def __repr__(self):
         return "<Quiz (%r) by (%r)>" % (self.topic, self.author.name)
@@ -85,6 +87,7 @@ class Option(Base):
     question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id'), nullable=False)
 
     question = relationship("Question", back_populates="options")
+    answers = relationship("PlayAnswer", back_populates="option")
 
     def __repr__(self):
         return "<Option (%r)%r>" % (self.text[:20], " (correct)" if self.is_correct else "")

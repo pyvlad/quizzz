@@ -1,7 +1,7 @@
 import datetime
 
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask import g, request
 
@@ -18,7 +18,9 @@ class Tournament(Base):
     has_finished = sa.Column(sa.Boolean, default=False)
 
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
-    group = relationship("Group", backref="tournaments")
+
+    group = relationship("Group", back_populates="tournaments")
+    rounds = relationship("Round", back_populates="tournament", cascade="all, delete-orphan")
 
     def __repr__(self):
         return "<Tournament (%r) in (%r)>" % (self.name, self.group_id)
@@ -43,10 +45,11 @@ class Round(Base):
     finish_time = sa.Column(sa.DateTime)
 
     quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'))
-    quiz = relationship("Quiz", backref=backref("round", uselist=False))
-
     tournament_id = sa.Column(sa.Integer, sa.ForeignKey('tournaments.id'))
-    tournament = relationship("Tournament", backref=backref("rounds", cascade="all, delete-orphan"))
+
+    quiz = relationship("Quiz", back_populates="round")
+    tournament = relationship("Tournament", back_populates="rounds")
+    plays = relationship("Play", back_populates="round")
 
     def __repr__(self):
         return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)
@@ -82,10 +85,11 @@ class Play(Base):
     client_updated = sa.Column(sa.DateTime)
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
-    user = relationship("User", backref="plays")
-
     round_id = sa.Column(sa.Integer, sa.ForeignKey('rounds.id'), nullable=False)
-    round = relationship("Round", backref="plays")
+
+    user = relationship("User", back_populates="plays")
+    round = relationship("Round", back_populates="plays")
+    answers = relationship("PlayAnswer", back_populates="play")
 
     def __repr__(self):
         return "<RoundPlayed %r by %r>" % (self.round_id, self.user_id)
@@ -127,8 +131,8 @@ class PlayAnswer(Base):
     play_id = sa.Column(sa.Integer, sa.ForeignKey('plays.id'), nullable=False)
     option_id = sa.Column(sa.Integer, sa.ForeignKey('options.id'), nullable=False)
 
-    play = relationship("Play", backref="answers")
-    option = relationship("Option", backref="answers")
+    play = relationship("Play", back_populates="answers")
+    option = relationship("Option", back_populates="answers")
 
     def __repr__(self):
         return "<AnswerSelected [%r] %r by %r>" % (

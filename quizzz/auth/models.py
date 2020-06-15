@@ -1,5 +1,6 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy as sa
+from sqlalchemy.orm import relationship
 
 from quizzz.db import Base
 
@@ -10,6 +11,11 @@ class User(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String(50), unique=True, nullable=False)
     password_hash = sa.Column(sa.String(120), unique=True, nullable=False)
+
+    memberships = relationship("Member", back_populates="user")
+    messages = relationship("Message", back_populates="user")
+    quizzes = relationship("Quiz", back_populates="author")
+    plays = relationship("Play", back_populates="user")
 
     @classmethod
     def from_credentials(cls, *, password, **kwargs):
