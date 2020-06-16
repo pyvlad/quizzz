@@ -16,7 +16,7 @@ class Message(Base):
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
-    round_id = sa.Column(sa.Integer, sa.ForeignKey('rounds.id'), nullable=True)
+    round_id = sa.Column(sa.Integer, sa.ForeignKey('rounds.id', ondelete='CASCADE'), nullable=True)
 
     user = relationship("User", back_populates="messages")
     group = relationship("Group", back_populates="messages")

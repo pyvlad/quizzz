@@ -21,7 +21,8 @@ class Quiz(Base):
 
     author = relationship("User", back_populates="quizzes")
     group = relationship("Group", back_populates="quizzes")
-    questions = relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
+    questions = relationship("Question", back_populates="quiz", cascade="all, delete-orphan",
+        passive_deletes=True)
     round = relationship("Round", back_populates="quiz", uselist=False)
 
     def __repr__(self):
@@ -60,10 +61,11 @@ class Question(Base):
     text = sa.Column(sa.String(1000), nullable=False)
     comment = sa.Column(sa.String(1000))
 
-    quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'), nullable=False)
+    quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id', ondelete='CASCADE'), nullable=False)
 
     quiz = relationship("Quiz", back_populates="questions")
-    options = relationship("Option", back_populates="question", cascade="all, delete-orphan")
+    options = relationship("Option", back_populates="question", cascade="all, delete-orphan",
+        passive_deletes=True)
 
     def __repr__(self):
         return "<Question (%r) from quiz id (%r)>" % (self.text[:20], self.quiz_id)
@@ -77,7 +79,7 @@ class Option(Base):
     text = sa.Column(sa.String(100), nullable=False)
     is_correct = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id'), nullable=False)
+    question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id', ondelete='CASCADE'), nullable=False)
 
     question = relationship("Question", back_populates="options")
     answers = relationship("PlayAnswer", back_populates="option")

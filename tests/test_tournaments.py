@@ -4,7 +4,7 @@ from flask import g, session
 
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
-from quizzz.tournaments.models import Tournament, Round, Play
+from quizzz.tournaments.models import Tournament, Round, Play, PlayAnswer
 
 from .data import TOURNAMENTS
 
@@ -313,3 +313,83 @@ def test_play_round(app, client, auth):
         assert len(play.answers) == 2
         assert play.result == 2
         assert play.get_server_time() == time_taken
+
+
+
+def test_delete_round(app, client, auth):
+    """
+    Test the 'delete_round' view:
+    - it should delete round itself, all plays for that round, and all submitted play answers.
+    """
+    auth.login_as("bob")
+    assert client.post("/groups/1/tournaments/1/rounds/0/edit",
+        data=ROUND_REQUEST_PAYLOAD).status_code == 302 # add a new round
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # start play
+    assert client.post("/groups/1/plays/1/", data={"q1": 4, "q2": 8}).status_code == 302 # submit
+
+    with app.app_context():
+        db = get_db_session()
+        round = db.query(Round).filter(Round.id == 1).first()
+        assert round is not None
+        assert len(round.plays) == 1
+        assert len(round.plays[0].answers) == 2
+
+    # access denied for non group admins
+    auth.logout()
+    assert client.post("/groups/1/rounds/1/delete", data={}).status_code == 401
+    auth.login_as("ben")
+    assert client.post("/groups/1/rounds/1/delete", data={}).status_code == 403
+    auth.login_as("alice")
+    assert client.post("/groups/1/rounds/1/delete", data={}).status_code == 403
+    auth.login_as("bob")
+    assert client.post("/groups/1/rounds/1/delete", data={}).status_code == 302
+
+    with app.app_context():
+        db = get_db_session()
+        round = db.query(Round).filter(Round.id == 1).first()
+        assert round is None
+        plays = db.query(Play).all()
+        assert len(plays) == 0
+        answers = db.query(PlayAnswer).all()
+        assert len(answers) == 0
+
+
+
+def test_delete_tournament(app, client, auth):
+    """
+    Test the 'delete_tournament' view:
+    - it should delete tournament itself, all rounds, plays, and submitted play answers.
+    """
+    auth.login_as("bob")
+    assert client.post("/groups/1/tournaments/1/rounds/0/edit",
+        data=ROUND_REQUEST_PAYLOAD).status_code == 302 # add a new round
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # start play
+    assert client.post("/groups/1/plays/1/", data={"q1": 4, "q2": 8}).status_code == 302 # submit
+
+    with app.app_context():
+        db = get_db_session()
+        round = db.query(Round).filter(Round.id == 1).first()
+        assert round is not None
+        assert len(round.plays) == 1
+        assert len(round.plays[0].answers) == 2
+
+    # access denied for non group admins
+    auth.logout()
+    assert client.post("/groups/1/tournaments/1/delete", data={}).status_code == 401
+    auth.login_as("ben")
+    assert client.post("/groups/1/tournaments/1/delete", data={}).status_code == 403
+    auth.login_as("alice")
+    assert client.post("/groups/1/tournaments/1/delete", data={}).status_code == 403
+    auth.login_as("bob")
+    assert client.post("/groups/1/tournaments/1/delete", data={}).status_code == 302
+
+    with app.app_context():
+        db = get_db_session()
+        tournament = db.query(Tournament).filter(Tournament.id == 1).first()
+        assert tournament is None
+        rounds = db.query(Round).filter(Round.tournament_id == 1).all()
+        assert len(rounds) == 0
+        plays = db.query(Play).all()
+        assert len(plays) == 0
+        answers = db.query(PlayAnswer).all()
+        assert len(answers) == 0

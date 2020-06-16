@@ -4,6 +4,9 @@ from flask.cli import with_appcontext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
+from sqlalchemy.event import listen
 
 
 Base = declarative_base()
@@ -45,6 +48,14 @@ def init_db_command():
     click.echo('Initialized the database.')
 
 
+
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
+
+
 def init_app(app):
     """
     Configure database binding, establish session registry, register handlers.
@@ -54,6 +65,9 @@ def init_app(app):
     engine = create_engine(app.config["DATABASE_URI"], echo=app.config["SQLALCHEMY_ECHO"])
     Session = scoped_session(sessionmaker(bind=engine, autoflush=True, autocommit=False))
     Base.query = Session.query_property()
+
+    if app.config["DATABASE_URI"].startswith("sqlite"):
+        listen(Engine, "connect", set_sqlite_pragma)
 
     app.teardown_appcontext(close_db_session)
     app.cli.add_command(init_db_command)

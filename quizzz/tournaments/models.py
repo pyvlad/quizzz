@@ -49,8 +49,10 @@ class Round(Base):
 
     quiz = relationship("Quiz", back_populates="round")
     tournament = relationship("Tournament", back_populates="rounds")
-    plays = relationship("Play", back_populates="round")
-    messages = relationship("Message", back_populates="round")
+    plays = relationship("Play", back_populates="round", cascade="all, delete-orphan",
+        passive_deletes=True)
+    messages = relationship("Message", back_populates="round", cascade="all, delete-orphan",
+        passive_deletes=True)
 
     def __repr__(self):
         return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)
@@ -86,11 +88,12 @@ class Play(Base):
     client_updated = sa.Column(sa.DateTime)
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
-    round_id = sa.Column(sa.Integer, sa.ForeignKey('rounds.id'), nullable=False)
+    round_id = sa.Column(sa.Integer, sa.ForeignKey('rounds.id', ondelete='CASCADE'), nullable=False)
 
     user = relationship("User", back_populates="plays")
     round = relationship("Round", back_populates="plays")
-    answers = relationship("PlayAnswer", back_populates="play")
+    answers = relationship("PlayAnswer", back_populates="play", cascade="all, delete-orphan",
+        passive_deletes=True)
 
     def __repr__(self):
         return "<RoundPlayed %r by %r>" % (self.round_id, self.user_id)
@@ -133,7 +136,7 @@ class PlayAnswer(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
 
-    play_id = sa.Column(sa.Integer, sa.ForeignKey('plays.id'), nullable=False)
+    play_id = sa.Column(sa.Integer, sa.ForeignKey('plays.id', ondelete='CASCADE'), nullable=False)
     option_id = sa.Column(sa.Integer, sa.ForeignKey('options.id'), nullable=False)
 
     play = relationship("Play", back_populates="answers")
