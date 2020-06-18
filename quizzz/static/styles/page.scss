@@ -1,0 +1,31 @@
+/* Page Layout */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  &__section {
+    padding: 5px;
+
+    &_header {
+      background-color: #eee;
+      border-bottom: 2px solid #ccc;
+    }
+
+    &_main {
+      flex: 1;
+    }
+
+    &_footer {
+      border-top: 2px solid #ccc;
+      background-color: #eee;
+      color: black;
+    }
+  }
+
+  &__section-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}

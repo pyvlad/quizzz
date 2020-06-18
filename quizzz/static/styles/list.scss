@@ -1,0 +1,50 @@
+/* List */
+.list {
+  list-style: none;
+
+  &__item {
+    margin: 1em 0;
+    background-color: rgba(230,230,230);
+
+    &_active {
+      background-color: rgba(0,255,0,0.5);
+    }
+  }
+
+  &__linked-content {
+    display: block;
+    padding: 1em;
+
+    text-decoration: none;
+    outline: none;
+    color: inherit;
+
+    &:focus {
+      background-color: rgba(0,0,0,0.1);
+    }
+    &:hover {
+      background-color: rgba(0,0,0,0.2);
+    }
+    &:active {
+      background-color: rgba(0,0,0,0.3);
+    }
+  }
+
+  &__text-primary {
+    font-size: 1.2em;
+    color: #352000;
+    font-variant: small-caps;
+    font-weight: bold;
+  }
+
+  &__text-secondary {
+    font-size: 1em;
+    color: #555;
+  }
+
+  &__extras {
+    padding: 0.2em 1em;
+    background-color: rgba(0,0,0,0.1);
+    border-top: 1px dashed grey;
+  }
+}

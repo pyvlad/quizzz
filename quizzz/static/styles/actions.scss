@@ -1,0 +1,14 @@
+/* ADMIN ACTIONS */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__item {
+    display: block;
+    margin-right: 1em;
+
+    &_last {
+      margin-right: 0;
+    }
+  }
+}

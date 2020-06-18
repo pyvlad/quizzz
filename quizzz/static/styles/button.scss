@@ -1,0 +1,40 @@
+/* Button */
+.button {
+  display: block;
+  text-decoration: none;
+  outline: none;
+  padding: 10px 40px;
+  font-weight: bold;
+  min-width: 100px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+
+  &::-moz-focus-inner {
+     border: 0;
+  }
+
+  &_action {
+    color: #FFFFFF;
+    background-color: #5995DA;
+
+    &:hover {
+      background-color: #76AEED;
+    }
+    &:active {
+      background-color: #407FC7;
+    }
+  }
+
+  &_danger {
+    color: #FFFFFF;
+    background-color: red;
+
+    &:hover {
+      background-color: darkred;
+    }
+    &:active {
+      background-color: pink;
+    }
+  }
+}

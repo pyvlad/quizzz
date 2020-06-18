@@ -23,33 +23,37 @@
   <h3>To Be Finished</h3>
   <ul class="list">
     {% for quiz in data.user_quizzes_in_progress %}
-      <a class="list__item-link" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
-        <li class="list__item list__item_active">
-          <div class="list__text-primary">{{ quiz.topic }}</div>
-          <div class="list__text-secondary my_sm">
-            {% if quiz.time_updated %}
-              <span>last updated at {{ quiz.time_updated.strftime('%Y-%m-%d') }}</span>
-            {% endif %}
+      <li class="list__item list__item_active">
+        <a class="list__linked-content" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
+          <div class="list__text-primary">
+            {{ quiz.topic }}
           </div>
-        </li>
-      </a>
+          {% if quiz.time_updated %}
+            <div class="list__text-secondary">
+              last updated at {{ quiz.time_updated.strftime('%Y-%m-%d') }}
+            </div>
+          {% endif %}
+        </a>
+      </li>
     {% endfor %}
   </ul>
   <h3>Submitted Quizzes</h3>
   <ul class="list">
     {% for quiz in data.user_quizzes_finalized %}
-      <a class="list__item-link" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
-        <li class="list__item">
-          <div class="list__text-primary">{{ quiz.topic }}</div>
-          <div class="list__text-secondary my_sm">
+      <li class="list__item">
+        <a class="list__linked-content" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
+          <div class="list__text-primary">
+            {{ quiz.topic }}
+          </div>
+          <div class="list__text-secondary">
             {% if quiz.time_updated %}
               {{ quiz.time_updated.strftime('%Y-%m-%d') }}
             {% else %}
               {{ quiz.time_created.strftime('%Y-%m-%d') }}
             {% endif %}
           </div>
-        </li>
-      </a>
+        </a>
+      </li>
     {% endfor %}
   </ul>
 {% endblock %}

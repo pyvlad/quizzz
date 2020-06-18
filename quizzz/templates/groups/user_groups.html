@@ -9,12 +9,14 @@
 {% block content %}
   <ul class="list">
     {% for group in data.user_groups %}
-      <a class="list__item-link"
-         href="{{ url_for('groups.show_group_page', group_id=group.id) }}">
-        <li class="list__item">
-          <div class="list__text-primary">{{ group.name }}</div>
-        </li>
-      </a>
+      <li class="list__item">
+        <a class="list__linked-content"
+           href="{{ url_for('groups.show_group_page', group_id=group.id) }}">
+          <div class="list__text-primary">
+            {{ group.name }}
+          </div>
+        </a>
+      </li>
     {% endfor %}
   </ul>
   <form class="form my_md"

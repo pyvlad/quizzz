@@ -1,10 +1,8 @@
 {% macro render_header(items) -%}
-  <header class="page-info">
-  {% for (text, link) in items %}
-    <div class="page-info__item">
-      <a style="color: #e7e7e7; text-decoration:none;" href="{{ link }}">{{ text }}</a>
-    </div>
-  {% endfor %}
+  <header class="page-info my_xs">
+    {% for (text, link) in items %}
+      <a class="page-info__item" href="{{ link }}">{{ text }}</a>
+    {% endfor %}
   </header>
 {%- endmacro %}
 
@@ -20,48 +18,48 @@
 
 <body>
 <div class="page">
-  <header class="page__item page__item_header">
-    <div class="page__item-content site-header">
-      <div class="site-logo">
-        <a href="{{ url_for('index') }}" class="site-logo__link site-logo__container">
-          <img src="{{ url_for('static', filename='images/logo.svg') }}"
-               alt="Website Logo Cat"
-               class="site-logo__image"
-          />
-          <h1 class="site-logo__text">Quizzz</h1>
-        </a>
-      </div>
-      <nav class="user-menu user-menu__container">
+  <header class="page__section page__section_header">
+    <div class="page__section-content site-header">
+      <a href="{{ url_for('index') }}" class="site-logo">
+        <img src="{{ url_for('static', filename='images/logo.svg') }}"
+             alt="Website Logo Cat"
+             class="site-logo__image"
+        />
+        <h1 class="site-logo__text">Quizzz</h1>
+      </a>
+      <nav class="menu">
         {% if g.user %}
-          <div class="user-menu__item user-menu__item_username">{{ g.user.name }}</div>
-          <a class="user-menu__item user-menu__item_link"
+          <div class="menu__item menu__item_username">
+            {{ g.user.name }}
+          </div>
+          <a class="menu__item menu__item_link"
              href="{{ url_for('auth.logout') }}">
              Log Out
           </a>
         {% else %}
-          <a class="user-menu__item user-menu__item_link"
+          <a class="menu__item menu__item_link"
              href="{{ url_for('auth.register') }}">Register</a>
-          <a class="user-menu__item user-menu__item_link"
+          <a class="menu__item menu__item_link"
              href="{{ url_for('auth.login') }}">Login</a>
         {% endif %}
       </nav>
     </div>
   </header>
 
-  <section class="page__item page__item_content page__item_stretching">
-    <div class="page__item-content">
+  <section class="page__section page__section_main">
+    <div class="page__section-content">
       {% block header %}{% endblock %}
-      <section class="page-messages">
+      <section class="flash-messages my_md">
         {% for message in get_flashed_messages() %}
-          <div class="page-messages__item">{{ message }}</div>
+          <div class="flash-messages__item my_sm py_sm px_sm">{{ message }}</div>
         {% endfor %}
       </section>
       {% block content %}{% endblock %}
     </div>
   </section>
 
-  <footer class="page__item page__item_footer">
-    <div class="page__item-content">
+  <footer class="page__section page__section_footer">
+    <div class="page__section-content">
       <p>(c) 2020</p>
     </div>
   </footer>

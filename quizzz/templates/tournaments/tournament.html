@@ -28,19 +28,21 @@
   {% endif %}
   <ul class="list">
     {% for round in data.tournament.rounds %}
-      <a class="list__item-link"
-         href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
-        <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
+      <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
+        <a class="list__linked-content"
+           href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
           <div class="list__text-primary">{{ round.quiz.topic }}</div>
           <div class="list__text-secondary">by {{ round.quiz.author }}</div>
           <div class="list__text-secondary">{{ round.start_time }} - {{ round.finish_time }}</div>
-          {% if data.has_edit_permissions %}
+        </a>
+        {% if data.has_edit_permissions %}
+          <div class="list__extras">
             <a href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=round.id) }}">
               Edit Round
             </a>
-          {% endif %}
-        </li>
-      </a>
+          </div>
+        {% endif %}
+      </li>
     {% endfor %}
   </ul>
 {% endblock %}

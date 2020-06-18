@@ -1,0 +1,40 @@
+/* Play Results */
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  &__header-row {
+    background-color: #444;
+    color: white;
+    font-variant: small-caps;
+    text-align: center;
+  }
+
+  &__header-cell {
+    padding: 2px 10px;
+    border: 3px solid #bca;
+  }
+
+  &__cell {
+    padding: 2px 10px;
+    border: 1px solid #bca;
+  }
+
+  &__cell-link {
+    text-decoration: none;
+    color: #420;
+
+    &:hover {
+      color: brown;
+    }
+  }
+
+  &__row {
+    &_odd {
+      background-color: #ddc;
+    }
+    &_even {
+      background-color: #eee;
+    }
+  }
+}

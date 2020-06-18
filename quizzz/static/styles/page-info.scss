@@ -1,0 +1,27 @@
+/* Page Info (Site Navigation) */
+.page-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  &__item {
+    display: block;
+
+    background-color: lighten(#352000, 10%);
+    text-shadow: 1px 1px 2px black;
+    color: white;
+    font-weight: bold;
+
+    border-radius: 0 1em 1em 0;
+
+    text-decoration: none;
+    outline: none;
+
+    padding: 2px 15px;
+    margin-right: 10px;
+  }
+
+  &__item:hover {
+    background-color: lighten(#352000, 20%);
+  }
+}
