@@ -4,6 +4,7 @@ from flask import g, flash, request, redirect, url_for, abort, render_template
 
 from quizzz.permissions import USER, check_user_permissions
 from quizzz.db import get_db_session
+from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Tournament, Round
@@ -30,9 +31,9 @@ def edit_tournament(tournament_id):
         except:
             traceback.print_exc()
             db.rollback()
-            flash("Tournament could not be created!")
+            flash("Tournament could not be created!", Flashing.ERROR)
         else:
-            flash("Tournament successfully created/updated.")
+            flash("Tournament successfully created/updated.", Flashing.SUCCESS)
             return redirect(url_for('tournaments.show_tournament', tournament_id=tournament.id))
 
     data = {
@@ -60,7 +61,7 @@ def delete_tournament(tournament_id):
     db = get_db_session()
     db.delete(tournament)
     db.commit()
-    flash("Tournament has been deleted.")
+    flash("Tournament has been deleted.", Flashing.SUCCESS)
 
     return redirect(url_for('tournaments.index'))
 
@@ -85,9 +86,9 @@ def edit_round(tournament_id, round_id):
         except:
             traceback.print_exc()
             db.rollback()
-            flash("Quiz Round could not be updated!")
+            flash("Quiz Round could not be updated!", Flashing.ERROR)
         else:
-            flash("Quiz Round has been created/updated.")
+            flash("Quiz Round has been created/updated.", Flashing.SUCCESS)
             return redirect(url_for('tournaments.show_tournament', tournament_id=tournament_id))
 
     data = {
@@ -124,6 +125,6 @@ def delete_round(round_id):
     round = get_round_by_id(round_id)
     db.delete(round)
     db.commit()
-    flash("Quiz round has been deleted.")
+    flash("Quiz round has been deleted.", Flashing.SUCCESS)
 
     return redirect(url_for('tournaments.index'))

@@ -1,7 +1,20 @@
 .flash-messages {
   &__item {
-    background-color: beige;
-    color: maroon;
     font-weight: bold;
+
+    &_message {
+      background-color: beige;
+      color: black;
+    }
+
+    &_error {
+      background-color: pink;
+      color: maroon;
+    }
+
+    &_success {
+      background-color: lightgreen;
+      color: darkgreen;
+    }
   }
 }

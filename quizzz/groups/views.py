@@ -3,6 +3,7 @@ from flask import g, flash, request, redirect, url_for, abort, render_template
 
 from quizzz.db import get_db_session
 from quizzz.auth import login_required
+from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Group, Member
@@ -51,15 +52,15 @@ def join():
     db = get_db_session()
     group = db.query(Group).filter(Group.invitation_code == invitation_code).first()
     if not group:
-        flash("Invalid invitation code!")
+        flash("Invalid invitation code!", Flashing.ERROR)
     else:
         user_group_ids = { m.group_id for m in g.user.memberships }
         if group.id not in user_group_ids:
             member = Member(group=group, user=g.user)
             db.add(member)
             db.commit()
-            flash("Joined!")
+            flash("Joined!", Flashing.SUCCESS)
         else:
-            flash("You are already a member of this group!")
+            flash("You are already a member of this group!", Flashing.ERROR)
 
     return redirect(url_for('groups.show_user_groups'))

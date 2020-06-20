@@ -2,6 +2,7 @@ from flask import g, request, render_template, flash, redirect, url_for, abort
 
 from quizzz.db import get_db_session
 from quizzz.auth.models import User
+from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Message
@@ -73,7 +74,7 @@ def create():
             error = "Message must not be empty."
 
         if error is not None:
-            flash(error)
+            flash(error, Flashing.ERROR)
         else:
             db = get_db_session()
             msg = Message(text=text, user=g.user, group=g.group)
@@ -97,7 +98,7 @@ def update(id):
             error = "Message must not be empty."
 
         if error is not None:
-            flash(error)
+            flash(error, Flashing.ERROR)
         else:
             db = get_db_session()
             msg.text = text

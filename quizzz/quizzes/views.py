@@ -4,6 +4,7 @@ from sqlalchemy.orm import joinedload
 from flask import current_app, render_template, g, flash, request, redirect, url_for, abort
 
 from quizzz.db import get_db_session
+from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Quiz, Question, Option
@@ -84,13 +85,13 @@ def edit(quiz_id):
         except:
             traceback.print_exc()
             db.rollback()
-            flash("Quiz could not be saved!")
+            flash("Quiz could not be saved!", Flashing.ERROR)
         else:
             if quiz.is_finalized:
-                flash("Submitted!")
+                flash("Submitted!", Flashing.SUCCESS)
                 return redirect(url_for('quizzes.index'))
             else:
-                flash("Saved!")
+                flash("Saved!", Flashing.MESSAGE)
                 return redirect(url_for('quizzes.edit', quiz_id=quiz.id))
 
     num_questions = current_app.config["QUESTIONS_PER_QUIZ"]

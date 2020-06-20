@@ -50,8 +50,10 @@
     <div class="page__section-content">
       {% block header %}{% endblock %}
       <section class="flash-messages my_md">
-        {% for message in get_flashed_messages() %}
-          <div class="flash-messages__item my_sm py_sm px_sm">{{ message }}</div>
+        {% for category, message in get_flashed_messages(with_categories=True) %}
+          <div class="flash-messages__item flash-messages__item_{{ category }} my_sm py_sm px_sm">
+            {{ message }}
+          </div>
         {% endfor %}
       </section>
       {% block content %}{% endblock %}

@@ -20,8 +20,9 @@
       </a>
     </section>
   {% endif %}
+  
   <h3>To Be Finished</h3>
-  <ul class="list">
+  <ul class="list my_md">
     {% for quiz in data.user_quizzes_in_progress %}
       <li class="list__item list__item_active">
         <a class="list__linked-content" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
@@ -35,10 +36,15 @@
           {% endif %}
         </a>
       </li>
+    {% else %}
+      <li>
+        You don't have any unfinished quizzes.
+      </li>
     {% endfor %}
   </ul>
+
   <h3>Submitted Quizzes</h3>
-  <ul class="list">
+  <ul class="list my_md">
     {% for quiz in data.user_quizzes_finalized %}
       <li class="list__item">
         <a class="list__linked-content" href="{{ url_for('quizzes.edit', quiz_id=quiz.id) }}">
@@ -53,6 +59,10 @@
             {% endif %}
           </div>
         </a>
+      </li>
+    {% else %}
+      <li>
+        You don't have any submitted quizzes.
       </li>
     {% endfor %}
   </ul>

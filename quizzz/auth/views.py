@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from flask import request, session, g, redirect, url_for, flash, render_template
 
 from quizzz.db import get_db_session
+from quizzz.flashing import Flashing
 
 from . import bp
 from .models import User
@@ -35,10 +36,10 @@ def register():
             user.set_password_hash(password)
             db_session.add(user)
             db_session.commit()
-            flash(f"User {username} has been successfully created.")
+            flash(f'User {username} has been successfully created.', Flashing.SUCCESS)
             return redirect(url_for('auth.login'))
         else:
-            flash(error)
+            flash(error, Flashing.ERROR)
 
     return render_template('auth/register.html')
 
@@ -69,7 +70,7 @@ def login():
             session['user_id'] = user.id
             return redirect(url_for('index'))
 
-        flash(error)
+        flash(error, Flashing.ERROR)
 
     return render_template('auth/login.html')
 
