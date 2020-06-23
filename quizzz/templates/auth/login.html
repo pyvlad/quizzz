@@ -8,6 +8,9 @@
 
 {% block content %}
   <form method="post" class="form">
+
+    {{ form.hidden_tag() }}
+
     <div class="form__header">
       Log In Form
     </div>
@@ -20,25 +23,16 @@
 
     <div class="form__item">
       <div class="form__label">
-        <label for="username">Username</label>
+        {{ form.username.label }}
       </div>
-      <input class="form__input"
-        name="username"
-        id="username"
-        required
-      />
+      {{ form.username(class="form__input") }}
     </div>
 
     <div class="form__item">
       <div class="form__label">
-        <label for="password">Password</label>
+        {{ form.password.label }}
       </div>
-      <input class="form__input"
-        type="password"
-        name="password"
-        id="password"
-        required
-      />
+      {{ form.password(class="form__input") }}
     </div>
 
     <div class="form__item">

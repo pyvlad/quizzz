@@ -6,6 +6,7 @@ from quizzz.flashing import Flashing
 
 from . import bp
 from .models import User
+from .forms import RegistrationForm, LoginForm
 
 
 
@@ -15,33 +16,26 @@ def register():
     if g.user:
         return redirect(url_for("index"))
 
+    form = RegistrationForm()
+
     if request.method == 'POST':
-        username = request.form['username'].lower()
-        password = request.form['password']
+        if form.validate():
+            username = form.username.data.lower()
+            password = form.password.data
 
-        db_session = get_db_session()
-
-        error = None
-        if not username:
-            error = 'Username is required.'
-        elif not password:
-            error = 'Password is required.'
-        else:
-            user = db_session.query(User).filter(User.name == username).first()
-            if user is not None:
-                error = f'User {username} already exists.'
-
-        if error is None:
             user = User(name=username)
             user.set_password_hash(password)
-            db_session.add(user)
-            db_session.commit()
+
+            db = get_db_session()
+            db.add(user)
+            db.commit()
+
             flash(f'User {username} has been successfully created.', Flashing.SUCCESS)
             return redirect(url_for('auth.login'))
         else:
-            flash(error, Flashing.ERROR)
+            flash("Please fix the errors and submit the form again.", Flashing.ERROR)
 
-    return render_template('auth/register.html')
+    return render_template('auth/register.html', form=form)
 
 
 
@@ -51,15 +45,16 @@ def login():
     if g.user:
         return redirect(url_for("index"))
 
-    if request.method == 'POST':
-        username = request.form['username'].lower()
-        password = request.form['password']
+    form = LoginForm()
 
-        db_session = get_db_session()
+    if request.method == 'POST' and form.validate():
+        username = form.username.data.lower()
+        password = form.password.data
+
+        db = get_db_session()
+        user = db.query(User).filter(User.name == username).first()
 
         error = None
-
-        user = db_session.query(User).filter(User.name == username).first()
         if user is None:
             error = 'Incorrect username.'
         elif not user.check_password(password):
@@ -69,10 +64,10 @@ def login():
             session.clear()
             session['user_id'] = user.id
             return redirect(url_for('index'))
+        else:
+            flash(error, Flashing.ERROR)
 
-        flash(error, Flashing.ERROR)
-
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', form=form)
 
 
 

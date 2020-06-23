@@ -8,6 +8,9 @@
 
 {% block content %}
   <form method="post" class="form">
+    
+    {{ form.hidden_tag() }}
+
     <div class="form__header">
       Registration Form
     </div>
@@ -20,34 +23,22 @@
 
     <div class="form__item">
       <div class="form__label">
-        <label for="username">Username</label>
+        {{ form.username.label }}
       </div>
-      <input class="form__input"
-        type="text"
-        name="username"
-        id="username"
-        placeholder="username"
-        pattern="^[a-zA-Z][a-zA-Z0-9_\.]{1,20}$"
-        required
-      />
+      {{ form.username(class="form__input", placeholder="username",
+                       pattern="^[a-zA-Z][a-zA-Z0-9_\\.]{1,19}$") }}
+      {{ render_form_errors(form.username) }}
       <div class="form__input-help">
-        Please use English letters, numbers, ".", or "_". From 2 to 20 letters.
+        Please start with a letter, and use English letters, numbers, ".", or "_". From 2 to 20 letters.
       </div>
     </div>
 
     <div class="form__item">
       <div class="form__label">
-        <label for="password">Password</label>
+        {{ form.password.label }}
       </div>
-      <input class="form__input"
-        type="password"
-        name="password"
-        id="password"
-        placeholder="password"
-        minlength=6
-        maxlength=50
-        required
-      />
+      {{ form.password(class="form__input", placeholder="password", minlength=6, maxlength=50) }}
+      {{ render_form_errors(form.password) }}
       <div class="form__input-help">
         Minimum 6 letters.
       </div>

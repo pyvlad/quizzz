@@ -10,6 +10,7 @@ def create_app(test_config=None):
     # configure app
     app.config.from_mapping(
         SECRET_KEY='dev',
+        WTF_CSRF_SECRET_KEY="dev",
         SESSION_COOKIE_SAMESITE="Lax",
         DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'db.sqlite'), # /// for absolute paths
         QUESTIONS_PER_QUIZ=2,

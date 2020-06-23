@@ -254,12 +254,23 @@
   font-family: "Helvetica", "Arial", sans-serif;
   font-size: 1em;
   font-weight: bold;
+  padding: 0.25em;
 }
 .form__input-help {
   font-family: "Helvetica", "Arial", sans-serif;
   font-size: 0.8em;
-  font-style: italic;
   color: #444;
+  padding: 0.25em 0.5em;
+}
+.form__errors {
+  list-style: none;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+.form__error {
+  color: red;
+  background-color: #ffe6e6;
+  padding: 0.25em 0.5em;
 }
 .form__input {
   background-color: #FFFFFF;
