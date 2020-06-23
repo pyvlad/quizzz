@@ -21,7 +21,7 @@ def test_index(client, auth):
         else:
             assert msg["text"].encode() not in response.data
         # group 1 messages that belong to bob should be editable:
-        href = f"/groups/{msg['group_id']}/chat/{msg['id']}/update"
+        href = f"/groups/{msg['group_id']}/chat/{msg['id']}/edit"
         if msg["group_id"] == 1 and msg["user_id"] == USERS["bob"]["id"]:
             assert f'href="{href}"'.encode() in response.data
         else:
@@ -36,14 +36,14 @@ def test_author_required(app, client, auth):
     b. the user doesn't see edit link
     """
     auth.login_as("alice")
-    assert client.post('/groups/1/chat/1/update').status_code == 403
+    assert client.post('/groups/1/chat/1/edit').status_code == 403
     assert client.post('/groups/1/chat/1/delete').status_code == 403
-    assert b'href="/groups/1/chat/1/update"' not in client.get('/chat').data
+    assert b'href="/groups/1/chat/1/edit"' not in client.get('/chat').data
 
 
 
 @pytest.mark.parametrize('path', (
-    f'/groups/1/chat/{len(MESSAGES)+1}/update',
+    f'/groups/1/chat/{len(MESSAGES)+1}/edit',
     f'/groups/1/chat/{len(MESSAGES)+1}/delete',
 ))
 def test_exists_required(client, auth, path):
@@ -65,10 +65,10 @@ def test_create(client, auth, app):
 
     auth.login_as("bob")
 
-    response = client.get('/groups/1/chat/create')
+    response = client.get('/groups/1/chat/0/edit')
     assert response.status_code == 200
 
-    response = client.post('/groups/1/chat/create', data={'text': msg_text})
+    response = client.post('/groups/1/chat/0/edit', data={'text': msg_text})
     assert 'http://localhost/groups/1/chat/' == response.headers['Location']
 
     with app.app_context():
@@ -88,10 +88,10 @@ def test_update(client, auth, app):
 
     auth.login_as("bob")
 
-    response = client.get('/groups/1/chat/1/update')
+    response = client.get('/groups/1/chat/1/edit')
     assert response.status_code == 200
 
-    response = client.post('/groups/1/chat/1/update', data={'text': msg_text})
+    response = client.post('/groups/1/chat/1/edit', data={'text': msg_text})
     assert 'http://localhost/groups/1/chat/' == response.headers['Location']
 
     with app.app_context():
@@ -102,8 +102,8 @@ def test_update(client, auth, app):
 
 
 @pytest.mark.parametrize('path', (
-    '/groups/1/chat/create',
-    '/groups/1/chat/1/update',
+    '/groups/1/chat/0/edit',
+    '/groups/1/chat/1/edit',
 ))
 def test_create_update_validate(client, auth, path):
     """

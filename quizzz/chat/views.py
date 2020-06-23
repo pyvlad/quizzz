@@ -6,6 +6,7 @@ from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Message
+from .forms import MessageForm, MessageDeleteForm
 
 
 # *** HELPERS ***
@@ -63,57 +64,48 @@ def index():
     return render_template('chat/index.html', data=data)
 
 
+@bp.route('/<int:message_id>/edit', methods=('GET', 'POST'))
+def edit(message_id):
+    if message_id:
+        msg = get_own_message_by_id(message_id)
+    else:
+        msg = Message()
+        msg.user = g.user
+        msg.group = g.group
 
-@bp.route('/create', methods=('GET', 'POST'))
-def create():
-    if request.method == 'POST':
-        text = request.form['text']
+    form = MessageForm(text=msg.text) # request.form is added automatically as 1st arg by flask-wtf
+    delete_form = MessageDeleteForm()
 
-        error = None
-        if not text:
-            error = "Message must not be empty."
+    if request.method == 'POST' and form.validate():
+        msg.text = form.text.data
 
-        if error is not None:
-            flash(error, Flashing.ERROR)
-        else:
-            db = get_db_session()
-            msg = Message(text=text, user=g.user, group=g.group)
-            db.add(msg)
-            db.commit()
-            return redirect(url_for('chat.index'))
+        db = get_db_session()
+        db.add(msg)
+        db.commit()
 
-    return render_template('chat/edit.html', data={})
+        return redirect(url_for('chat.index'))
 
+    for error in form.text.errors:
+        flash(error, Flashing.ERROR)
 
-
-@bp.route('/<int:id>/update', methods=('GET', 'POST'))
-def update(id):
-    msg = get_own_message_by_id(id)
-
-    if request.method == 'POST':
-        text = request.form['text']
-
-        error = None
-        if not text:
-            error = "Message must not be empty."
-
-        if error is not None:
-            flash(error, Flashing.ERROR)
-        else:
-            db = get_db_session()
-            msg.text = text
-            db.add(msg)
-            db.commit()
-            return redirect(url_for('chat.index'))
-
-    return render_template('chat/edit.html', data={"msg": msg})
+    return render_template('chat/edit.html',
+        form=form, delete_form=delete_form,
+        data={"message_id": msg.id})
 
 
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
     msg = get_own_message_by_id(id)
-    db = get_db_session()
-    db.delete(msg)
-    db.commit()
+
+    form = MessageDeleteForm()
+
+    if form.validate():
+        db = get_db_session()
+        db.delete(msg)
+        db.commit()
+        flash("Message has been deleted", Flashing.MESSAGE)
+    else:
+        abort(403, "Bad CSRF token")
+
     return redirect(url_for('chat.index'))

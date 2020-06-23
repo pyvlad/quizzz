@@ -14,7 +14,7 @@
 
 {% block content %}
   <section class="actions">
-    <a class="button button_action my_md" href="{{ url_for('chat.create') }}">
+    <a class="button button_action my_md" href="{{ url_for('chat.edit', message_id=0) }}">
       New Message
     </a>
   </section>
@@ -30,7 +30,7 @@
         {% endif %}
         {% if msg.is_own %}
           <a class="message__details-item"
-             href="{{ url_for('chat.update', id=msg.id) }}">
+             href="{{ url_for('chat.edit', message_id=msg.id) }}">
              Edit
           </a>
         {% endif %}

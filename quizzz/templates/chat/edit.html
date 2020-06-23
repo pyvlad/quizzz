@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  Chat: {% if data.msg %}Edit Message{% else %}New Message{% endif %}
+  Chat: {% if data.message_id %}Edit Message{% else %}New Message{% endif %}
   - {{ g.group.name }}
 {% endblock %}
 
@@ -19,8 +19,11 @@
 {% block content %}
   <div class="form">
     <form method="post">
+
+      {{ form.hidden_tag() }}
+
       <div class="form__header">
-        {% if data.msg %}
+        {% if data.message_id %}
           Edit Your Message
         {% else %}
           Create New Message
@@ -34,11 +37,7 @@
       </div>
 
       <div class="form__item">
-        <textarea class="form__textarea form__textarea_md"
-          name="text"
-          id="message_text"
-          required
-        >{{ request.form['text'] or (data.msg and data.msg.text) }}</textarea>
+        {{ form.text(class="form__textarea form__textarea_md", maxlength=1000) }}
       </div>
 
       <div class="form__item">
@@ -48,9 +47,10 @@
         />
       </div>
     </form>
-    {% if data.msg %}
+    {% if data.message_id %}
       <div class="form__item">
-        <form action="{{ url_for('chat.delete', id=data.msg.id) }}" method="post">
+        <form action="{{ url_for('chat.delete', id=data.message_id) }}" method="post">
+          {{ delete_form.hidden_tag() }}
           <input class="button button_danger"
             type="submit"
             value="Delete"
