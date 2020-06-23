@@ -106,6 +106,6 @@ def delete(id):
         db.commit()
         flash("Message has been deleted", Flashing.MESSAGE)
     else:
-        abort(403, "Bad CSRF token")
+        flash("Invalid form submitted.", Flashing.ERROR)
 
     return redirect(url_for('chat.index'))

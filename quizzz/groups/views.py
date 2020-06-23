@@ -7,6 +7,7 @@ from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Group, Member
+from .forms import InvitationCodeForm
 
 
 
@@ -28,7 +29,10 @@ def show_user_groups():
             } for m, group in user_groups
         ]
     }
-    return render_template('groups/user_groups.html', data=data)
+
+    form = InvitationCodeForm()
+
+    return render_template('groups/user_groups.html', form=form, data=data)
 
 
 
@@ -47,20 +51,25 @@ def show_group_page():
 @bp.route('/join_group/', methods=("POST",))
 @login_required
 def join():
-    invitation_code = request.form["invitation_code"]
+    form = InvitationCodeForm()
 
-    db = get_db_session()
-    group = db.query(Group).filter(Group.invitation_code == invitation_code).first()
-    if not group:
-        flash("Invalid invitation code!", Flashing.ERROR)
-    else:
-        user_group_ids = { m.group_id for m in g.user.memberships }
-        if group.id not in user_group_ids:
-            member = Member(group=group, user=g.user)
-            db.add(member)
-            db.commit()
-            flash("Joined!", Flashing.SUCCESS)
+    if form.validate():
+        invitation_code = form.invitation_code.data
+
+        db = get_db_session()
+        group = db.query(Group).filter(Group.invitation_code == invitation_code).first()
+        if not group:
+            flash("Invalid invitation code!", Flashing.ERROR)
         else:
-            flash("You are already a member of this group!", Flashing.ERROR)
+            user_group_ids = { m.group_id for m in g.user.memberships }
+            if group.id not in user_group_ids:
+                member = Member(group=group, user=g.user)
+                db.add(member)
+                db.commit()
+                flash("Joined!", Flashing.SUCCESS)
+            else:
+                flash("You are already a member of this group!", Flashing.ERROR)
+    else:
+        flash("Invalid form submitted.", Flashing.ERROR)
 
     return redirect(url_for('groups.show_user_groups'))

@@ -49,7 +49,8 @@ def test_join_group(app, client, auth):
 
     auth.login_as("bob")
     response = client.post('/groups/join_group/', data={})
-    assert response.status_code == 400
+    assert response.status_code == 302
+    assert b'Invalid form submitted.' in client.get(response.headers["LOCATION"]).data
 
     initial_user_groups = [m["group_id"] for m in MEMBERSHIPS if m["user_id"] == USERS["bob"]["id"]]
 

@@ -22,6 +22,9 @@
   <form class="form my_md"
         action="{{ url_for('groups.join') }}"
         method="post">
+
+    {{ form.hidden_tag() }}
+
     <div class="form__header">Join Group</div>
     <div class="form__item">
       <div class="form__help">
@@ -29,16 +32,8 @@
       </div>
     </div>
     <div class="form__item">
-      <label class="form__label"
-        for="group_invitation_code">
-        Invitation Code
-      </label>
-      <input class="form__input"
-        type="text"
-        id="group_invitation_code"
-        name="invitation_code"
-        required
-      />
+      {{ form.invitation_code.label(class="form__label") }}
+      {{ form.invitation_code(class="form__input") }}
     </div>
     <div class="form__item">
       <button class="button button_action">Submit</button>
