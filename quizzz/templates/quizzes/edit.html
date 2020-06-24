@@ -30,63 +30,39 @@
 
     <form action="" method="post">
 
+      {{ form.hidden_tag() }}
+
       <div class="quiz-form__item">
         <div class="quiz-form__row">
           <div class="quiz-form__label">
-            <label for="quiz_topic">Quiz Topic</label>
+            {{ form.topic.label() }}
           </div>
         </div>
         <div class="quiz-form__row">
-          <input class="quiz-form__input"
-            name="topic"
-            id="quiz_topic"
-            type="text"
-            value="{{ data.quiz.topic or ''}}"
-            maxlength="1000"
-            required
-            {{ (data.read_only and 'disabled') or '' }}
-          />
+          {{ form.topic(class="quiz-form__input", maxlength=1000, disabled=data.read_only) }}
         </div>
       </div>
 
-      {% for qnum in range(1, data.num_questions + 1) %}
+      {% for question in form.questions %}
+        {% set outer_loop = loop %}
         <div class="quiz-form__item">
           <div class="quiz-form__row">
             <div class="quiz-form__label">
-              <label for="{{'question_%s' % qnum}}">Question {{ qnum }}</label>
+              <label for="{{'question_%s' % qnum}}">Question {{ loop.index }}</label>
             </div>
           </div>
           <div class="quiz-form__row">
-            <textarea class="quiz-form__textarea"
-              name="{{'question_%s' % qnum}}"
-              id="{{'question_%s' % qnum}}"
-              maxlength="1000"
-              {{ (data.read_only and 'disabled') or '' }}
-              required>{{ data.quiz["question_%s" % qnum] or ''}}</textarea
-            >
+            {{ question.form.text(class="quiz-form__textarea", maxlength=1000, disabled=data.read_only) }}
           </div>
           <div class="quiz-form__row">
             <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
-              {% for optnum in range(1, data.num_options + 1) %}
+              {% for subfield in question.form.answer %}
                 <div class="quiz-form__fieldset-item">
-                  <input
-                    type='radio'
-                    id="{{'question_%s_option_%s_radio' % (qnum, optnum)}}"
-                    name="{{'question_%s_answer' % qnum }}"
-                    value='{{ optnum }}'
-                    {{ ((data.quiz['question_%s_answer' % qnum] == optnum|string) and 'checked') or '' }}
-                    required
-                  />
+                  {{ subfield(required=True) }}
                   <label class="quiz-form__fieldset-item-input"
-                         for="{{'question_%s_option_%s_radio' % (qnum, optnum)}}">
-                    <input class="quiz-form__input"
-                      type='text'
-                      id="{{'question_%s_option_%s' % (qnum, optnum)}}"
-                      name="{{'question_%s_option_%s' % (qnum, optnum)}}"
-                      value="{{ data.quiz['question_%s_option_%s' % (qnum, optnum)] or '' }}"
-                      maxlength="200"
-                      required
-                    />
+                         for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
+                     {{ question.form.options[loop.index0].form.text(
+                          class="quiz-form__input", maxlength=200, disabled=data.read_only) }}
                   </label>
                 </div>
               {% endfor %}
@@ -95,41 +71,20 @@
         </div>
       {% endfor %}
 
-
       <div class="quiz-form__item">
         <div class="quiz-form__row">
           <div class="quiz-form__label">
-            Submit Quiz?
+            {{ form.is_finalized.label }}
           </div>
         </div>
         <div class="quiz-form__row">
-          <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
-            <div class="quiz-form__fieldset-item">
-              <input
-                type='radio'
-                id="is_finalized_no"
-                name="is_finalized"
-                value='0'
-                {{ (not data.quiz.is_finalized and 'checked') or '' }}
-              />
-              <label class="quiz-form__fieldset-item-input"
-                     for="is_finalized_no">
-                No, I am not finished yet and want to review/update it later.
-              </label>
-            </div>
-            <div class="quiz-form__fieldset-item">
-              <input
-                type='radio'
-                id="is_finalized_yes"
-                name="is_finalized"
-                value='1'
-                {{ (data.quiz.is_finalized and 'checked') or '' }}
-              />
-              <label class="quiz-form__fieldset-item-input"
-                     for="is_finalized_yes">
-                Yes, the quiz is finished and checked and I want it added to the group's quiz pool.
-              </label>
-            </div>
+          <fieldset class="quiz-form__fieldset" >
+            {% for subfield in form.is_finalized %}
+              <div class="quiz-form__fieldset-item">
+                {{ subfield(required=True) }}
+                {{ subfield.label(class="quiz-form__fieldset-item-input") }}
+              </div>
+            {% endfor %}
           </fieldset>
         </div>
       </div>
@@ -143,14 +98,15 @@
     </form>
 
     {% if data.quiz_id and not data.read_only %}
-    <form action="{{ url_for('quizzes.delete', quiz_id=data.quiz_id) }}" method="post">
-      <div class='quiz-form__item'>
-        <button class="button button_danger"
-                onclick="return confirm('Are you sure?');">
-          Delete
-        </button>
-      </div>
-    </form>
+      <form action="{{ url_for('quizzes.delete', quiz_id=data.quiz_id) }}" method="post">
+        {{ delete_form.hidden_tag() }}
+        <div class='quiz-form__item'>
+          <button class="button button_danger"
+                  onclick="return confirm('Are you sure?');">
+            Delete
+          </button>
+        </div>
+      </form>
     {% endif %}
   </div>
 {% endblock %}

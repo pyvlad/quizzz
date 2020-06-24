@@ -8,7 +8,7 @@ from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Quiz, Question, Option
-
+from .forms import make_quiz_form, QuizDeleteForm
 
 
 # *** HELPERS ***
@@ -65,61 +65,78 @@ def index():
 
 @bp.route('/<int:quiz_id>/edit', methods=('GET', 'POST'))
 def edit(quiz_id):
+
+    # load or initialize quiz object with questions
     if quiz_id:
         quiz = get_own_quiz_by_id(quiz_id, with_questions=True)
     else:
         quiz = Quiz()
+        quiz.is_finalized = False
+        quiz.num_questions = current_app.config["QUESTIONS_PER_QUIZ"]
+        quiz.num_options = current_app.config["OPTIONS_PER_QUESTION"]
         quiz.init_questions()
 
+    # create appropriate form class based on quiz configuration
+    QuizForm = make_quiz_form(quiz.num_questions, quiz.num_options)
 
     if request.method == 'POST':
+        # bail out of updating if submitted
         if quiz.is_finalized:
             abort(403, "Cannot update submitted quiz.")
 
-        quiz.populate_from_request_form(request.form)
+        # otherwise initialize form (implicitly loads data from request.POST)
+        form = QuizForm()
 
-        db = get_db_session()
-        try:
-            db.add(quiz)
-            db.commit()
-        except:
-            traceback.print_exc()
-            db.rollback()
-            flash("Quiz could not be saved!", Flashing.ERROR)
-        else:
-            if quiz.is_finalized:
-                flash("Submitted!", Flashing.SUCCESS)
-                return redirect(url_for('quizzes.index'))
+        # if data is valid, populate ORM object from form data and save
+        if form.validate():
+            quiz.populate_from_wtform(form)
+
+            db = get_db_session()
+            try:
+                db.add(quiz)
+                db.commit()
+            except:
+                traceback.print_exc()
+                db.rollback()
+                flash("Quiz could not be saved!", Flashing.ERROR)
             else:
-                flash("Saved!", Flashing.MESSAGE)
-                return redirect(url_for('quizzes.edit', quiz_id=quiz.id))
+                if quiz.is_finalized:
+                    flash("Submitted!", Flashing.SUCCESS)
+                    return redirect(url_for('quizzes.index'))
+                else:
+                    flash("Saved!", Flashing.MESSAGE)
+                    return redirect(url_for('quizzes.edit', quiz_id=quiz.id))
+        else:
+            flash("Bad form was submitted!")
 
-    num_questions = current_app.config["QUESTIONS_PER_QUIZ"]
-    num_options = current_app.config["OPTIONS_PER_QUESTION"]
-    form_fields = [
-        ("topic", quiz.topic),
-        ("is_finalized", quiz.is_finalized),
-        *[(f"question_{qnum+1}", quiz.questions[qnum].text)
-            for qnum in range(num_questions)],
-        *[(f"question_{qnum+1}_answer", str(optnum + 1))
-            for qnum in range(num_questions) for optnum in range(num_options)
-            if quiz.questions[qnum].options[optnum].is_correct],
-        *[(f"question_{qnum+1}_option_{optnum+1}", quiz.questions[qnum].options[optnum].text)
-            for qnum in range(num_questions) for optnum in range(num_options)]
-    ]
+    # if this is GET request, populate form from loaded/initialized ORM objects
+    else:
+        form = QuizForm(
+            topic=quiz.topic,
+            is_finalized="1" if quiz.is_finalized else "0",
+            questions=[
+                {
+                    "text": question.text,
+                    "options": [
+                        {"text": opt.text} for opt in question.options
+                    ],
+                    "answer": {
+                        opt.is_correct: str(num)
+                        for num, opt in enumerate(question.options)
+                    }.get(True, "")
+                } for question in quiz.questions
+            ]
+        )
 
+    # some extra params to render template correctly
     data = {
         "quiz_id": quiz.id,
         "read_only": quiz.is_finalized,
-        "num_questions": num_questions,
-        "num_options": num_options,
-        "quiz": ({k: request.form.get(k, default) for k, default in form_fields}
-            if request.form
-            else dict(form_fields)
-        )
     }
 
-    return render_template('quizzes/edit.html', data=data)
+    delete_form = QuizDeleteForm()
+
+    return render_template('quizzes/edit.html', form=form, delete_form=delete_form, data=data)
 
 
 

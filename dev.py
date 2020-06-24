@@ -144,6 +144,10 @@ with app.app_context():
             is_finalized=True
         )
     ]
+    for quiz in quizzes:
+        quiz.num_questions = len(quiz.questions)
+        quiz.num_options = len(quiz.questions[0].options)
+
 
     tournament = Tournament(
         name="First Tournament",

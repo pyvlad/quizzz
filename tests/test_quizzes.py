@@ -10,18 +10,18 @@ from .data import USERS, QUIZZES, QUIZ_QUESTIONS, QUESTION_OPTIONS
 REQUEST_PAYLOAD = {
     "topic": "Quiz 2",
     "is_finalized": "0",
-    "question_1": "What is love?",
-    "question_1_answer": "4",
-    "question_1_option_1": "baby, don't hurt me",
-    "question_1_option_2": "don't hurt me",
-    "question_1_option_3": "no more",
-    "question_1_option_4": "all of these",
-    "question_2": "How much is the fish?",
-    "question_2_answer": "4",
-    "question_2_option_1": "lala-lalala-la-la",
-    "question_2_option_2": "lalalala",
-    "question_2_option_3": "lala-lalala-la-lalala",
-    "question_2_option_4": "all of these"
+    "questions-0-text": "What is love?",
+    "questions-0-answer": "3",
+    "questions-0-options-0-text": "baby, don't hurt me",
+    "questions-0-options-1-text": "don't hurt me",
+    "questions-0-options-2-text": "no more",
+    "questions-0-options-3-text": "all of these",
+    "questions-1-text": "How much is the fish?",
+    "questions-1-answer": "3",
+    "questions-1-options-0-text": "lala-lalala-la-la",
+    "questions-1-options-1-text": "lalalala",
+    "questions-1-options-2-text": "lala-lalala-la-lalala",
+    "questions-1-options-3-text": "all of these"
 }
 
 
@@ -190,7 +190,8 @@ def test_create_update_validate(client, auth, path):
     del request_payload["topic"] # will raise key error on request.form['topic']
 
     response = client.post(path, data=request_payload)
-    assert response.status_code == 400
+    assert b'Bad form was submitted!' in response.data
+    # assert response.status_code == 400
 
 
 

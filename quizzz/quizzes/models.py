@@ -13,6 +13,9 @@ class Quiz(Base):
     topic = sa.Column(sa.String(100), nullable=False)
     is_finalized = sa.Column(sa.Boolean, default=False)
 
+    num_questions = sa.Column(sa.Integer, default=0, nullable=False)
+    num_options = sa.Column(sa.Integer, default=4, nullable=False)
+
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
@@ -28,30 +31,28 @@ class Quiz(Base):
     def __repr__(self):
         return "<Quiz (%r) by (%r)>" % (self.topic, self.author.name)
 
-    def populate_from_request_form(self, request_form):
+    def init_questions(self):
+        for i in range(self.num_questions):
+            question = Question(quiz=self)
+            for j in range(self.num_options):
+                option = Option(question=question)
+
+    def populate_from_wtform(self, form):
         self.author = g.user
         self.group = g.group
 
-        self.topic = request_form['topic']
-        self.is_finalized = True if request_form['is_finalized'] == '1' else False
+        self.topic = form.topic.data
+        self.is_finalized = True if form.is_finalized.data == '1' else False
 
         if not self.questions:
             self.init_questions()
 
-        for qnum, question in enumerate(self.questions, 1):
-            question.text = request_form['question_%s' % qnum]
-            for optnum, option in enumerate(question.options, 1):
-                option.text = request_form['question_%s_option_%s' % (qnum, optnum)]
-                option.is_correct = (request_form['question_%s_answer' % qnum] == str(optnum))
-
-        return self
-
-    def init_questions(self):
-        for qnum in range(1, current_app.config["QUESTIONS_PER_QUIZ"] + 1):
-            question = Question(quiz=self)
-            for optnum in range(1, current_app.config["OPTIONS_PER_QUESTION"] + 1):
-                option = Option(question=question)
-
+        for qnum, question in enumerate(self.questions):
+            question_subform = form.questions[qnum].form
+            question.text = question_subform.text.data
+            for optnum, option in enumerate(question.options):
+                option.text = question_subform.options[optnum].form.text.data
+                option.is_correct = (question_subform.answer.data == str(optnum))
 
 
 class Question(Base):
