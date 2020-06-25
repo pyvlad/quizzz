@@ -9,6 +9,7 @@ from quizzz.flashing import Flashing
 from . import bp
 from .models import Tournament, Round
 from .queries import get_tournament_by_id, get_quiz_pool, get_round_by_id
+from .forms import TournamentForm, DeleteTournamentForm, RoundForm, DeleteRoundForm
 
 
 
@@ -22,7 +23,8 @@ def edit_tournament(tournament_id):
     tournament = (Tournament() if not tournament_id else get_tournament_by_id(tournament_id))
 
     if request.method == 'POST':
-        tournament.populate_from_request_form(request.form)
+        form = TournamentForm()
+        tournament.populate_from_wtform(form)
 
         db = get_db_session()
         try:
@@ -36,6 +38,13 @@ def edit_tournament(tournament_id):
             flash("Tournament successfully created/updated.", Flashing.SUCCESS)
             return redirect(url_for('tournaments.show_tournament', tournament_id=tournament.id))
 
+    else:
+        form = TournamentForm(
+            tournament_name=tournament.name,
+            has_started=tournament.has_started,
+            has_finished=tournament.has_finished
+        )
+
     data = {
         "tournament": {
             "id": tournament.id,
@@ -45,7 +54,9 @@ def edit_tournament(tournament_id):
         }
     }
 
-    return render_template('tournaments/edit.html', data=data)
+    delete_form = DeleteTournamentForm()
+
+    return render_template('tournaments/edit.html', form=form, delete_form=delete_form, data=data)
 
 
 
@@ -76,20 +87,41 @@ def edit_round(tournament_id, round_id):
     quiz_pool = get_quiz_pool(g.group_id)
     round = Round() if not round_id else get_round_by_id(round_id)
 
-    if request.method == 'POST':
-        round.populate_from_request_form(request.form, tournament_id)
+    choices = [
+        (quiz.id, "%s by %s" % (quiz.topic, author_name))
+        for quiz, author_id, author_name in quiz_pool
+    ]
+    if round.quiz:
+        choices.insert(0, (round.quiz.id, "%s by %s" % (round.quiz.topic, round.quiz.author.name)))
 
-        db = get_db_session()
-        try:
-            db.add(round)
-            db.commit()
-        except:
-            traceback.print_exc()
-            db.rollback()
-            flash("Quiz Round could not be updated!", Flashing.ERROR)
+
+    if request.method == 'POST':
+        form = RoundForm()
+        form.quiz_id.choices = choices
+
+        if form.validate():
+            round.populate_from_wtform(form, tournament_id)
+
+            db = get_db_session()
+            try:
+                db.add(round)
+                db.commit()
+            except:
+                traceback.print_exc()
+                db.rollback()
+                flash("Quiz Round could not be updated!", Flashing.ERROR)
+            else:
+                flash("Quiz Round has been created/updated.", Flashing.SUCCESS)
+                return redirect(url_for('tournaments.show_tournament', tournament_id=tournament_id))
         else:
-            flash("Quiz Round has been created/updated.", Flashing.SUCCESS)
-            return redirect(url_for('tournaments.show_tournament', tournament_id=tournament_id))
+            flash("Invalid form submitted.")
+    else:
+        form = RoundForm(
+            quiz_id=round.quiz.id if round.quiz else None,
+            start_time=round.start_time,
+            finish_time=round.finish_time
+        )
+        form.quiz_id.choices = choices
 
     data = {
         "tournament": {
@@ -113,7 +145,9 @@ def edit_round(tournament_id, round_id):
         }
     }
 
-    return render_template('tournaments/edit_round.html', data=data)
+    delete_form = DeleteRoundForm()
+
+    return render_template('tournaments/edit_round.html', form=form, delete_form=delete_form, data=data)
 
 
 

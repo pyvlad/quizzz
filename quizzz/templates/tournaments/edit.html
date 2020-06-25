@@ -31,40 +31,26 @@
 
     <form action="" method="post">
 
+      {{ form.hidden_tag() }}
+
       <div class="form__item">
         <div class="form__label">
+          {{ form.tournament_name.label }}
           <label for="tournament_name">Tournament Name</label>
         </div>
-        <input class="form__input"
-          name="tournament_name"
-          id="tournament_name"
-          type="text"
-          value="{{ data.tournament.name or '' }}"
-          maxlength="100"
-          required
-        />
+        {{ form.tournament_name(class="form__input", maxlength=100) }}
       </div>
 
       <div class='form__item'>
         <label for='has_started'>
-          <input id='has_started'
-                 name='has_started'
-                 type='checkbox'
-                 value='1'
-                 {{ (data.tournament.has_started and "checked") or '' }}
-          />
+          {{ form.has_started() }}
           <span>Launch tournament?</span>
         </label>
       </div>
 
       <div class='form__item'>
         <label for='has_finished'>
-          <input id='has_finished'
-                 name='has_finished'
-                 type='checkbox'
-                 value='1'
-                 {{ (data.tournament.has_finished and "checked") or '' }}
-          />
+          {{ form.has_finished() }}
           <span>Finish tournament?</span>
         </label>
       </div>
@@ -78,6 +64,7 @@
     {% if data.tournament.id %}
       <form action="{{ url_for('tournaments.delete_tournament', tournament_id=data.tournament.id) }}"
             method="post">
+        {{ delete_form.hidden_tag() }}
         <div class='form__item'>
           <button class="button button_danger"
                   onclick="return confirm('Are you sure?');">

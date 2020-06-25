@@ -25,12 +25,12 @@ class Tournament(Base):
     def __repr__(self):
         return "<Tournament (%r) in (%r)>" % (self.name, self.group_id)
 
-    def populate_from_request_form(self, request_form):
+    def populate_from_wtform(self, form):
         self.group = g.group
 
-        self.name = request.form["tournament_name"]
-        self.has_started = bool(request.form.get("has_started"))
-        self.has_finished = bool(request.form.get("has_finished"))
+        self.name = form.tournament_name.data
+        self.has_started = bool(form.has_started.data)
+        self.has_finished = bool(form.has_finished.data)
 
         return self
 
@@ -57,13 +57,13 @@ class Round(Base):
     def __repr__(self):
         return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)
 
-    def populate_from_request_form(self, request_form, tournament_id):
+    def populate_from_wtform(self, form, tournament_id):
         self.tournament_id = tournament_id
-        self.quiz_id = int(request.form["quiz_id"])
-        if request.form.get("start_time"):
-            self.start_time = datetime.datetime.strptime(request.form["start_time"], '%Y-%m-%d')
-        if request.form.get("finish_time"):
-            self.finish_time = datetime.datetime.strptime(request.form["finish_time"], '%Y-%m-%d')
+        self.quiz_id = form.quiz_id.data
+        self.start_time = form.start_time.data
+        self.finish_time = form.finish_time.data
+        # if request.form.get("finish_time"):
+            # self.finish_time = datetime.datetime.strptime(request.form["finish_time"], '%Y-%m-%d')
         return self
 
 
@@ -111,14 +111,14 @@ class Play(Base):
     def get_result(self):
         return len(answer.option.is_correct for answer in self.answers)
 
-    def populate_from_request_form(self, request_form):
+    def populate_from_wtform(self, form):
         quiz = self.round.quiz
 
         answers = []
-        for question in quiz.questions:
-            options_by_id = { option.id: option for option in question.options }
+        for qnum, question in enumerate(quiz.questions):
+            options_by_id = { str(option.id): option for option in question.options }
 
-            selected_option_id = int(request.form["q%s" % question.id])
+            selected_option_id = form.questions[qnum].form.answer.data  # string
             selected_option = options_by_id.get(selected_option_id)
 
             answers += [PlayAnswer(play=self, option=selected_option)]

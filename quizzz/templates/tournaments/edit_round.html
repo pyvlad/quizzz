@@ -30,61 +30,40 @@
       </div>
     </div>
 
+    <div class="form__item">
+      <div class="form__label">
+        <label for="tournament_name">Tournament Name</label>
+      </div>
+      <input class="form__input"
+        name="tournament_name"
+        id="tournament_name"
+        type="text"
+        value="{{ data.tournament.name }}"
+        disabled
+      />
+    </div>
+
     <form action="" method="post">
 
-      <div class="form__item">
-        <div class="form__label">
-          <label for="tournament_name">Tournament Name</label>
-        </div>
-        <input class="form__input"
-          name="tournament_name"
-          id="tournament_name"
-          type="text"
-          value="{{ data.tournament.name }}"
-          maxlength="100"
-          disabled
-        />
-      </div>
+      {{ form.hidden_tag() }}
 
       <div class='form__item'>
-        <label for='quiz_id'>Select Quiz</label>
-        <select id='quiz_id' name='quiz_id'>
-          {% if data.round.quiz %}
-            <option selected value='{{ data.round.quiz.id }}'>
-              {{ data.round.quiz.topic }} by {{ data.round.quiz.author_name }}
-            </option>
-          {% endif %}
-          {% for quiz in data.quiz_pool %}
-            <option value='{{ quiz.id }}'>{{ quiz.topic }} by {{ quiz.author_name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-
-      <div class="form__item">
-        <div class="form__label">
-          <label for="start_time">Start Time</label>
-        </div>
-        <input class="form__input"
-          name="start_time"
-          id="start_time"
-          type="date"
-          value="{{ ((data.round and data.round.start_time)|string)[:10] or '' }}"
-          maxlength="100"
-        />
+        {{ form.quiz_id.label }}
+        {{ form.quiz_id() }}
       </div>
 
       <div class="form__item">
         <div class="form__label">
-          <label for="finish_time">Finish Time</label>
+          {{ form.start_time.label }}
         </div>
-        <input class="form__input"
-          name="finish_time"
-          id="finish_time"
-          type="date"
-          value="{{ ((data.round and data.round.finish_time)|string)[:10] or '' }}"
-          maxlength="100"
-        />
+        {{ form.start_time(class="form__input") }}
+      </div>
+
+      <div class="form__item">
+        <div class="form__label">
+          {{ form.finish_time.label }}
+        </div>
+        {{ form.finish_time(class="form__input") }}
       </div>
 
       <div class='form__item'>
@@ -96,6 +75,9 @@
     {% if data.round.id %}
       <form action="{{ url_for('tournaments.delete_round', round_id=data.round.id) }}"
             method="post">
+
+        {{ delete_form.hidden_tag() }}
+
         <div class='form__item'>
           <button class="button button_danger"
                   onclick="return confirm('Are you sure?');">

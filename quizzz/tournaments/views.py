@@ -14,6 +14,7 @@ from .queries import (
     get_play_by_round_id,
     get_played_rounds_by_tournament_id
 )
+from .forms import make_play_round_form
 
 
 @bp.route('/tournaments/')
@@ -144,11 +145,22 @@ def play_round(play_id):
     round_id = play.round_id
     quiz = round.quiz
 
+    # create form, dynamically add choices
+    PlayRoundForm = make_play_round_form(len(quiz.questions))
+    form = PlayRoundForm()  # add choices from request form if it's POST
+    for qnum, question in enumerate(quiz.questions):
+        form.questions[qnum].form.answer.choices = [
+            (str(option.id), 'abcdefghij'[optnum])
+            for optnum, option in enumerate(question.options)
+        ]
+
     if request.method == 'POST':
-        # TODO: handle sqlalchemy errors rather than let application fail
-        play.populate_from_request_form(request.form)
-        db.commit()
-        return redirect(url_for("tournaments.review_round", round_id=round_id))
+        if form.validate():
+            play.populate_from_wtform(form)
+            db.commit()
+            return redirect(url_for("tournaments.review_round", round_id=round_id))
+        else:
+            flash("Invalid form submitted.")
 
     data = {
         "quiz_topic": quiz.topic,
@@ -170,7 +182,7 @@ def play_round(play_id):
         ]
     }
 
-    return render_template('tournaments/play_round.html', data=data)
+    return render_template('tournaments/play_round.html', form=form, data=data)
 
 
 
