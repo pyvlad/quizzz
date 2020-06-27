@@ -5,12 +5,14 @@ from wtforms.fields.html5 import DateField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Length, Optional
 
+from quizzz.forms import ValidatedTextInput
+
 
 class TournamentForm(FlaskForm):
     tournament_name = StringField("Tournament Name", validators=[
                 DataRequired(message="Tournament name cannot not be empty."),
                 Length(max=100, message='Tournament name cannot be longer than 100 characters.'),
-            ])
+            ], widget=ValidatedTextInput())
     has_started = BooleanField("Launch tournament?")
     has_finished = BooleanField("Finish tournament?")
 

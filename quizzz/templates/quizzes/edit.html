@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="quiz-form__row">
-          {{ form.topic(class="quiz-form__input", maxlength=1000, disabled=data.read_only) }}
+          {{ form.topic(class="quiz-form__input", disabled=data.read_only) }}
         </div>
       </div>
 
@@ -52,7 +52,7 @@
             </div>
           </div>
           <div class="quiz-form__row">
-            {{ question.form.text(class="quiz-form__textarea", maxlength=1000, disabled=data.read_only) }}
+            {{ question.form.text(class="quiz-form__textarea", disabled=data.read_only) }}
           </div>
           <div class="quiz-form__row">
             <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
@@ -62,7 +62,7 @@
                   <label class="quiz-form__fieldset-item-input"
                          for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
                      {{ question.form.options[loop.index0].form.text(
-                          class="quiz-form__input", maxlength=200, disabled=data.read_only) }}
+                          class="quiz-form__input", disabled=data.read_only) }}
                   </label>
                 </div>
               {% endfor %}

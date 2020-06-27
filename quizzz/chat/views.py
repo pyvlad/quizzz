@@ -1,3 +1,5 @@
+import re
+
 from flask import g, request, render_template, flash, redirect, url_for
 
 from quizzz.db import get_db_session
@@ -30,14 +32,19 @@ def edit(message_id):
     form = MessageForm(text=msg.text) # request.form is added automatically as 1st arg by flask-wtf
     delete_form = MessageDeleteForm()
 
-    if request.method == 'POST' and form.validate():
-        msg.text = form.text.data
+    if request.method == 'POST':
+        # browser creates "\r\n" linebreaks which messes up validation
+        form.text.data = form.text.data.replace("\r\n", "\n")
+        # replace 3+ linebreaks with 2
+        form.text.data = re.sub(r"\n\s*\n\s*\n", '\n\n', form.text.data)
+        if form.validate():
+            msg.text = form.text.data
 
-        db = get_db_session()
-        db.add(msg)
-        db.commit()
+            db = get_db_session()
+            db.add(msg)
+            db.commit()
 
-        return redirect(url_for('chat.index'))
+            return redirect(url_for('chat.index'))
 
     for error in form.text.errors:
         flash(error, Flashing.ERROR)

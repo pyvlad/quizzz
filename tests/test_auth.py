@@ -46,8 +46,8 @@ def test_register(client, app):
 
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
-    ('', '', b'Username is required.'),
-    ('a', '', b'Password is required.'),
+    ('', '', b'Username cannot be shorter'),
+    ('a', '', b'Password cannot be shorter'),
     (USERS["bob"]["name"], 'some_pass', f'User {USERS["bob"]["name"]} already exists.'.encode()),
     (USERS["bob"]["name"].upper(), 'some_pass', f'User {USERS["bob"]["name"]} already exists.'.encode()),
 ))
