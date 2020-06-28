@@ -80,6 +80,18 @@ def show_round(round_id):
     round = get_round_with_details_by_id(round_id)
     users_played = set(play.user.id for play in round.plays)
 
+    round_plays = sorted([
+        {
+            "id": play.id,
+            "user": play.user.name,
+            "user_id": play.user.id,
+            "result": play.result,
+            "time": play.get_server_time(),
+            "score": play.get_score()
+        }
+        for play in round.plays
+    ], key=lambda x: x["score"], reverse=True)
+
     data = {
         "tournament": {
             "id": round.tournament.id,
@@ -89,15 +101,7 @@ def show_round(round_id):
             "id": round.quiz.id,
             "topic": round.quiz.topic,
             "author": round.quiz.author.name,
-            "plays": [
-                {
-                    "id": play.id,
-                    "user": play.user.name,
-                    "result": play.result,
-                    "time": play.get_server_time()
-                }
-                for play in round.plays
-            ]
+            "plays": round_plays
         },
         "round": {
             "id": round.id,

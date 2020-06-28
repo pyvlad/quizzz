@@ -430,6 +430,9 @@
 .results-table__row_even {
   background-color: #eee;
 }
+.results-table__row_own {
+  font-weight: bold;
+}
 
 /* ADMIN ACTIONS */
 .actions {

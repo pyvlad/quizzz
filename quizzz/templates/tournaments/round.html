@@ -42,15 +42,20 @@
     {% if data.quiz.plays %}
       <table class="results-table">
         <tr class="results-table__header-row">
+          <td class="results-table__header-cell">#</td>
           <td class="results-table__header-cell">user</td>
           <td class="results-table__header-cell">result</td>
           <td class="results-table__header-cell">time</td>
+          <td class="results-table__header-cell">score</td>
         </tr>
         {% for obj in data.quiz.plays %}
-          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}">
+          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
+              {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
+            <td class="results-table__cell">{{ loop.index }}</td>
             <td class="results-table__cell">{{ obj.user }}</td>
             <td class="results-table__cell">{{ obj.result }}</td>
-            <td class="results-table__cell">{{ obj.time }}</td>
+            <td class="results-table__cell">{{ obj.time|round(2) }}</td>
+            <td class="results-table__cell"><strong>{{ obj.score|round(1) }}</strong></td>
           </tr>
         {% endfor %}
       </table>

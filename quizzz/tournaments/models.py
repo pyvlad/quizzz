@@ -109,7 +109,13 @@ class Play(Base):
         return (self.client_updated - self.client_started).total_seconds()
 
     def get_result(self):
-        return len(answer.option.is_correct for answer in self.answers)
+        return len([answer.option.is_correct for answer in self.answers])
+
+    def get_score(self):
+        if self.result and self.get_server_time():
+            return max(0, 100 * self.result - self.get_server_time())
+        else:
+            return 0
 
     def populate_from_wtform(self, form):
         quiz = self.round.quiz
