@@ -18,21 +18,33 @@ from .queries import (
 from .forms import make_play_round_form
 
 
+TOURNAMENT_FILTER_FUNCTIONS = {
+    "active": lambda x: x.has_started and not x.has_finished,
+    "finished": lambda x: x.has_finished,
+    "all": lambda x: x
+}
+
+
 @bp.route('/tournaments/')
 def index():
     """
     Get list of group tournaments.
     """
+    filter_arg = request.args.get("filter", "active")
+    filter_func = TOURNAMENT_FILTER_FUNCTIONS[filter_arg]
+
     data = {
         "tournaments": [
             {
                 "id": tournament.id,
                 "name": tournament.name
             }
-            for tournament in g.group.tournaments
+            for tournament in g.group.tournaments if filter_func(tournament)
         ],
-        "has_edit_permissions": g.group_membership.is_admin
+        "has_edit_permissions": g.group_membership.is_admin,
+        "filters": {filtr: (filter_arg == filtr) for filtr in TOURNAMENT_FILTER_FUNCTIONS}
     }
+
     return render_template('tournaments/index.html', data=data)
 
 

@@ -17,7 +17,7 @@ class Group(Base):
     members = relationship("Member", back_populates="group")
     messages = relationship("Message", back_populates="group")
     quizzes = relationship("Quiz", back_populates="group")
-    tournaments = relationship("Tournament", back_populates="group")
+    tournaments = relationship("Tournament", back_populates="group", order_by="Tournament.time_created.desc()")
 
     def __repr__(self):
         return "<Group %r>" % self.name

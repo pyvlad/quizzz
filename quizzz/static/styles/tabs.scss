@@ -1,0 +1,28 @@
+.tabs {
+  display: flex;
+  justify-content: flex-end;
+
+  &__button {
+    display: block;
+
+    border-right: 1px solid white;
+    border-left: 1px solid white;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 6px 16px;
+
+    text-decoration: none;
+    outline: none;
+    color: blue;
+    background-color: inherit;
+
+    &:hover {
+      background-color: darkblue;
+      color: white;
+    }
+    &_active {
+      background-color: #55d;
+      color: white;
+    }
+  }
+}

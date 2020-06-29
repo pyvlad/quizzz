@@ -201,6 +201,31 @@
   border-top: 1px dashed grey;
 }
 
+.tabs {
+  display: flex;
+  justify-content: flex-end;
+}
+.tabs__button {
+  display: block;
+  border-right: 1px solid white;
+  border-left: 1px solid white;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 6px 16px;
+  text-decoration: none;
+  outline: none;
+  color: blue;
+  background-color: inherit;
+}
+.tabs__button:hover {
+  background-color: darkblue;
+  color: white;
+}
+.tabs__button_active {
+  background-color: #55d;
+  color: white;
+}
+
 /* Message Board */
 .message {
   margin: 1em 0;

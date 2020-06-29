@@ -16,6 +16,7 @@ class Tournament(Base):
     name = sa.Column(sa.String(100), nullable=False)
     has_started = sa.Column(sa.Boolean, default=False)
     has_finished = sa.Column(sa.Boolean, default=False)
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
 
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
 
