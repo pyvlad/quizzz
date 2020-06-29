@@ -1,6 +1,8 @@
 """
 Create dev DB with some data.
 """
+import datetime
+
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
@@ -149,13 +151,17 @@ with app.app_context():
         quiz.num_options = len(quiz.questions[0].options)
 
 
+    now = datetime.datetime.utcnow()
+    now = now.replace(second=0, microsecond=0)
     tournament = Tournament(
         name="First Tournament",
         group=main_group,
         rounds=[
-            Round(quiz=quizzes[0]),
-            Round(quiz=quizzes[3])
-        ]
+            Round(quiz=quizzes[0], start_time=now, finish_time=now + datetime.timedelta(minutes=60)),
+            Round(quiz=quizzes[3], start_time=(now + datetime.timedelta(minutes=5)),
+                finish_time=(now + datetime.timedelta(days=7)))
+        ],
+        has_started=True
     )
 
     db_session.add_all([main_group, other_group])

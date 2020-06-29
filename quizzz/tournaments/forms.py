@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import Form
-from wtforms import StringField, BooleanField, SelectField, RadioField, FormField, FieldList
+from wtforms import StringField, BooleanField, SelectField, RadioField, FormField, FieldList, IntegerField
 from wtforms.fields.html5 import DateField
 from wtforms.widgets import TextArea
-from wtforms.validators import DataRequired, Length, Optional
+from wtforms.validators import DataRequired, Length, Optional, NumberRange
 
 from quizzz.forms import ValidatedTextInput
 
@@ -23,8 +23,12 @@ class DeleteTournamentForm(FlaskForm):
 
 class RoundForm(FlaskForm):
     quiz_id = SelectField("Select Quiz", coerce=int)
-    start_time = DateField("Start Time", validators=(Optional(),))
-    finish_time = DateField("Finish Time", validators=(Optional(),))
+    start_date = DateField("Start Date")
+    start_time_hours = IntegerField("Start Hours", validators=[NumberRange(min=0, max=23)])
+    start_time_minutes = IntegerField("Start Minutes", validators=[NumberRange(min=0, max=59)])
+    finish_date = DateField("Finish Date")
+    finish_time_hours = IntegerField("Finish Hours", validators=[NumberRange(min=0, max=23)])
+    finish_time_minutes = IntegerField("Finish Minutes", validators=[NumberRange(min=0, max=59)])
 
 
 class DeleteRoundForm(FlaskForm):

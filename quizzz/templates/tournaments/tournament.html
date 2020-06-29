@@ -27,13 +27,15 @@
     </div>
   {% endif %}
   <ul class="list">
-    {% for round in data.tournament.rounds %}
+    {% for round in data.rounds %}
       <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
         <a class="list__linked-content"
            href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
           <div class="list__text-primary">{{ round.quiz.topic }}</div>
           <div class="list__text-secondary">by {{ round.quiz.author }}</div>
-          <div class="list__text-secondary">{{ round.start_time }} - {{ round.finish_time }}</div>
+          <div class="list__text-secondary">
+            {{ round.start_time.strftime("%A, %d %b %Y at %H:%M") }} - {{ round.finish_time.strftime("%A, %d %b %Y at %H:%M") }}
+          </div>
         </a>
         {% if data.has_edit_permissions %}
           <div class="list__extras">
@@ -45,6 +47,12 @@
       </li>
     {% endfor %}
   </ul>
+
+  <h4>
+    <a href="{{ url_for('tournaments.show_rounds', tournament_id=data.tournament.id) }}">
+      Show Rounds
+    </a>
+  </h4>
 
   <section class="my_lg">
     <h2 class="item-header item-header_main">Standings</h2>

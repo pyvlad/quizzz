@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 import sqlalchemy
 from flask import g, session
@@ -9,6 +11,8 @@ from quizzz.quizzes.models import Quiz
 
 from .data import TOURNAMENTS
 
+NOW = datetime.datetime.utcnow()
+LATER = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
 
 TOURNAMENT_REQUEST_PAYLOAD = {
     "tournament_name": "Tournament 2",
@@ -18,8 +22,12 @@ TOURNAMENT_REQUEST_PAYLOAD = {
 
 ROUND_REQUEST_PAYLOAD = {
     "quiz_id": 1,
-    "start_time": "2020-10-10",
-    "finish_time": "2021-10-10"
+    "start_date": NOW.strftime("%Y-%m-%d"),
+    "start_time_hours": NOW.hour,
+    "start_time_minutes": NOW.minute,
+    "finish_date": LATER.strftime("%Y-%m-%d"),
+    "finish_time_hours": LATER.hour,
+    "finish_time_minutes": LATER.minute,
 }
 
 

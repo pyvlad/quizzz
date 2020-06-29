@@ -21,7 +21,8 @@ class Tournament(Base):
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
 
     group = relationship("Group", back_populates="tournaments")
-    rounds = relationship("Round", back_populates="tournament", cascade="all, delete-orphan")
+    rounds = relationship("Round", back_populates="tournament",
+        cascade="all, delete-orphan", order_by="Round.finish_time.desc()")
 
     def __repr__(self):
         return "<Tournament (%r) in (%r)>" % (self.name, self.group_id)
@@ -42,8 +43,8 @@ class Round(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
 
-    start_time = sa.Column(sa.DateTime)
-    finish_time = sa.Column(sa.DateTime)
+    start_time = sa.Column(sa.DateTime, nullable=False)
+    finish_time = sa.Column(sa.DateTime, nullable=False)
 
     quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id'))
     tournament_id = sa.Column(sa.Integer, sa.ForeignKey('tournaments.id'))
@@ -61,10 +62,12 @@ class Round(Base):
     def populate_from_wtform(self, form, tournament_id):
         self.tournament_id = tournament_id
         self.quiz_id = form.quiz_id.data
-        self.start_time = form.start_time.data
-        self.finish_time = form.finish_time.data
-        # if request.form.get("finish_time"):
-            # self.finish_time = datetime.datetime.strptime(request.form["finish_time"], '%Y-%m-%d')
+        self.start_time = datetime.datetime.combine(form.start_date.data, datetime.datetime.min.time()) \
+            + datetime.timedelta(hours=form.start_time_hours.data) \
+            + datetime.timedelta(minutes=form.start_time_minutes.data)
+        self.finish_time = datetime.datetime.combine(form.finish_date.data, datetime.datetime.min.time()) \
+            + datetime.timedelta(hours=form.finish_time_hours.data) \
+            + datetime.timedelta(minutes=form.finish_time_minutes.data)
         return self
 
 

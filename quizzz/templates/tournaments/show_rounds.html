@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ data.tournament.name }} Tournament - {{g.group.name}}{% endblock %}
+
+{% block header %}
+  {{
+    render_header([
+      ("Groups", url_for("groups.show_user_groups")),
+      (g.group.name, url_for("groups.show_group_page")),
+      ("Tournaments", url_for("tournaments.index")),
+      (data.tournament.name, url_for("tournaments.show_tournament", tournament_id=data.tournament.id)),
+      ("Rounds", "")
+    ])
+  }}
+{% endblock %}
+
+{% block content %}
+  {% if data.has_edit_permissions %}
+    <div class="actions">
+      <a class="actions__item button button_action my_md"
+         href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
+        Add Round
+      </a>
+    </div>
+  {% endif %}
+  <div class="tabs">
+    {% for filter, is_active in data.filters.items() %}
+      <a class="tabs__button {{ (is_active and 'tabs__button_active') or '' }}"
+         href="?filter={{ filter }}">
+        {{ filter|capitalize }}
+      </a>
+    {% endfor %}
+  </div>
+  <ul class="list">
+    {% for round in data.rounds %}
+      <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
+        <a class="list__linked-content"
+           href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
+          <div class="list__text-primary">{{ round.quiz.topic }}</div>
+          <div class="list__text-secondary">by {{ round.quiz.author }}</div>
+          <div class="list__text-secondary">{{ round.start_time }} - {{ round.finish_time }}</div>
+        </a>
+        {% if data.has_edit_permissions %}
+          <div class="list__extras">
+            <a href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=round.id) }}">
+              Edit Round
+            </a>
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

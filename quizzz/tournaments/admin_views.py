@@ -118,8 +118,12 @@ def edit_round(tournament_id, round_id):
     else:
         form = RoundForm(
             quiz_id=round.quiz.id if round.quiz else None,
-            start_time=round.start_time,
-            finish_time=round.finish_time
+            start_date=round.start_time,
+            start_time_hours=round.start_time.hour if round.start_time else 0,
+            start_time_minutes=round.start_time.minute if round.start_time else 0,
+            finish_date=round.finish_time,
+            finish_time_hours=round.finish_time.hour if round.start_time else 0,
+            finish_time_minutes=round.finish_time.minute if round.start_time else 0,
         )
         form.quiz_id.choices = choices
 

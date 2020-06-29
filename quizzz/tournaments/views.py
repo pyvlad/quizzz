@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy.orm import joinedload
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
@@ -25,6 +27,15 @@ TOURNAMENT_FILTER_FUNCTIONS = {
 }
 
 
+ROUND_STATUS_FUNCTIONS = {
+    "current": lambda x,now: now >= x.start_time and now <= x.finish_time,
+    "finished": lambda x,now: now > x.finish_time,
+    "coming": lambda x,now: now < x.start_time,
+    "all": lambda x,now: x,
+}
+
+
+
 @bp.route('/tournaments/')
 def index():
     """
@@ -48,6 +59,25 @@ def index():
     return render_template('tournaments/index.html', data=data)
 
 
+def _get_rounds(filtr, tournament_obj, played_round_ids={}, now=None):
+    if now is None:
+        now = datetime.datetime.utcnow()
+    return [
+        {
+            "id": round.id,
+            "quiz": {
+                "id": round.quiz.id,
+                "topic": round.quiz.topic,
+                "author": round.quiz.author.name
+            },
+            "start_time": round.start_time,
+            "finish_time": round.finish_time,
+            "is_taken": round.id in played_round_ids
+        }
+        for round in tournament_obj.rounds if ROUND_STATUS_FUNCTIONS[filtr](round, now)
+    ]
+
+
 
 @bp.route('/tournaments/<int:tournament_id>/')
 def show_tournament(tournament_id):
@@ -58,25 +88,14 @@ def show_tournament(tournament_id):
     standings = get_tournament_standings(tournament_id)
     played_round_ids = get_played_rounds_by_tournament_id(tournament_id)
 
+    rounds = _get_rounds("current", tournament, played_round_ids)
+
     data = {
         "tournament": {
             "id": tournament.id,
             "name": tournament.name,
-            "rounds": [
-                {
-                    "id": round.id,
-                    "quiz": {
-                        "id": round.quiz.id,
-                        "topic": round.quiz.topic,
-                        "author": round.quiz.author.name
-                    },
-                    "start_time": round.start_time or "",
-                    "finish_time": round.finish_time or "",
-                    "is_taken": round.id in played_round_ids
-                }
-                for round in tournament.rounds
-            ]
         },
+        "rounds": rounds,
         "standings": standings,
         "has_edit_permissions": g.group_membership.is_admin
     }
@@ -84,6 +103,29 @@ def show_tournament(tournament_id):
     return render_template('tournaments/tournament.html', data=data)
 
 
+@bp.route('/tournaments/<int:tournament_id>/rounds')
+def show_rounds(tournament_id):
+    """
+    Show tournament details.
+    """
+    filter_arg = request.args.get("filter", "all")
+    if filter_arg not in ROUND_STATUS_FUNCTIONS:
+        abort(400)
+
+    tournament = get_tournament_by_id(tournament_id, with_rounds=True)
+    rounds = _get_rounds(filter_arg, tournament)
+
+    data = {
+        "tournament": {
+            "id": tournament.id,
+            "name": tournament.name,
+        },
+        "rounds": rounds,
+        "has_edit_permissions": g.group_membership.is_admin,
+        "filters": {filtr: (filter_arg == filtr) for filtr in ROUND_STATUS_FUNCTIONS}
+    }
+
+    return render_template('tournaments/show_rounds.html', data=data)
 
 
 

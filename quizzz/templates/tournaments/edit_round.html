@@ -54,16 +54,22 @@
 
       <div class="form__item">
         <div class="form__label">
-          {{ form.start_time.label }}
+          {{ form.start_date.label }}
         </div>
-        {{ form.start_time(class="form__input") }}
+        {{ form.start_date(class="form__input") }}
+        <div class="form__label">Time</div>
+        {{ form.start_time_hours(class="form__input") }}
+        {{ form.start_time_minutes(class="form__input") }}
       </div>
 
       <div class="form__item">
         <div class="form__label">
-          {{ form.finish_time.label }}
+          {{ form.finish_date.label }}
         </div>
-        {{ form.finish_time(class="form__input") }}
+        {{ form.finish_date(class="form__input") }}
+        <div class="form__label">Time</div>
+        {{ form.finish_time_hours(class="form__input") }}
+        {{ form.finish_time_minutes(class="form__input") }}
       </div>
 
       <div class='form__item'>
