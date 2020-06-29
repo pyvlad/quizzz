@@ -7,6 +7,7 @@ from . import bp
 from .models import Play
 from .queries import (
     get_tournament_by_id,
+    get_tournament_standings,
     get_round_by_id,
     get_round_with_quiz_by_id,
     get_round_with_details_by_id,
@@ -42,6 +43,7 @@ def show_tournament(tournament_id):
     Show tournament details.
     """
     tournament = get_tournament_by_id(tournament_id, with_rounds=True)
+    standings = get_tournament_standings(tournament_id)
     played_round_ids = get_played_rounds_by_tournament_id(tournament_id)
 
     data = {
@@ -63,6 +65,7 @@ def show_tournament(tournament_id):
                 for round in tournament.rounds
             ]
         },
+        "standings": standings,
         "has_edit_permissions": g.group_membership.is_admin
     }
 

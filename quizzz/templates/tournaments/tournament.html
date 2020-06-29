@@ -45,4 +45,29 @@
       </li>
     {% endfor %}
   </ul>
+
+  <section class="my_lg">
+    <h2 class="item-header item-header_main">Standings</h2>
+    {% if data.standings %}
+      <table class="results-table">
+        <tr class="results-table__header-row">
+          <td class="results-table__header-cell">#</td>
+          <td class="results-table__header-cell">user</td>
+          <td class="results-table__header-cell">played</td>
+          <td class="results-table__header-cell">points</td>
+        </tr>
+        {% for obj in data.standings %}
+          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
+              {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
+            <td class="results-table__cell">{{ loop.index }}</td>
+            <td class="results-table__cell">{{ obj.user }}</td>
+            <td class="results-table__cell">{{ obj.rounds }}</td>
+            <td class="results-table__cell">{{ obj.points }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>Tournament standings will be here.</p>
+    {% endif %}
+  </section>
 {% endblock %}

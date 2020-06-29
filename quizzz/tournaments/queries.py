@@ -26,6 +26,47 @@ def get_tournament_by_id(tournament_id, with_rounds=False):
     return tournament
 
 
+def get_tournament_standings(tournament_id):
+    db = get_db_session()
+
+    tournament = db.query(Tournament)\
+        .options(joinedload(Tournament.rounds).joinedload(Round.plays))\
+        .filter(Tournament.id == tournament_id)\
+        .first()
+
+    if tournament is None:
+        abort(404, "Tournament doesn't exist.")
+
+    total_points = {}
+    total_plays = {}
+    for round in tournament.rounds:
+        round_plays = [{"user_id": play.user_id, "score": play.get_score()} for play in round.plays]
+        num_participants = len(round_plays)
+        round_plays = sorted(round_plays, key=lambda x: x["score"], reverse=True)
+        for i, round_play in enumerate(round_plays):
+            user_id = round_play["user_id"]
+            round_points = num_participants - i
+            total_plays[user_id] = total_plays.get(user_id, 0) + 1
+            total_points[user_id] = total_points.get(user_id, 0) + round_points
+
+    standings = [
+        {"user_id": x[0], "points": x[1], "rounds": total_plays[x[0]]}
+        for x in sorted(total_points.items(), key=lambda x:x[1], reverse=True)
+    ]
+
+    user_ids = [x["user_id"] for x in standings]
+    usernames_by_id = dict(db.query(User.id, User.name).filter(User.id.in_(user_ids)).all())
+
+    for row in standings:
+        row["user"] = usernames_by_id[row["user_id"]]
+
+    return standings
+
+
+def get_usernames(user_list):
+    db = get_db_session()
+    return
+
 
 def get_round_by_id(round_id):
     db = get_db_session()
