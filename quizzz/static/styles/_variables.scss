@@ -1,0 +1,47 @@
+$layout-breakpoint-sm: 600px;
+$layout-breakpoint-md: 960px;
+$layout-breakpoint-lg: 1200px;
+
+
+$main-color: #352000;
+$main-color-dark: #352000;
+$main-color-darker: darken($main-color, 10%);
+$main-color-light: lighten($main-color, 10%);
+$main-color-lighter: lighten($main-color, 20%);
+
+$grey-color: #ccc;
+$grey-color-light: #eee;
+$grey-color-lightest: #f6f6f6;
+$grey-color-medium: #888;
+$grey-color-dark: #444;
+$grey-color-darker: #333;
+
+$green-color: green;
+$green-color-light: #daffda;
+$green-color-dark: darkgreen;
+
+$red-color: red;
+$red-color-light: #faa;
+$red-color-lighter: rgb(255, 230, 230);
+$red-color-dark: darkred;
+
+$blue-color: #5995DA;
+$blue-color-light: #76AEED;
+$blue-color-dark: #407FC7;
+
+$tab-color-dark: darkblue;
+$tab-color: blue;
+$tab-color-light: #55d;
+
+$link-color: #05f;
+$link-color-dark: darken(#05f, 20%);
+
+$beige-color: beige;
+$black-color: black;
+$white-color: white;
+
+$shade-lightest: rgba(0,0,0,0.1);
+$shade-lighter: rgba(0,0,0,0.2);
+$shade-light: rgba(0,0,0,0.3);
+$red-shade: rgba(255,0,0,0.15);
+$green-shade: rgba(0,255,0,0.15);

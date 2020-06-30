@@ -1,4 +1,6 @@
 /* Page Layout */
+@import '_variables';
+
 .page {
   display: flex;
   flex-direction: column;
@@ -8,8 +10,8 @@
     padding: 5px;
 
     &_header {
-      background-color: #eee;
-      border-bottom: 2px solid #ccc;
+      background-color: $grey-color-light;
+      border-bottom: 2px solid $grey-color;
     }
 
     &_main {
@@ -17,15 +19,15 @@
     }
 
     &_footer {
-      border-top: 2px solid #ccc;
-      background-color: #eee;
-      color: black;
+      background-color: $grey-color-light;
+      border-top: 2px solid $grey-color;
+      color: $black-color;
     }
   }
 
   &__section-content {
     width: 100%;
-    max-width: 1200px;
+    max-width: $layout-breakpoint-lg;
     margin: 0 auto;
   }
 }

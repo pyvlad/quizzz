@@ -173,13 +173,13 @@ def test_show_tournament(app, client, auth):
     auth.login_as("bob")
     response = client.get('/groups/1/tournaments/1/')
     assert response.status_code == 200
-    check_links([("edit", True), ("add_round", True), ("view_round", False)], response.data)
+    check_links([("edit", False), ("add_round", False), ("view_round", False)], response.data)
 
     # tournament rounds should be listed once they're added:
     _finalize_first_quiz(app)
     client.post("/groups/1/tournaments/1/rounds/0/edit", data=ROUND_REQUEST_PAYLOAD)
     response = client.get('/groups/1/tournaments/1/')
-    check_links([("edit", True), ("add_round", True), ("view_round", True), ("edit_round", True)],
+    check_links([("edit", False), ("add_round", False), ("view_round", True), ("edit_round", True)],
         response.data)
 
 

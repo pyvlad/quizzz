@@ -1,4 +1,7 @@
 /* Button */
+@import '_variables';
+
+
 .button {
   display: block;
   text-decoration: none;
@@ -15,26 +18,26 @@
   }
 
   &_action {
-    color: #FFFFFF;
-    background-color: #5995DA;
+    color: $white-color;
+    background-color: $blue-color;
 
     &:hover {
-      background-color: #76AEED;
+      background-color: $blue-color-light;
     }
     &:active {
-      background-color: #407FC7;
+      background-color: $blue-color-dark;
     }
   }
 
   &_danger {
-    color: #FFFFFF;
-    background-color: red;
+    color: $white-color;
+    background-color: $red-color;
 
     &:hover {
-      background-color: darkred;
+      background-color: $red-color-light;
     }
     &:active {
-      background-color: pink;
+      background-color: $red-color-dark;
     }
   }
 }

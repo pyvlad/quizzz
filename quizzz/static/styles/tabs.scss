@@ -1,3 +1,6 @@
+@import '_variables';
+
+
 .tabs {
   display: flex;
   justify-content: flex-end;
@@ -5,24 +8,24 @@
   &__button {
     display: block;
 
-    border-right: 1px solid white;
-    border-left: 1px solid white;
+    border-right: 1px solid $white-color;
+    border-left: 1px solid $white-color;
     border-radius: 10px;
     cursor: pointer;
     padding: 6px 16px;
 
     text-decoration: none;
     outline: none;
-    color: blue;
+    color: $tab-color;
     background-color: inherit;
 
     &:hover {
-      background-color: darkblue;
-      color: white;
+      background-color: $tab-color-dark;
+      color: $white-color;
     }
     &_active {
-      background-color: #55d;
-      color: white;
+      background-color: $tab-color-light;
+      color: $white-color;
     }
   }
 }

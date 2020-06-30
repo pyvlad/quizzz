@@ -13,6 +13,17 @@
 {% endblock %}
 
 {% block content %}
+  <h2 class="heading heading_primary">Group Tournaments</h2>
+
+  {% if data.has_edit_permissions %}
+    <div class="admin-actions">
+      <a class="admin-actions__item button button_action"
+         href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
+        New Tournament
+      </a>
+    </div>
+  {% endif %}
+
   <div class="tabs">
     {% for filter, is_active in data.filters.items() %}
       <a class="tabs__button {{ (is_active and 'tabs__button_active') or '' }}"
@@ -21,14 +32,7 @@
       </a>
     {% endfor %}
   </div>
-  {% if data.has_edit_permissions %}
-    <div class="actions">
-      <a class="actions__item button button_action my_md"
-         href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
-        New Tournament
-      </a>
-    </div>
-  {% endif %}
+
   <ul class="list">
     {% for tournament in data.tournaments %}
       <li class="list__item">
@@ -46,6 +50,8 @@
           </div>
         {% endif %}
       </li>
+    {% else %}
+      <p>Nothing here.</p>
     {% endfor %}
   </ul>
 {% endblock %}

@@ -1,11 +1,17 @@
-/* Headers */
-.item-header {
+/* Headings */
+@import '_variables';
+
+.heading {
   font-weight: bold;
   font-family: "Helvetica", "Arial", sans-serif;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+  color: $main-color;
 
-  &_main {
+  &_primary {
     font-size: 2em;
+  }
+  &_secondary {
+    font-size: 1.4em;
   }
 }

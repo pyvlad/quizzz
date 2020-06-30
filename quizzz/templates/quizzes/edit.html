@@ -17,96 +17,100 @@
 {% endblock %}
 
 {% block content %}
-  <div class="quiz-form">
+  <div class="paper paper_sm-disabled">
+    <div class="quiz-form">
 
-    <div class="quiz-form__header">
-      Create New Quiz
-    </div>
-
-    <div class="quiz-form__helper-text">
-      Please fill in the form below and hit 'save'.<br/>
-      A saved quiz will remain available for updates until you 'submit' it for a group competition.
-    </div>
-
-    <form action="" method="post">
-
-      {{ form.hidden_tag() }}
+      <div class="quiz-form__header">
+        Create New Quiz
+      </div>
 
       <div class="quiz-form__item">
-        <div class="quiz-form__row">
-          <div class="quiz-form__label">
-            {{ form.topic.label() }}
-          </div>
-        </div>
-        <div class="quiz-form__row">
-          {{ form.topic(class="quiz-form__input", disabled=data.read_only) }}
+        <div class="quiz-form__help">
+          Please fill in the form below and hit 'save'.<br/>
+          A saved quiz will remain available for updates until you 'submit' it for a group competition.
         </div>
       </div>
 
-      {% for question in form.questions %}
-        {% set outer_loop = loop %}
+      <form action="" method="post">
+
+        {{ form.hidden_tag() }}
+
         <div class="quiz-form__item">
           <div class="quiz-form__row">
             <div class="quiz-form__label">
-              <label for="{{'question_%s' % qnum}}">Question {{ loop.index }}</label>
+              {{ form.topic.label() }}
             </div>
           </div>
           <div class="quiz-form__row">
-            {{ question.form.text(class="quiz-form__textarea", disabled=data.read_only) }}
+            {{ form.topic(class="quiz-form__input", disabled=data.read_only) }}
+          </div>
+        </div>
+
+        {% for question in form.questions %}
+          {% set outer_loop = loop %}
+          <div class="quiz-form__item">
+            <div class="quiz-form__row">
+              <div class="quiz-form__label">
+                <label for="{{'question_%s' % qnum}}">Question {{ loop.index }}</label>
+              </div>
+            </div>
+            <div class="quiz-form__row">
+              {{ question.form.text(class="quiz-form__textarea", disabled=data.read_only) }}
+            </div>
+            <div class="quiz-form__row">
+              <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
+                {% for subfield in question.form.answer %}
+                  <div class="quiz-form__fieldset-item">
+                    {{ subfield(required=True) }}
+                    <label class="quiz-form__fieldset-item-input"
+                           for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
+                       {{ question.form.options[loop.index0].form.text(
+                            class="quiz-form__input", disabled=data.read_only) }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </fieldset>
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="quiz-form__item">
+          <div class="quiz-form__row">
+            <div class="quiz-form__label">
+              {{ form.is_finalized.label }}
+            </div>
           </div>
           <div class="quiz-form__row">
-            <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
-              {% for subfield in question.form.answer %}
+            <fieldset class="quiz-form__fieldset" >
+              {% for subfield in form.is_finalized %}
                 <div class="quiz-form__fieldset-item">
                   {{ subfield(required=True) }}
-                  <label class="quiz-form__fieldset-item-input"
-                         for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
-                     {{ question.form.options[loop.index0].form.text(
-                          class="quiz-form__input", disabled=data.read_only) }}
-                  </label>
+                  {{ subfield.label(class="quiz-form__fieldset-item-input") }}
                 </div>
               {% endfor %}
             </fieldset>
           </div>
         </div>
-      {% endfor %}
 
-      <div class="quiz-form__item">
-        <div class="quiz-form__row">
-          <div class="quiz-form__label">
-            {{ form.is_finalized.label }}
+        {% if not data.read_only %}
+          <div class='quiz-form__item'>
+            <button class="button button_action">Save</button>
           </div>
-        </div>
-        <div class="quiz-form__row">
-          <fieldset class="quiz-form__fieldset" >
-            {% for subfield in form.is_finalized %}
-              <div class="quiz-form__fieldset-item">
-                {{ subfield(required=True) }}
-                {{ subfield.label(class="quiz-form__fieldset-item-input") }}
-              </div>
-            {% endfor %}
-          </fieldset>
-        </div>
-      </div>
+        {% endif %}
 
-      {% if not data.read_only %}
-        <div class='quiz-form__item'>
-          <button class="button button_action">Save</button>
-        </div>
-      {% endif %}
-
-    </form>
-
-    {% if data.quiz_id and not data.read_only %}
-      <form action="{{ url_for('quizzes.delete', quiz_id=data.quiz_id) }}" method="post">
-        {{ delete_form.hidden_tag() }}
-        <div class='quiz-form__item'>
-          <button class="button button_danger"
-                  onclick="return confirm('Are you sure?');">
-            Delete
-          </button>
-        </div>
       </form>
-    {% endif %}
+
+      {% if data.quiz_id and not data.read_only %}
+        <form action="{{ url_for('quizzes.delete', quiz_id=data.quiz_id) }}" method="post">
+          {{ delete_form.hidden_tag() }}
+          <div class='quiz-form__item'>
+            <button class="button button_danger"
+                    onclick="return confirm('Are you sure?');">
+              Delete
+            </button>
+          </div>
+        </form>
+      {% endif %}
+    </div>
   </div>
 {% endblock %}

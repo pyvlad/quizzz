@@ -1,9 +1,12 @@
 @use 'styles/_reset';
 
+@use 'styles/grid';
+
 @use 'styles/page';
 @use 'styles/header';
 @use 'styles/page-info';
 @use 'styles/flash-messages';
+@use 'styles/paper';
 
 @use 'styles/button';
 @use 'styles/list';
@@ -13,8 +16,8 @@
 @use 'styles/form';
 @use 'styles/quiz-form';
 @use 'styles/results-table';
-@use 'styles/actions';
-@use 'styles/item-headers';
+@use 'styles/admin-actions';
+@use 'styles/headings';
 @use 'styles/home-logo';
 
 @use 'styles/spacing';

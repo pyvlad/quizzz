@@ -17,48 +17,49 @@
 {% endblock %}
 
 {% block content %}
-  <div class="form">
-    <form method="post">
+  <div class="paper paper_narrow paper_sm-disabled">
+    <div class="form">
+      <form method="post">
 
-      {{ form.hidden_tag() }}
+        {{ form.hidden_tag() }}
 
-      <div class="form__header">
-        {% if data.message_id %}
-          Edit Your Message
-        {% else %}
-          Create New Message
-        {% endif %}
-      </div>
-
-      <div class="form__item">
-        <div class="form__help">
-          Please enter your message below.
+        <div class="form__header">
+          {% if data.message_id %}
+            Edit Your Message
+          {% else %}
+            Create New Message
+          {% endif %}
         </div>
-      </div>
 
-      <div class="form__item">
-        {{ form.text(class="form__textarea form__textarea_md") }}
-      </div>
+        <div class="form__item">
+          <div class="form__help">
+            Please enter your message below.
+          </div>
+        </div>
 
-      <div class="form__item">
-        <input class="button button_action"
-          type="submit"
-          value="Submit"
-        />
-      </div>
-    </form>
-    {% if data.message_id %}
-      <div class="form__item">
-        <form action="{{ url_for('chat.delete', id=data.message_id) }}" method="post">
-          {{ delete_form.hidden_tag() }}
-          <input class="button button_danger"
+        <div class="form__item">
+          {{ form.text(class="form__textarea form__textarea_md") }}
+        </div>
+
+        <div class="form__item">
+          <input class="button button_action"
             type="submit"
-            value="Delete"
-            onclick="return confirm('Are you sure?');"
+            value="Submit"
           />
-        </form>
-      </div>
-    {% endif %}
+        </div>
+      </form>
+      {% if data.message_id %}
+        <div class="form__item">
+          <form action="{{ url_for('chat.delete', id=data.message_id) }}" method="post">
+            {{ delete_form.hidden_tag() }}
+            <input class="button button_danger"
+              type="submit"
+              value="Delete"
+              onclick="return confirm('Are you sure?');"
+            />
+          </form>
+        </div>
+      {% endif %}
+    </div>
   </div>
-
 {% endblock %}

@@ -14,18 +14,9 @@
 {% endblock %}
 
 {% block content %}
-  {% if data.has_edit_permissions %}
-    <div class="actions">
-      <a class="actions__item button button_action my_md"
-         href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
-        Add Round
-      </a>
-      <a class="actions__item actions__item_last button button_action my_md"
-         href="{{ url_for('tournaments.edit_tournament', tournament_id=data.tournament.id) }}">
-         Edit Tournament
-      </a>
-    </div>
-  {% endif %}
+  <h2 class="heading heading_primary">Tournament Page</h2>
+
+  <h3 class="heading heading_secondary">Current Rounds</h3>
   <ul class="list">
     {% for round in data.rounds %}
       <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
@@ -36,6 +27,11 @@
           <div class="list__text-secondary">
             {{ round.start_time.strftime("%A, %d %b %Y at %H:%M") }} - {{ round.finish_time.strftime("%A, %d %b %Y at %H:%M") }}
           </div>
+          <div class="list__text-secondary">
+            {{ round.time_left.days }} days
+            {{ round.time_left.hours }} hours
+            {{ round.time_left.minutes }} minutes left
+          </div>
         </a>
         {% if data.has_edit_permissions %}
           <div class="list__extras">
@@ -45,17 +41,18 @@
           </div>
         {% endif %}
       </li>
+    {% else %}
+      <p>No rounds are currently available for play.</p>
     {% endfor %}
   </ul>
-
-  <h4>
+  <p>
     <a href="{{ url_for('tournaments.show_rounds', tournament_id=data.tournament.id) }}">
-      Show Rounds
+      View All Rounds
     </a>
-  </h4>
+  </p>
 
   <section class="my_lg">
-    <h2 class="item-header item-header_main">Standings</h2>
+    <h3 class="heading heading_secondary">Overall Standings</h3>
     {% if data.standings %}
       <table class="results-table">
         <tr class="results-table__header-row">

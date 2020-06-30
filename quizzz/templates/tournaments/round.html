@@ -15,30 +15,46 @@
 {% endblock %}
 
 {% block content %}
-  <section class="my_lg">
-    <div class="actions">
-      {% if not data.is_taken %}
-        <div class="actions__item">
+  <h2 class="heading heading_primary">Round Page</h2>
+
+  <table>
+    <tr>
+      <td>Topic</td>
+      <td>{{ data.quiz.topic }}</td>
+    </tr>
+    <tr>
+      <td>Author</td>
+      <td>{{ data.quiz.author }}</td>
+    </tr>
+    <tr>
+      <td>Start Time</td>
+      <td>{{ data.round.start_time.strftime("%A, %d %b %Y at %H:%M") }}</td>
+    </tr>
+    <tr>
+      <td>Finish Time</td>
+      <td>{{ data.round.finish_time.strftime("%A, %d %b %Y at %H:%M") }}</td>
+    </tr>
+    <tr>
+      <td class="pr_lg">Your Action</td>
+      <td>
+        {% if not data.is_taken %}
           <form action="{{ url_for('tournaments.start_round', round_id=data.round.id) }}" method="post">
             <button class="button button_action my_md">
               Take Quiz
             </button>
           <form>
-        </div>
-      {% else %}
-        <div class="actions__item">
+        {% else %}
           <a class="button button_action my_md"
              href="{{ url_for('tournaments.review_round', round_id=data.round.id) }}">
             Review Quiz
           </a>
-        </div>
-      {% endif %}
-    </div>
-    <h3>{{ data.quiz.topic }} [by {{ data.quiz.author }}]</h3>
-  </section>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
 
   <section class="my_lg">
-    <h2 class="item-header item-header_main">Standings</h2>
+    <h3 class="heading heading_secondary">Standings</h3>
     {% if data.quiz.plays %}
       <table class="results-table">
         <tr class="results-table__header-row">

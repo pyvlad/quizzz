@@ -1,22 +1,24 @@
 /* Message Board */
+@import '_variables';
+
+
 .message {
   margin: 1em 0;
-  border-color: #dde;
-  border-style: solid;
-  border-width: 1px;
+  background-color: $grey-color-light;
+  padding: 2px;
+  box-shadow: 3px 3px 5px $grey-color;
 
   &_own {
-    background-color: rgba(0,255,0,0.1);
+    background-color: $green-color-light;
   }
 
   &__details {
     font-family: "Helvetica", "Arial", sans-serif;
     font-size: 0.8em;
-    color: #444;
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 0.5em;
-    background-color: #eef;
+    color: $grey-color-dark;
   }
 
   &__details-item {
@@ -29,5 +31,6 @@
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    background-color: $grey-color-lightest;
   }
 }

@@ -3,51 +3,53 @@
 {% block title %}Take Quiz{% endblock %}
 
 {% block content %}
-  <div class="quiz-form">
-    <form action="" method="post">
+  <div class="paper">
+    <div class="quiz-form">
+      <form action="" method="post">
 
-      {{ form.hidden_tag() }}
+        {{ form.hidden_tag() }}
 
-      <div class="quiz-form__item">
-        <div class="quiz-form__header">
-          "{{ data.quiz_topic }}"
-        </div>
-      </div>
-
-      {% for question in data.questions %}
-      {% set question_form = form.questions[loop.index0].form %}
-      {% set outer_loop = loop %}
-        <div class='quiz-form__item quiz-form__item_outlined'>
-          <div class="quiz-form__row">
-            <div class='quiz-form__helper-text'>
-              Question {{ question.number }}
-            </div>
-          </div>
-          <div class="quiz-form__row">
-            <div class='quiz-form__label'>
-              {{ question.text }}
-            </div>
-          </div>
-          <div class="quiz-form__row">
-            <fieldset class="quiz-form__fieldset">
-              {% for subfield in question_form.answer %}
-              {% set option = question.options[loop.index0] %}
-                <div class="quiz-form__fieldset-item">
-                  {{ subfield() }}
-                  <label class="quiz-form__fieldset-item-input"
-                         for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
-                    {{ option.text }}
-                  </label>
-                </div>
-              {% endfor %}
-            </fieldset>
+        <div class="quiz-form__item">
+          <div class="quiz-form__header">
+            "{{ data.quiz_topic }}"
           </div>
         </div>
-      {% endfor %}
-      <div class='quiz-form__row'>
-        <button class="button button_action">Submit</button>
-      </div>
 
-    </form>
+        {% for question in data.questions %}
+        {% set question_form = form.questions[loop.index0].form %}
+        {% set outer_loop = loop %}
+          <div class='quiz-form__item quiz-form__item_outlined'>
+            <div class="quiz-form__row">
+              <div class='quiz-form__helper-text'>
+                Question {{ question.number }}
+              </div>
+            </div>
+            <div class="quiz-form__row">
+              <div class='quiz-form__label'>
+                {{ question.text }}
+              </div>
+            </div>
+            <div class="quiz-form__row">
+              <fieldset class="quiz-form__fieldset">
+                {% for subfield in question_form.answer %}
+                {% set option = question.options[loop.index0] %}
+                  <div class="quiz-form__fieldset-item">
+                    {{ subfield() }}
+                    <label class="quiz-form__fieldset-item-input"
+                           for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
+                      {{ option.text }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </fieldset>
+            </div>
+          </div>
+        {% endfor %}
+        <div class='quiz-form__row'>
+          <button class="button button_action">Submit</button>
+        </div>
+
+      </form>
+    </div>
   </div>
 {% endblock %}

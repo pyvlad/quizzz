@@ -1,0 +1,82 @@
+@import '_variables';
+
+$NCOLUMNS: 12;
+$BREAKPOINTS: (
+  '': 0,
+  'xs': 0,
+  'sm': $layout-breakpoint-sm,
+  'md': $layout-breakpoint-md,
+  'lg': $layout-breakpoint-lg
+);
+
+
+@mixin create-media-query($breakpoint, $which: "min") {
+  @if($breakpoint == 0) {
+    @content;
+  } @else {
+    @media screen and (#{$which}-width: $breakpoint) {
+      @content;
+    }
+  }
+}
+
+
+
+@function get-modsuffix($modifier) {
+  $result: '';
+  @if ($modifier == '') {
+    $result: '';
+  } @else {
+    $result: '-#{$modifier}';
+  }
+  @return $result;
+}
+
+
+@mixin create-col-classes($modifier, $breakpoint) {
+  $modsuffix: get-modsuffix($modifier);
+
+  @include create-media-query($breakpoint) {
+
+    .col#{$modsuffix}-offset-0 {
+      margin-left: 0;
+    }
+
+    @for $i from 1 through $NCOLUMNS {
+      .col#{$modsuffix}-#{$i} {
+        flex-basis: $i / $NCOLUMNS * 100%;
+      }
+      .col#{$modsuffix}-offset-#{$i} {
+        margin-left: $i / $NCOLUMNS * 100%;
+      }
+    }
+  }
+
+  @include create-media-query($breakpoint - 1px, 'max') {
+    .hidden#{$modsuffix}-down {
+      display: none !important;
+    }
+  }
+
+  @include create-media-query($breakpoint, 'min') {
+    .hidden#{$modsuffix}-up {
+      display: none !important;
+    }
+  }
+}
+
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+@each $modifier, $breakpoint in $BREAKPOINTS {
+  @include create-col-classes($modifier, $breakpoint);
+}

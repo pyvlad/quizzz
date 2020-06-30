@@ -11,68 +11,69 @@
       ("Groups", url_for("groups.show_user_groups")),
       (g.group.name, url_for("groups.show_group_page")),
       ("Tournaments", url_for("tournaments.index")),
-      ((tournament and "Edit Tournament") or "New Tournament", "")
+      ((data.tournament.id and "Edit Tournament") or "New Tournament", "")
     ])
   }}
 {% endblock %}
 
 {% block content %}
-  <div class="form">
+  <div class="paper paper_narrow paper_sm-disabled">
+    <div class="form">
 
-    <div class="form__header">
-      {{ (tournament and "Edit Tournament") or "New Tournament" }}
-    </div>
-
-    <div class="form__item">
-      <div class="form__help">
-        Please fill in the form below and hit 'save'.<br/>
+      <div class="form__header">
+        {{ (data.tournament.id and "Edit Tournament") or "New Tournament" }}
       </div>
-    </div>
-
-    <form action="" method="post">
-
-      {{ form.hidden_tag() }}
 
       <div class="form__item">
-        <div class="form__label">
-          {{ form.tournament_name.label }}
-          <label for="tournament_name">Tournament Name</label>
+        <div class="form__help">
+          Please fill in the form below and hit 'save'.<br/>
         </div>
-        {{ form.tournament_name(class="form__input") }}
       </div>
 
-      <div class='form__item'>
-        <label for='has_started'>
-          {{ form.has_started() }}
-          <span>Launch tournament?</span>
-        </label>
-      </div>
+      <form action="" method="post">
 
-      <div class='form__item'>
-        <label for='has_finished'>
-          {{ form.has_finished() }}
-          <span>Finish tournament?</span>
-        </label>
-      </div>
+        {{ form.hidden_tag() }}
 
-      <div class='form__item'>
-        <button class="button button_action">Save</button>
-      </div>
+        <div class="form__item">
+          <div class="form__label">
+            {{ form.tournament_name.label }}
+          </div>
+          {{ form.tournament_name(class="form__input") }}
+        </div>
 
-    </form>
-
-    {% if data.tournament.id %}
-      <form action="{{ url_for('tournaments.delete_tournament', tournament_id=data.tournament.id) }}"
-            method="post">
-        {{ delete_form.hidden_tag() }}
         <div class='form__item'>
-          <button class="button button_danger"
-                  onclick="return confirm('Are you sure?');">
-            Delete
-          </button>
+          <label for='has_started'>
+            {{ form.has_started() }}
+            <span>Launch tournament?</span>
+          </label>
         </div>
-      </form>
-    {% endif %}
 
+        <div class='form__item'>
+          <label for='has_finished'>
+            {{ form.has_finished() }}
+            <span>Finish tournament?</span>
+          </label>
+        </div>
+
+        <div class='form__item'>
+          <button class="button button_action">Save</button>
+        </div>
+
+      </form>
+
+      {% if data.tournament.id %}
+        <form action="{{ url_for('tournaments.delete_tournament', tournament_id=data.tournament.id) }}"
+              method="post">
+          {{ delete_form.hidden_tag() }}
+          <div class='form__item'>
+            <button class="button button_danger"
+                    onclick="return confirm('Are you sure?');">
+              Delete
+            </button>
+          </div>
+        </form>
+      {% endif %}
+
+    </div>
   </div>
 {% endblock %}

@@ -7,36 +7,51 @@
 {% endblock %}
 
 {% block content %}
-  <ul class="list">
-    {% for group in data.user_groups %}
-      <li class="list__item">
-        <a class="list__linked-content"
-           href="{{ url_for('groups.show_group_page', group_id=group.id) }}">
-          <div class="list__text-primary">
-            {{ group.name }}
-          </div>
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-  <form class="form my_md"
-        action="{{ url_for('groups.join') }}"
-        method="post">
+  <h2 class="heading heading_primary">Your Groups</h2>
 
-    {{ form.hidden_tag() }}
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h3 class="heading heading_secondary">Memberships</h3>
+        <ul class="list">
+          {% for group in data.user_groups %}
+            <li class="list__item">
+              <a class="list__linked-content"
+                 href="{{ url_for('groups.show_group_page', group_id=group.id) }}">
+                <div class="list__text-primary">
+                  {{ group.name }}
+                </div>
+              </a>
+            </li>
+          {% else %}
+            <p>You are not a member of any group yet.</p>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4 col-md-offset-1 p_md">
+        <div class="paper paper_sm-disabled">
+          <form class="form"
+                action="{{ url_for('groups.join') }}"
+                method="post">
 
-    <div class="form__header">Join Group</div>
-    <div class="form__item">
-      <div class="form__help">
-        You need to know invitation code to join an existing group.
+            {{ form.hidden_tag() }}
+
+            <div class="form__header">Join Group</div>
+            <div class="form__item">
+              <div class="form__help">
+                You need to know invitation code to join an existing group.
+              </div>
+            </div>
+            <div class="form__item">
+              {{ form.invitation_code.label(class="form__label") }}
+              {{ form.invitation_code(class="form__input") }}
+            </div>
+            <div class="form__item">
+              <button class="button button_action">Submit</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-    <div class="form__item">
-      {{ form.invitation_code.label(class="form__label") }}
-      {{ form.invitation_code(class="form__input") }}
-    </div>
-    <div class="form__item">
-      <button class="button button_action">Submit</button>
-    </div>
-  </form>
+  </div>
 {% endblock %}

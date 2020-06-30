@@ -18,80 +18,82 @@
 {% endblock %}
 
 {% block content %}
-  <div class="form">
+  <div class="paper paper_narrow paper_sm-disabled">
+    <div class="form">
 
-    <div class="form__header">
-      {{ (data.round.id and "Edit Round") or "New Round" }}
-    </div>
-
-    <div class="form__item">
-      <div class="form__help">
-        Please fill in the form below and hit 'save'.<br/>
+      <div class="form__header">
+        {{ (data.round.id and "Edit Round") or "New Round" }}
       </div>
-    </div>
 
-    <div class="form__item">
-      <div class="form__label">
-        <label for="tournament_name">Tournament Name</label>
-      </div>
-      <input class="form__input"
-        name="tournament_name"
-        id="tournament_name"
-        type="text"
-        value="{{ data.tournament.name }}"
-        disabled
-      />
-    </div>
-
-    <form action="" method="post">
-
-      {{ form.hidden_tag() }}
-
-      <div class='form__item'>
-        {{ form.quiz_id.label }}
-        {{ form.quiz_id() }}
+      <div class="form__item">
+        <div class="form__help">
+          Please fill in the form below and hit 'save'.<br/>
+        </div>
       </div>
 
       <div class="form__item">
         <div class="form__label">
-          {{ form.start_date.label }}
+          <label for="tournament_name">Tournament Name</label>
         </div>
-        {{ form.start_date(class="form__input") }}
-        <div class="form__label">Time</div>
-        {{ form.start_time_hours(class="form__input") }}
-        {{ form.start_time_minutes(class="form__input") }}
+        <input class="form__input"
+          name="tournament_name"
+          id="tournament_name"
+          type="text"
+          value="{{ data.tournament.name }}"
+          disabled
+        />
       </div>
 
-      <div class="form__item">
-        <div class="form__label">
-          {{ form.finish_date.label }}
-        </div>
-        {{ form.finish_date(class="form__input") }}
-        <div class="form__label">Time</div>
-        {{ form.finish_time_hours(class="form__input") }}
-        {{ form.finish_time_minutes(class="form__input") }}
-      </div>
+      <form action="" method="post">
 
-      <div class='form__item'>
-        <button class="button button_action">Save</button>
-      </div>
-
-    </form>
-
-    {% if data.round.id %}
-      <form action="{{ url_for('tournaments.delete_round', round_id=data.round.id) }}"
-            method="post">
-
-        {{ delete_form.hidden_tag() }}
+        {{ form.hidden_tag() }}
 
         <div class='form__item'>
-          <button class="button button_danger"
-                  onclick="return confirm('Are you sure?');">
-            Delete
-          </button>
+          {{ form.quiz_id.label }}
+          {{ form.quiz_id() }}
         </div>
-      </form>
-    {% endif %}
 
+        <div class="form__item">
+          <div class="form__label">
+            {{ form.start_date.label }}
+          </div>
+          {{ form.start_date(class="form__input") }}
+          <div class="form__label">Time</div>
+          {{ form.start_time_hours(class="form__input") }}
+          {{ form.start_time_minutes(class="form__input") }}
+        </div>
+
+        <div class="form__item">
+          <div class="form__label">
+            {{ form.finish_date.label }}
+          </div>
+          {{ form.finish_date(class="form__input") }}
+          <div class="form__label">Time</div>
+          {{ form.finish_time_hours(class="form__input") }}
+          {{ form.finish_time_minutes(class="form__input") }}
+        </div>
+
+        <div class='form__item'>
+          <button class="button button_action">Save</button>
+        </div>
+
+      </form>
+
+      {% if data.round.id %}
+        <form action="{{ url_for('tournaments.delete_round', round_id=data.round.id) }}"
+              method="post">
+
+          {{ delete_form.hidden_tag() }}
+
+          <div class='form__item'>
+            <button class="button button_danger"
+                    onclick="return confirm('Are you sure?');">
+              Delete
+            </button>
+          </div>
+        </form>
+      {% endif %}
+
+    </div>
   </div>
 {% endblock %}

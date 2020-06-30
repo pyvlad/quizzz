@@ -1,4 +1,7 @@
 /* Header */
+@import '_variables';
+
+
 .site-header {
   display: flex;
   justify-content: space-between;
@@ -8,7 +11,7 @@
 .site-logo {
   display: flex;
   align-items: center;
-  color: #352000;
+  color: $main-color-dark;
   font-variant: small-caps;
   text-decoration: none;
   outline: none;
@@ -18,7 +21,7 @@
   }
   &__text {
     padding: 5px;
-    text-shadow: 1px 1px 2px #352000;
+    text-shadow: 1px 1px 2px $main-color-dark;
     font-weight: bold;
     font-size: 36px;
   }
@@ -35,18 +38,18 @@
     margin-left: 20px;
   }
   &__item_link {
-    color: #05f;
+    color: $link-color;
     font-weight: bold;
 
     text-decoration: none;
     outline: none;
   }
   &__item_link:hover {
-    color: darken(#05f, 20%);
+    color: $link-color-dark;
   }
   &__item_username {
-    background-color: #05f;
-    color: white;
+    background-color: $link-color;
+    color: $white-color;
     font-weight: bold;
     padding: 5px 10px;
     border-radius: 20px;

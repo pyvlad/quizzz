@@ -72,6 +72,7 @@ def _get_rounds(filtr, tournament_obj, played_round_ids={}, now=None):
             },
             "start_time": round.start_time,
             "finish_time": round.finish_time,
+            "time_left": round.time_left,
             "is_taken": round.id in played_round_ids
         }
         for round in tournament_obj.rounds if ROUND_STATUS_FUNCTIONS[filtr](round, now)
@@ -162,6 +163,8 @@ def show_round(round_id):
         },
         "round": {
             "id": round.id,
+            "start_time": round.start_time,
+            "finish_time": round.finish_time
         },
         "is_taken": g.user.id in users_played
     }

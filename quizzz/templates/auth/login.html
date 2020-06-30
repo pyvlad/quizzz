@@ -7,39 +7,41 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post" class="form">
+  <div class="paper paper_narrow paper_sm-disabled">
+    <form method="post" class="form">
 
-    {{ form.hidden_tag() }}
+      {{ form.hidden_tag() }}
 
-    <div class="form__header">
-      Log In Form
-    </div>
-
-    <div class="form__item">
-      <div class="form__help">
-        In order to sign in, please enter your credentials below.
+      <div class="form__header">
+        Log In Form
       </div>
-    </div>
 
-    <div class="form__item">
-      <div class="form__label">
-        {{ form.username.label }}
+      <div class="form__item">
+        <div class="form__help">
+          In order to sign in, please enter your credentials below.
+        </div>
       </div>
-      {{ form.username(class="form__input") }}
-    </div>
 
-    <div class="form__item">
-      <div class="form__label">
-        {{ form.password.label }}
+      <div class="form__item">
+        <div class="form__label">
+          {{ form.username.label }}
+        </div>
+        {{ form.username(class="form__input") }}
       </div>
-      {{ form.password(class="form__input") }}
-    </div>
 
-    <div class="form__item">
-      <input class="button button_action"
-        type="submit"
-        value="Log In"
-      />
-    </div>
-  </form>
+      <div class="form__item">
+        <div class="form__label">
+          {{ form.password.label }}
+        </div>
+        {{ form.password(class="form__input") }}
+      </div>
+
+      <div class="form__item">
+        <input class="button button_action"
+          type="submit"
+          value="Log In"
+        />
+      </div>
+    </form>
+  </div>
 {% endblock %}

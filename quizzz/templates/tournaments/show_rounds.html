@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ data.tournament.name }} Tournament - {{g.group.name}}{% endblock %}
+{% block title %}{{ data.tournament.name }} Tournament Rounds - {{g.group.name}}{% endblock %}
 
 {% block header %}
   {{
@@ -15,14 +15,17 @@
 {% endblock %}
 
 {% block content %}
+  <h2 class="heading heading_primary">Tournament Rounds</h2>
+
   {% if data.has_edit_permissions %}
-    <div class="actions">
-      <a class="actions__item button button_action my_md"
+    <div class="admin-actions">
+      <a class="admin-actions__item button button_action"
          href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
         Add Round
       </a>
     </div>
   {% endif %}
+
   <div class="tabs">
     {% for filter, is_active in data.filters.items() %}
       <a class="tabs__button {{ (is_active and 'tabs__button_active') or '' }}"
@@ -38,7 +41,9 @@
            href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
           <div class="list__text-primary">{{ round.quiz.topic }}</div>
           <div class="list__text-secondary">by {{ round.quiz.author }}</div>
-          <div class="list__text-secondary">{{ round.start_time }} - {{ round.finish_time }}</div>
+          <div class="list__text-secondary">
+            {{ round.start_time.strftime("%A, %d %b %Y at %H:%M") }} - {{
+               round.finish_time.strftime("%A, %d %b %Y at %H:%M") }}</div>
         </a>
         {% if data.has_edit_permissions %}
           <div class="list__extras">
@@ -48,6 +53,8 @@
           </div>
         {% endif %}
       </li>
+    {% else %}
+      <li>Nothing here.<li>
     {% endfor %}
   </ul>
 {% endblock %}

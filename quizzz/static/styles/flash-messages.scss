@@ -1,20 +1,23 @@
+@import '_variables';
+
+
 .flash-messages {
   &__item {
     font-weight: bold;
 
     &_message {
-      background-color: beige;
-      color: black;
+      background-color: $beige-color;
+      color: $black-color;
     }
 
     &_error {
-      background-color: pink;
-      color: maroon;
+      background-color: $red-color-light;
+      color: $red-color-dark;
     }
 
     &_success {
-      background-color: lightgreen;
-      color: darkgreen;
+      background-color: $green-color-light;
+      color: $green-color-dark;
     }
   }
 }

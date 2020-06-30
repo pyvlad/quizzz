@@ -1,15 +1,19 @@
 /* Page Info (Site Navigation) */
+@import '_variables';
+
+
 .page-info {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  border-bottom: 2px solid $grey-color;
 
   &__item {
     display: block;
 
-    background-color: lighten(#352000, 10%);
-    text-shadow: 1px 1px 2px black;
-    color: white;
+    background-color: $main-color-light;
+    text-shadow: 1px 1px 2px $black-color;
+    color: $white-color;
     font-weight: bold;
 
     border-radius: 0 1em 1em 0;
@@ -18,10 +22,10 @@
     outline: none;
 
     padding: 2px 15px;
-    margin-right: 10px;
+    margin: 0px 10px 10px 0px;
   }
 
   &__item:hover {
-    background-color: lighten(#352000, 20%);
+    background-color: $main-color-lighter;
   }
 }

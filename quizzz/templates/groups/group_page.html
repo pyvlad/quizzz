@@ -12,9 +12,8 @@
 {% endblock %}
 
 {% block content %}
-  <h2 class="item-header item-header_main">
-    {{ data.group.name }} Group
-  </h2>
+  <h2 class="heading heading_primary">{{ data.group.name }} Group</h2>
+
   <ul class="list">
     {% for (url, label) in
         [(url_for('chat.index'), "Group Chat"),

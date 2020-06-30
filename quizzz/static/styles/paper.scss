@@ -1,0 +1,21 @@
+@import "_variables";
+
+.paper {
+  background-color: $grey-color-lightest;
+  border: 1px solid $grey-color;
+  border-radius: 3px;
+  padding: 2em;
+  box-shadow: 0 0 10px $grey-color-dark;
+
+  &_narrow {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  &_sm-disabled {
+    @media (max-width: $layout-breakpoint-sm) {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}

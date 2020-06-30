@@ -7,47 +7,49 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post" class="form">
+  <div class="paper paper_narrow paper_sm-disabled">
+    <form method="post" class="form">
 
-    {{ form.hidden_tag() }}
+      {{ form.hidden_tag() }}
 
-    <div class="form__header">
-      Registration Form
-    </div>
-
-    <div class="form__item form__help">
-      <div class="form__help">
-        In order to create an account, please fill the form below.
+      <div class="form__header">
+        Registration Form
       </div>
-    </div>
 
-    <div class="form__item">
-      <div class="form__label">
-        {{ form.username.label }}
+      <div class="form__item form__help">
+        <div class="form__help">
+          Please fill this form to create an account.
+        </div>
       </div>
-      {{ form.username(class="form__input", placeholder="username") }}
-      {{ render_form_errors(form.username) }}
-      <div class="form__input-help">
-        Please start with a letter, and use English letters, numbers, ".", or "_". From 2 to 20 letters.
-      </div>
-    </div>
 
-    <div class="form__item">
-      <div class="form__label">
-        {{ form.password.label }}
+      <div class="form__item">
+        <div class="form__label">
+          {{ form.username.label }}
+        </div>
+        {{ form.username(class="form__input", placeholder="enter your username") }}
+        {{ render_form_errors(form.username) }}
+        <div class="form__input-help">
+          Start with a letter. Use English letters, numbers, ".", or "_". From 2 to 20 characters.
+        </div>
       </div>
-      {{ form.password(class="form__input", placeholder="password") }}
-      {{ render_form_errors(form.password) }}
-      <div class="form__input-help">
-        Minimum 6 letters.
-      </div>
-    </div>
 
-    <div class="form__item">
-      <input class="button button_action"
-        type="submit"
-        value="Register"
-      />
-    </div>
-  </form>
+      <div class="form__item">
+        <div class="form__label">
+          {{ form.password.label }}
+        </div>
+        {{ form.password(class="form__input", placeholder="enter your password") }}
+        {{ render_form_errors(form.password) }}
+        <div class="form__input-help">
+          Minimum 6 letters.
+        </div>
+      </div>
+
+      <div class="form__item">
+        <input class="button button_action"
+          type="submit"
+          value="Register"
+        />
+      </div>
+    </form>
+  </div>
 {% endblock %}

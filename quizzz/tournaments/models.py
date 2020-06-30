@@ -70,6 +70,14 @@ class Round(Base):
             + datetime.timedelta(minutes=form.finish_time_minutes.data)
         return self
 
+    @property
+    def time_left(self):
+        seconds_left = (self.finish_time - datetime.datetime.utcnow()).total_seconds()
+        return {
+            "days": int(seconds_left // (60 * 60 * 24)),
+            "hours": int((seconds_left % (60 * 60 * 24)) // (60 * 60)),
+            "minutes": int(((seconds_left % (60 * 60 * 24)) % (60 * 60)) // 60),
+        }
 
 
 class Play(Base):
