@@ -37,13 +37,13 @@
     <tr>
       <td class="pr_lg">Your Action</td>
       <td>
-        {% if not data.is_taken %}
+        {% if not data.is_taken and data.round.is_active %}
           <form action="{{ url_for('tournaments.start_round', round_id=data.round.id) }}" method="post">
             <button class="button button_action my_md">
               Take Quiz
             </button>
           <form>
-        {% else %}
+        {% elif data.is_taken %}
           <a class="button button_action my_md"
              href="{{ url_for('tournaments.review_round', round_id=data.round.id) }}">
             Review Quiz

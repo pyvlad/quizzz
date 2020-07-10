@@ -36,21 +36,19 @@ def edit_tournament(tournament_id):
             flash("Tournament could not be created!", Flashing.ERROR)
         else:
             flash("Tournament successfully created/updated.", Flashing.SUCCESS)
-            return redirect(url_for('tournaments.show_tournament', tournament_id=tournament.id))
+            return redirect(url_for('tournaments.index', filter="all"))
 
     else:
         form = TournamentForm(
             tournament_name=tournament.name,
-            has_started=tournament.has_started,
-            has_finished=tournament.has_finished
+            is_active=tournament.is_active
         )
 
     data = {
         "tournament": {
             "id": tournament.id,
             "name": tournament.name,
-            "has_started": tournament.has_started,
-            "has_finished": tournament.has_finished
+            "is_active": tournament.is_active
         }
     }
 
@@ -74,7 +72,7 @@ def delete_tournament(tournament_id):
     db.commit()
     flash("Tournament has been deleted.", Flashing.SUCCESS)
 
-    return redirect(url_for('tournaments.index'))
+    return redirect(url_for('tournaments.index', filter="all"))
 
 
 

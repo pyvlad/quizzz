@@ -14,8 +14,7 @@ class Tournament(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String(100), nullable=False)
-    has_started = sa.Column(sa.Boolean, default=False)
-    has_finished = sa.Column(sa.Boolean, default=False)
+    is_active = sa.Column(sa.Boolean, default=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
 
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
@@ -31,8 +30,7 @@ class Tournament(Base):
         self.group = g.group
 
         self.name = form.tournament_name.data
-        self.has_started = bool(form.has_started.data)
-        self.has_finished = bool(form.has_finished.data)
+        self.is_active = bool(form.is_active.data)
 
         return self
 
@@ -78,6 +76,11 @@ class Round(Base):
             "hours": int((seconds_left % (60 * 60 * 24)) // (60 * 60)),
             "minutes": int(((seconds_left % (60 * 60 * 24)) % (60 * 60)) // 60),
         }
+
+    @property
+    def is_active(self):
+        now = datetime.datetime.utcnow()
+        return (now > self.start_time) and (now < self.finish_time)
 
 
 class Play(Base):

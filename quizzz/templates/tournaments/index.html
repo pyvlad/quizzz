@@ -33,25 +33,40 @@
     {% endfor %}
   </div>
 
-  <ul class="list">
-    {% for tournament in data.tournaments %}
-      <li class="list__item">
-        <a class="list__linked-content"
-           href="{{ url_for('tournaments.show_tournament', tournament_id=tournament.id) }}">
-          <div class="list__text-primary">
-            {{ tournament.name }}
-          </div>
-        </a>
-        {% if data.has_edit_permissions %}
-          <div class="list__extras">
+  <table class="table table--full-width my_md">
+    <thead>
+      <tr>
+        <th width="5%">#</th>
+        <th width="50%">Name</th>
+        <th width="10%">Active</th>
+        <th width="25%">Time Created</th>
+        <th width="10%">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tournament in data.tournaments %}
+        <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}">
+          <td class="table__td table__td--centered">{{ loop.index }}</td>
+          <td class="table__td">
+            <a href="{{ url_for('tournaments.show_tournament', tournament_id=tournament.id) }}">
+              {{ tournament.name }}
+            </a>
+          </td>
+          <td class="table__td table__td--centered">{{ (tournament.is_active and "yes") or "" }}</td>
+          <td class="table__td table__td--centered">{{ tournament.time_created }}</td>
+          <td class="table__td table__td--centered">
+            {% if data.has_edit_permissions %}
             <a href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}">
               Edit
             </a>
-          </div>
-        {% endif %}
-      </li>
-    {% else %}
-      <p>Nothing here.</p>
-    {% endfor %}
-  </ul>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr class="table__tr table__tr--odd">
+          <td class="table__td" colspan="5">Nothing to see here.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

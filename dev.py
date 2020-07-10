@@ -161,7 +161,7 @@ with app.app_context():
             Round(quiz=quizzes[3], start_time=(now + datetime.timedelta(minutes=5)),
                 finish_time=(now + datetime.timedelta(days=7)))
         ],
-        has_started=True
+        is_active=True
     )
 
     db_session.add_all([main_group, other_group])

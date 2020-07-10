@@ -16,8 +16,7 @@ LATER = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
 
 TOURNAMENT_REQUEST_PAYLOAD = {
     "tournament_name": "Tournament 2",
-    "has_started": True,
-    "has_finished": False
+    "is_active": True
 }
 
 ROUND_REQUEST_PAYLOAD = {
@@ -103,7 +102,7 @@ def test_create_tournament(app, client, auth):
     # POST request should redirect to tournament view
     auth.login_as("bob")
     response = client.post(create_url, data=TOURNAMENT_REQUEST_PAYLOAD)
-    assert f'http://localhost/groups/1/tournaments/2/' == response.headers['Location']
+    assert response.headers['Location'].startswith(f'http://localhost/groups/1/tournaments/')
 
     # new tournament should be in database now
     with app.app_context():
@@ -383,6 +382,39 @@ def test_delete_round(app, client, auth):
         assert len(plays) == 0
         answers = db.query(PlayAnswer).all()
         assert len(answers) == 0
+
+
+
+def test_inactive_round(app, client, auth):
+    """
+    Test the round's time_started and time_finished behaviour:
+    - a round cannot be played outside of (time_started, time_finished) time span;
+    -
+    """
+    auth.login_as("bob")
+    _finalize_first_quiz(app)
+
+    # a. add a new round that already finished and try playing it
+    payload = ROUND_REQUEST_PAYLOAD.copy()
+    payload.update({
+        "finish_date": NOW.strftime("%Y-%m-%d"),
+        "finish_time_hours": NOW.hour,
+        "finish_time_minutes": NOW.minute,
+    })
+    assert client.post("/groups/1/tournaments/1/rounds/0/edit", data=payload).status_code == 302
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 403
+
+    # delete the round to re-use quiz_id=1
+    assert client.post("/groups/1/rounds/1/delete", data={}).status_code == 302
+    # b. add a new round that has not started yet and try playing it
+    payload = ROUND_REQUEST_PAYLOAD.copy()
+    payload.update({
+        "start_date": LATER.strftime("%Y-%m-%d"),
+        "start_time_hours": LATER.hour,
+        "start_time_minutes": LATER.minute,
+    })
+    assert client.post("/groups/1/tournaments/1/rounds/0/edit", data=payload).status_code == 302
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 403
 
 
 

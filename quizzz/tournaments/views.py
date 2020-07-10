@@ -21,8 +21,8 @@ from .forms import make_play_round_form
 
 
 TOURNAMENT_FILTER_FUNCTIONS = {
-    "active": lambda x: x.has_started and not x.has_finished,
-    "finished": lambda x: x.has_finished,
+    "active": lambda x: x.is_active,
+    "inactive": lambda x: not x.is_active,
     "all": lambda x: x
 }
 
@@ -44,13 +44,17 @@ def index():
     filter_arg = request.args.get("filter", "active")
     filter_func = TOURNAMENT_FILTER_FUNCTIONS[filter_arg]
 
+    group_tournaments = g.group.tournaments
+
     data = {
         "tournaments": [
             {
                 "id": tournament.id,
-                "name": tournament.name
+                "name": tournament.name,
+                "is_active": tournament.is_active,
+                "time_created": tournament.time_created,
             }
-            for tournament in g.group.tournaments if filter_func(tournament)
+            for tournament in group_tournaments if filter_func(tournament)
         ],
         "has_edit_permissions": g.group_membership.is_admin,
         "filters": {filtr: (filter_arg == filtr) for filtr in TOURNAMENT_FILTER_FUNCTIONS}
@@ -95,6 +99,7 @@ def show_tournament(tournament_id):
         "tournament": {
             "id": tournament.id,
             "name": tournament.name,
+            "is_active": tournament.is_active
         },
         "rounds": rounds,
         "standings": standings,
@@ -120,6 +125,7 @@ def show_rounds(tournament_id):
         "tournament": {
             "id": tournament.id,
             "name": tournament.name,
+            "is_active": tournament.is_active
         },
         "rounds": rounds,
         "has_edit_permissions": g.group_membership.is_admin,
@@ -153,20 +159,22 @@ def show_round(round_id):
     data = {
         "tournament": {
             "id": round.tournament.id,
-            "name": round.tournament.name
+            "name": round.tournament.name,
+            "is_active": round.tournament.is_active,
         },
         "quiz": {
             "id": round.quiz.id,
             "topic": round.quiz.topic,
             "author": round.quiz.author.name,
-            "plays": round_plays
+            "plays": round_plays,
         },
         "round": {
             "id": round.id,
             "start_time": round.start_time,
-            "finish_time": round.finish_time
+            "finish_time": round.finish_time,
+            "is_active": round.is_active,
         },
-        "is_taken": g.user.id in users_played
+        "is_taken": g.user.id in users_played,
     }
 
     return render_template('tournaments/round.html', data=data)
@@ -178,15 +186,17 @@ def start_round(round_id):
     db = get_db_session()
 
     round = get_round_by_id(round_id)
+    if not round.is_active:
+        abort(403, "This round is not available (already finished or not started yet).")
+
     play = get_play_by_round_id(round_id)
+    if play and play.is_submitted:
+        abort(403, "You have already played this round.")
 
     if play is None:
         play = Play(user=g.user, round=round)
         db.add(play)
         db.commit()
-
-    if play.is_submitted:
-        abort(403, "You have already played this round.")
 
     return redirect(url_for("tournaments.play_round", play_id=play.id))
 

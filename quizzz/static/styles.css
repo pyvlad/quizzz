@@ -992,6 +992,37 @@
   font-weight: bold;
 }
 
+/* Generic Table */
+.table {
+  border-collapse: separate;
+  border-spacing: 1px;
+  border: 1px solid #ccc;
+}
+.table--full-width {
+  width: 100%;
+}
+.table thead tr {
+  background-color: #444;
+  color: #eee;
+}
+.table thead th {
+  padding: 4px 10px;
+  text-align: center;
+  font-weight: bold;
+}
+.table__tr--odd {
+  background-color: #eee;
+}
+.table__tr--even {
+  background-color: white;
+}
+.table__td {
+  padding: 4px 10px;
+}
+.table__td--centered {
+  text-align: center;
+}
+
 /* Play Results */
 .results-table {
   width: 100%;

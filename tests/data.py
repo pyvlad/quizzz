@@ -117,6 +117,6 @@ TOURNAMENTS = {
         "id": 1,
         "name": "Tournament1",
         "group_id": GROUPS["group1"]["id"],
-        "has_started": True,
+        "is_active": True,
     }
 }

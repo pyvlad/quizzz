@@ -13,8 +13,7 @@ class TournamentForm(FlaskForm):
                 DataRequired(message="Tournament name cannot not be empty."),
                 Length(max=100, message='Tournament name cannot be longer than 100 characters.'),
             ], widget=ValidatedTextInput())
-    has_started = BooleanField("Launch tournament?")
-    has_finished = BooleanField("Finish tournament?")
+    is_active = BooleanField("Show tournament as active?")
 
 
 class DeleteTournamentForm(FlaskForm):

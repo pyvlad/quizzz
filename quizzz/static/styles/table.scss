@@ -1,0 +1,40 @@
+/* Generic Table */
+@import '_variables';
+
+
+.table {
+  border-collapse: separate;
+  border-spacing: 1px;
+  border: 1px solid $grey-color;
+
+  &--full-width {
+    width: 100%;
+  }
+
+  thead tr {
+    background-color: $grey-color-dark;
+    color: $grey-color-light;
+  }
+  thead th {
+    padding: 4px 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  &__tr {
+    &--odd {
+      background-color: $grey-color-light;
+    }
+    &--even {
+      background-color: $white-color;
+    }
+  }
+
+  &__td {
+    padding: 4px 10px;
+
+    &--centered {
+      text-align: center;
+    }
+  }
+}
