@@ -23,3 +23,27 @@ def get_own_quiz_by_id(quiz_id, with_questions=False):
         abort(403, "What do you think you're doing?")
 
     return quiz
+
+
+
+def get_user_group_quizzes(which="all", return_count=False):
+    """ """
+    db = get_db_session()
+    
+    query = db.query(Quiz)\
+        .filter(Quiz.author_id == g.user.id)\
+        .filter(Quiz.group_id == g.group.id)
+
+    if which == "finalized":
+        query = query.filter(Quiz.is_finalized == True)
+    elif which == "in-progress":
+        query = query.filter(Quiz.is_finalized != True)
+    elif which == "all":
+        pass
+    else:
+        raise ValueError("Unsupported values of 'which': %s" % which)
+
+    if return_count:
+        return query.count()
+    else:
+        return query.order_by(Quiz.time_created.desc()).all()

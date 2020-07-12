@@ -7,7 +7,7 @@ from quizzz.flashing import Flashing
 
 from . import bp
 from .models import Quiz
-from .queries import get_own_quiz_by_id
+from .queries import get_own_quiz_by_id, get_user_group_quizzes
 from .forms import make_quiz_form, QuizDeleteForm
 
 
@@ -19,19 +19,8 @@ def index():
     """
     db = get_db_session()
 
-    user_quizzes_in_progress = db.query(Quiz)\
-        .filter(Quiz.author_id == g.user.id)\
-        .filter(Quiz.group_id == g.group.id)\
-        .filter(Quiz.is_finalized != True)\
-        .order_by(Quiz.time_created.desc())\
-        .all()
-
-    user_quizzes_finalized = db.query(Quiz)\
-        .filter(Quiz.author_id == g.user.id)\
-        .filter(Quiz.group_id == g.group.id)\
-        .filter(Quiz.is_finalized == True)\
-        .order_by(Quiz.time_created.desc())\
-        .all()
+    user_quizzes_in_progress = get_user_group_quizzes(which="in-progress")
+    user_quizzes_finalized = get_user_group_quizzes(which="finalized")
 
     data = {
         "user_quizzes_in_progress": user_quizzes_in_progress,

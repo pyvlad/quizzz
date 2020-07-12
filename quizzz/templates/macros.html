@@ -1,0 +1,33 @@
+{% macro render_form_errors(field) %}
+  {% if field.errors %}
+    <ul class="form__errors">
+    {% for error in field.errors %}
+      <li class="form__error">
+        {{ error }}
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro render_chat_message(msg) %}
+  <article class="message {% if msg.is_own %}message_own{% endif %}">
+    <div class="message__details">
+      <div class="message__details-item">{{ msg.user_name }}</div>
+      <div class="message__details-item">{{ msg.time_created.strftime('%Y-%m-%d %H:%M') }}</div>
+      {% if msg.time_updated %}
+        <div class="message__details-item">
+          edited at {{ msg.time_updated.strftime('%Y-%m-%d %H:%M') }}
+        </div>
+      {% endif %}
+      {% if msg.is_own %}
+        <a class="message__details-item"
+           href="{{ url_for('chat.edit', message_id=msg.id) }}">
+           Edit
+        </a>
+      {% endif %}
+    </div>
+    <p class="message__text">{{ msg.text }}</p>
+  </article>
+{% endmacro %}

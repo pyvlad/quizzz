@@ -9,7 +9,7 @@
   {{
     render_header([
       ("Groups", url_for("groups.show_user_groups")),
-      (g.group.name, url_for("groups.show_group_page")),
+      (g.group.name, url_for("group.show_group_page")),
       ("Tournaments", url_for("tournaments.index")),
       ((data.tournament.id and "Edit Tournament") or "New Tournament", "")
     ])

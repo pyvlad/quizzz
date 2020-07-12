@@ -36,18 +36,6 @@ def show_user_groups():
 
 
 
-@bp.route('/<int:group_id>/')
-def show_group_page():
-    data = {
-        "group": {
-            "id": g.group.id,
-            "name": g.group.name
-        }
-    }
-    return render_template('groups/group_page.html', data=data)
-
-
-
 @bp.route('/join_group/', methods=("POST",))
 @login_required
 def join():

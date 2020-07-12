@@ -6,19 +6,24 @@ from quizzz.auth.models import User
 from .models import Message
 
 
-def get_chat_messages(round_id=None):
+def get_chat_messages(round_id=None, limit=None):
     """
     Helper function.
     Get messages for given chat.
     "round_id=None" means common group chat.
     """
     db = get_db_session()
-    messages = db.query(Message, User.id, User.name)\
+
+    query = db.query(Message, User.id, User.name)\
         .join(User, Message.user_id == User.id)\
         .filter(Message.group_id == g.group.id)\
         .filter(Message.round_id == round_id)\
-        .order_by(Message.time_created.desc())\
-        .all()
+        .order_by(Message.time_created.desc())
+
+    if limit:
+        messages = query[:limit]
+    else:
+        messages = query.all()
 
     return [
         {
