@@ -20,7 +20,7 @@ def get_db_session():
     return Session()
 
 
-def close_db_session(exception=None):
+def discard_db_session(exception=None):
     """
     The Session registry is instructed to remove the db session (if present):
 
@@ -32,8 +32,28 @@ def close_db_session(exception=None):
     Session.remove()
 
 
+def add_db_session():
+    """
+    'before_request' handler.
+    Add the request-local db session to g object for easier access.
+    """
+    g.db = get_db_session()
+
+
+def remove_db_session(exception=None):
+    """
+    'teardown_request' handler.
+    Add the request-local db session to g object for easier access.
+    """
+    if exception:
+        g.db.rollback() # If no transaction is in progress, this method is a pass-through.
+    g.db = None
+
+
 def init_db():
-    """ """
+    """
+    Create new tables if they don't exist yet.
+    """
     engine = create_engine(current_app.config["DATABASE_URI"])
     Base.metadata.create_all(engine)
 
@@ -43,6 +63,7 @@ def init_db():
 def init_db_command():
     """
     Create new tables if they don't exist yet.
+    CLI command.
     """
     init_db()
     click.echo('Initialized the database.')
@@ -69,5 +90,7 @@ def init_app(app):
     if app.config["DATABASE_URI"].startswith("sqlite"):
         listen(Engine, "connect", set_sqlite_pragma)
 
-    app.teardown_appcontext(close_db_session)
+    app.before_request(add_db_session)
+    app.teardown_request(remove_db_session)
+    app.teardown_appcontext(discard_db_session)
     app.cli.add_command(init_db_command)

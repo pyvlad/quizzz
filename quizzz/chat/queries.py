@@ -1,6 +1,5 @@
 from flask import g, abort
 
-from quizzz.db import get_db_session
 from quizzz.auth.models import User
 
 from .models import Message
@@ -12,9 +11,7 @@ def get_chat_messages(round_id=None, limit=None):
     Get messages for given chat.
     "round_id=None" means common group chat.
     """
-    db = get_db_session()
-
-    query = db.query(Message, User.id, User.name)\
+    query = g.db.query(Message, User.id, User.name)\
         .join(User, Message.user_id == User.id)\
         .filter(Message.group_id == g.group.id)\
         .filter(Message.round_id == round_id)\
@@ -44,9 +41,7 @@ def get_own_message_by_id(id):
     Helper function.
     Get message by given id.
     """
-    db = get_db_session()
-
-    msg = db.query(Message).filter(Message.id == id).first()
+    msg = g.db.query(Message).filter(Message.id == id).first()
     if msg is None:
         abort(404, "Message doesn't exist.")
     if msg.user_id != g.user.id:

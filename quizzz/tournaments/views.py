@@ -3,8 +3,6 @@ import datetime
 from sqlalchemy.orm import joinedload
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
-from quizzz.db import get_db_session
-
 from . import bp
 from .models import Play
 from .queries import (
@@ -183,8 +181,6 @@ def show_round(round_id):
 
 @bp.route('/rounds/<int:round_id>/start', methods=('POST',))
 def start_round(round_id):
-    db = get_db_session()
-
     round = get_round_by_id(round_id)
     if not round.is_active:
         abort(403, "This round is not available (already finished or not started yet).")
@@ -195,8 +191,8 @@ def start_round(round_id):
 
     if play is None:
         play = Play(user=g.user, round=round)
-        db.add(play)
-        db.commit()
+        g.db.add(play)
+        g.db.commit()
 
     return redirect(url_for("tournaments.play_round", play_id=play.id))
 
@@ -207,9 +203,7 @@ def play_round(play_id):
     """
     Take the round's quiz.
     """
-    db = get_db_session()
-
-    play = db.query(Play).filter(Play.id == play_id).first()
+    play = g.db.query(Play).filter(Play.id == play_id).first()
     if not play or play.user_id != g.user.id:
         abort(403)
     if play.is_submitted:
@@ -231,7 +225,7 @@ def play_round(play_id):
     if request.method == 'POST':
         if form.validate():
             play.populate_from_wtform(form)
-            db.commit()
+            g.db.commit()
             return redirect(url_for("tournaments.review_round", round_id=round_id))
         else:
             flash("Invalid form submitted.")

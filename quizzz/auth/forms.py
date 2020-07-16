@@ -1,8 +1,8 @@
+from flask import g
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Length, Regexp, ValidationError
 
-from quizzz.db import get_db_session
 from quizzz.forms import ValidatedTextInput, ValidatedPasswordInput
 
 from .models import User
@@ -20,9 +20,8 @@ class RegistrationForm(FlaskForm):
         ], widget=ValidatedPasswordInput())
 
     def validate_username(self, field):
-        db = get_db_session()
         username = field.data.lower()
-        user = db.query(User).filter(User.name == username).first()
+        user = g.db.query(User).filter(User.name == username).first()
         if user:
             raise ValidationError(f'User {username} already exists.')
 

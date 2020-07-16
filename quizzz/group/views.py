@@ -3,13 +3,10 @@ from flask import g, render_template
 from . import bp
 from quizzz.quizzes.queries import get_user_group_quizzes
 from quizzz.chat.queries import get_chat_messages
-from quizzz.db import get_db_session
 
 
 @bp.route('/')
 def show_group_page():
-    db = get_db_session()
-
     group_tournaments = g.group.tournaments
     current_tournaments = [
         { "id": tournament.id, "name": tournament.name }

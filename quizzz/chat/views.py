@@ -2,7 +2,6 @@ import re
 
 from flask import g, request, render_template, flash, redirect, url_for
 
-from quizzz.db import get_db_session
 from quizzz.flashing import Flashing
 
 from . import bp
@@ -40,9 +39,8 @@ def edit(message_id):
         if form.validate():
             msg.text = form.text.data
 
-            db = get_db_session()
-            db.add(msg)
-            db.commit()
+            g.db.add(msg)
+            g.db.commit()
 
             return redirect(url_for('chat.index'))
 
@@ -62,9 +60,8 @@ def delete(id):
     form = MessageDeleteForm()
 
     if form.validate():
-        db = get_db_session()
-        db.delete(msg)
-        db.commit()
+        g.db.delete(msg)
+        g.db.commit()
         flash("Message has been deleted", Flashing.MESSAGE)
     else:
         flash("Invalid form submitted.", Flashing.ERROR)

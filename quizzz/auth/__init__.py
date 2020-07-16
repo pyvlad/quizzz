@@ -1,7 +1,5 @@
 from flask import Blueprint, session, g, request
 
-from quizzz.db import get_db_session
-
 
 bp = Blueprint('auth', __name__, url_prefix='/auth', template_folder="templates")
 
@@ -19,11 +17,10 @@ def load_logged_in_user():
     # TODO delete this in production
     if '/static/' in request.path:
         return
-        
+
     user_id = session.get('user_id')
 
     if user_id is None:
         g.user = None
     else:
-        db = get_db_session()
-        g.user = db.query(models.User).filter(models.User.id == user_id).one()
+        g.user = g.db.query(models.User).filter(models.User.id == user_id).one()

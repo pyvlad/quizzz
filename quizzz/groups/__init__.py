@@ -1,6 +1,5 @@
 from flask import Blueprint, request, g, abort
 
-from quizzz.db import get_db_session
 from quizzz.groups.models import Group, Member
 
 
@@ -24,8 +23,7 @@ def load_group_and_membership():
         if g.user is None:
             abort(401, "You are not logged in.")
 
-        db = get_db_session()
-        result = db.query(Group, Member)\
+        result = g.db.query(Group, Member)\
             .join(Member, Group.id == Member.group_id)\
             .filter(Member.user_id == g.user.id)\
             .filter(Group.id == g.group_id)\

@@ -3,7 +3,6 @@ import traceback
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
 from quizzz.permissions import USER, check_user_permissions
-from quizzz.db import get_db_session
 from quizzz.flashing import Flashing
 
 from . import bp
@@ -26,13 +25,12 @@ def edit_tournament(tournament_id):
         form = TournamentForm()
         tournament.populate_from_wtform(form)
 
-        db = get_db_session()
         try:
-            db.add(tournament)
-            db.commit()
+            g.db.add(tournament)
+            g.db.commit()
         except:
             traceback.print_exc()
-            db.rollback()
+            g.db.rollback()
             flash("Tournament could not be created!", Flashing.ERROR)
         else:
             flash("Tournament successfully created/updated.", Flashing.SUCCESS)
@@ -67,9 +65,8 @@ def delete_tournament(tournament_id):
 
     tournament = get_tournament_by_id(tournament_id)
 
-    db = get_db_session()
-    db.delete(tournament)
-    db.commit()
+    g.db.delete(tournament)
+    g.db.commit()
     flash("Tournament has been deleted.", Flashing.SUCCESS)
 
     return redirect(url_for('tournaments.index', filter="all"))
@@ -100,13 +97,12 @@ def edit_round(tournament_id, round_id):
         if form.validate():
             round.populate_from_wtform(form, tournament_id)
 
-            db = get_db_session()
             try:
-                db.add(round)
-                db.commit()
+                g.db.add(round)
+                g.db.commit()
             except:
                 traceback.print_exc()
-                db.rollback()
+                g.db.rollback()
                 flash("Quiz Round could not be updated!", Flashing.ERROR)
             else:
                 flash("Quiz Round has been created/updated.", Flashing.SUCCESS)
@@ -157,10 +153,9 @@ def edit_round(tournament_id, round_id):
 def delete_round(round_id):
     check_user_permissions(USER.IS_GROUP_ADMIN)
 
-    db = get_db_session()
     round = get_round_by_id(round_id)
-    db.delete(round)
-    db.commit()
+    g.db.delete(round)
+    g.db.commit()
     flash("Quiz round has been deleted.", Flashing.SUCCESS)
 
     return redirect(url_for('tournaments.index'))

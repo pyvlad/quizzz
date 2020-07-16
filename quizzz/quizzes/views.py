@@ -2,7 +2,6 @@ import traceback
 
 from flask import current_app, render_template, g, flash, request, redirect, url_for, abort
 
-from quizzz.db import get_db_session
 from quizzz.flashing import Flashing
 
 from . import bp
@@ -17,8 +16,6 @@ def index():
     """
     Get list of quizzes of logged in user in current group.
     """
-    db = get_db_session()
-
     user_quizzes_in_progress = get_user_group_quizzes(which="in-progress")
     user_quizzes_finalized = get_user_group_quizzes(which="finalized")
 
@@ -59,13 +56,12 @@ def edit(quiz_id):
         if form.validate():
             quiz.populate_from_wtform(form)
 
-            db = get_db_session()
             try:
-                db.add(quiz)
-                db.commit()
+                g.db.add(quiz)
+                g.db.commit()
             except:
                 traceback.print_exc()
-                db.rollback()
+                g.db.rollback()
                 flash("Quiz could not be saved!", Flashing.ERROR)
             else:
                 if quiz.is_finalized:
@@ -115,8 +111,7 @@ def delete(quiz_id):
     if quiz.is_finalized:
         abort(403, "Can not delete submitted quiz.")
 
-    db = get_db_session()
-    db.delete(quiz)
-    db.commit()
+    g.db.delete(quiz)
+    g.db.commit()
 
     return redirect(url_for('quizzes.index'))

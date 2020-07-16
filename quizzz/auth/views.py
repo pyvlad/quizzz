@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 from flask import request, session, g, redirect, url_for, flash, render_template
 
-from quizzz.db import get_db_session
 from quizzz.flashing import Flashing
 
 from . import bp
@@ -26,9 +25,8 @@ def register():
             user = User(name=username)
             user.set_password_hash(password)
 
-            db = get_db_session()
-            db.add(user)
-            db.commit()
+            g.db.add(user)
+            g.db.commit()
 
             flash(f'User {username} has been successfully created.', Flashing.SUCCESS)
             return redirect(url_for('auth.login'))
@@ -51,8 +49,7 @@ def login():
         username = form.username.data.lower()
         password = form.password.data
 
-        db = get_db_session()
-        user = db.query(User).filter(User.name == username).first()
+        user = g.db.query(User).filter(User.name == username).first()
 
         error = None
         if user is None:
