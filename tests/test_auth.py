@@ -35,8 +35,9 @@ def test_register(client, app):
     """
     assert client.get('/auth/register').status_code == 200
 
-    response = client.post('/auth/register', data={'username': 'new_user', 'password': 'new_pass'})
-    assert 'http://localhost/auth/login' == response.headers['Location']
+    response = client.post('/auth/register',
+        data={'username': 'new_user', 'password': 'new_pass', 'password2': 'new_pass'})
+    assert 'http://localhost/' == response.headers['Location']
 
     with app.app_context():
         db = get_db_session()
@@ -46,8 +47,8 @@ def test_register(client, app):
 
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
-    ('', '', b'Username cannot be shorter'),
-    ('a', '', b'Password cannot be shorter'),
+    ('a', '', b'Username cannot be shorter'),
+    ('a', 'a', b'Password cannot be shorter'),
     (USERS["bob"]["name"], 'some_pass', f'User {USERS["bob"]["name"]} already exists.'.encode()),
     (USERS["bob"]["name"].upper(), 'some_pass', f'User {USERS["bob"]["name"]} already exists.'.encode()),
 ))
@@ -55,7 +56,8 @@ def test_register_validate_input(client, username, password, message):
     """
     Invalid data should display error messages.
     """
-    response = client.post('/auth/register', data={'username': username, 'password': password})
+    response = client.post('/auth/register',
+        data={'username': username, 'password': password, 'password2': password})
     assert message in response.data
 
 

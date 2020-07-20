@@ -24,3 +24,5 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = g.db.query(models.User).filter(models.User.uuid == user_uuid).one()
+        if g.user.is_deleted:
+            g.user = None

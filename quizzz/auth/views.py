@@ -29,8 +29,9 @@ def register():
             g.db.add(user)
             g.db.commit()
 
-            flash(f'User {username} has been successfully created.', Flashing.SUCCESS)
-            return redirect(url_for('auth.login'))
+            flash(f'User {username} has been registered! Welcome to the website!', Flashing.SUCCESS)
+            session['user_id'] = user.uuid
+            return redirect(url_for('index'))
         else:
             flash("Please fix the errors and submit the form again.", Flashing.ERROR)
 

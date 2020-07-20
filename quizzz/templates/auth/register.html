@@ -46,6 +46,17 @@
       </div>
 
       <div class="form__item">
+        <div class="form__label">
+          {{ form.password2.label }}
+        </div>
+        {{ form.password2(class="form__input", placeholder="enter your password again") }}
+        {{ render_form_errors(form.password2) }}
+        <div class="form__input-help">
+          Type your password one more time to confirm it.
+        </div>
+      </div>
+
+      <div class="form__item">
         <input class="button button_action"
           type="submit"
           value="Register"

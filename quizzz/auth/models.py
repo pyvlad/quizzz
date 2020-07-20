@@ -2,6 +2,7 @@ import uuid
 
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy as sa
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
 from quizzz.db import Base
@@ -14,6 +15,9 @@ class User(Base):
     uuid = sa.Column(sa.String(36), unique=True, index=True, nullable=False)
     name = sa.Column(sa.String(50), unique=True, index=True, nullable=False)
     password_hash = sa.Column(sa.String(120), unique=True, nullable=False)
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
+    is_deleted = sa.Column(sa.Boolean, default=False)
 
     memberships = relationship("Member", back_populates="user")
     messages = relationship("Message", back_populates="user")
