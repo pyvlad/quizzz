@@ -74,7 +74,7 @@ def test_login(client, auth):
 
     with client:
         client.get('/')
-        assert session['user_id'] == USERS["bob"]["id"]
+        assert session['user_id'] == g.user.uuid
         assert g.user.name == USERS["bob"]["name"]
 
     auth.logout()
@@ -85,7 +85,7 @@ def test_login(client, auth):
 
     with client:
         client.get('/')
-        assert session['user_id'] == USERS["alice"]["id"]
+        assert session['user_id'] == g.user.uuid
         assert g.user.name == USERS["alice"]["name"]
 
 

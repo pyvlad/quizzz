@@ -24,6 +24,7 @@ def register():
 
             user = User(name=username)
             user.set_password_hash(password)
+            user.create_uuid()
 
             g.db.add(user)
             g.db.commit()
@@ -59,7 +60,7 @@ def login():
 
         if error is None:
             session.clear()
-            session['user_id'] = user.id
+            session['user_id'] = user.uuid
             return redirect(url_for('index'))
         else:
             flash(error, Flashing.ERROR)

@@ -18,9 +18,9 @@ def load_logged_in_user():
     if '/static/' in request.path:
         return
 
-    user_id = session.get('user_id')
+    user_uuid = session.get('user_id')
 
-    if user_id is None:
+    if user_uuid is None:
         g.user = None
     else:
-        g.user = g.db.query(models.User).filter(models.User.id == user_id).one()
+        g.user = g.db.query(models.User).filter(models.User.uuid == user_uuid).one()
