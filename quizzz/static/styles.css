@@ -879,7 +879,6 @@
   padding: 0.5em;
 }
 .form__input {
-  font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 3px;
   padding: 0.5em;
@@ -887,7 +886,6 @@
   width: 100%;
 }
 .form__textarea {
-  font-size: 1em;
   resize: none;
   height: 60px;
   padding: 0.5em;

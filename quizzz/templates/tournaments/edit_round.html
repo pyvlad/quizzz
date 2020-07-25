@@ -49,28 +49,52 @@
         {{ form.hidden_tag() }}
 
         <div class='form__item'>
-          {{ form.quiz_id.label }}
+          {{ form.quiz_id.label(class="form__label") }}
           {{ form.quiz_id() }}
         </div>
 
         <div class="form__item">
           <div class="form__label">
-            {{ form.start_date.label }}
+            Start Time
           </div>
-          {{ form.start_date(class="form__input") }}
-          <div class="form__label">Time</div>
-          {{ form.start_time_hours(class="form__input") }}
-          {{ form.start_time_minutes(class="form__input") }}
+          <div class="container">
+            <div class="row">
+              <div class="col-6">
+                <div class="form__input-help">date</div>
+                {{ form.start_date(class="form__input") }}
+              </div>
+              <div class="col-offset-1 col-2">
+                <div class="form__input-help">hours</div>
+                {{ form.start_time_hours(class="form__input") }}
+              </div>
+              <div class="col-offset-1 col-2">
+                <div class="form__input-help">minutes</div>
+                {{ form.start_time_minutes(class="form__input") }}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="form__item">
           <div class="form__label">
-            {{ form.finish_date.label }}
+            Finish Time
           </div>
-          {{ form.finish_date(class="form__input") }}
-          <div class="form__label">Time</div>
-          {{ form.finish_time_hours(class="form__input") }}
-          {{ form.finish_time_minutes(class="form__input") }}
+          <div class="container">
+            <div class="row">
+              <div class="col-6">
+                <div class="form__input-help">date</div>
+                {{ form.finish_date(class="form__input") }}
+              </div>
+              <div class="col-offset-1 col-2">
+                <div class="form__input-help">hours</div>
+                {{ form.finish_time_hours(class="form__input") }}
+              </div>
+              <div class="col-offset-1 col-2">
+                <div class="form__input-help">minutes</div>
+                {{ form.finish_time_minutes(class="form__input") }}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class='form__item'>

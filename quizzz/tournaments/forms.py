@@ -3,7 +3,8 @@ from wtforms import Form
 from wtforms import StringField, BooleanField, SelectField, RadioField, FormField, FieldList, IntegerField
 from wtforms.fields.html5 import DateField
 from wtforms.widgets import TextArea
-from wtforms.validators import DataRequired, Length, Optional, NumberRange
+from wtforms.widgets.html5 import NumberInput
+from wtforms.validators import DataRequired, InputRequired, Length, Optional, NumberRange
 
 from quizzz.forms import ValidatedTextInput
 
@@ -23,11 +24,23 @@ class DeleteTournamentForm(FlaskForm):
 class RoundForm(FlaskForm):
     quiz_id = SelectField("Select Quiz", coerce=int)
     start_date = DateField("Start Date")
-    start_time_hours = IntegerField("Start Hours", validators=[NumberRange(min=0, max=23)])
-    start_time_minutes = IntegerField("Start Minutes", validators=[NumberRange(min=0, max=59)])
+    start_time_hours = IntegerField("Start Hours",
+        validators=[ InputRequired(), NumberRange(min=0, max=23) ],
+        widget=NumberInput(min=0, max=23)
+    )
+    start_time_minutes = IntegerField("Start Minutes",
+        validators=[ InputRequired(), NumberRange(min=0, max=59) ],
+        widget=NumberInput(min=0, max=59)
+    )
     finish_date = DateField("Finish Date")
-    finish_time_hours = IntegerField("Finish Hours", validators=[NumberRange(min=0, max=23)])
-    finish_time_minutes = IntegerField("Finish Minutes", validators=[NumberRange(min=0, max=59)])
+    finish_time_hours = IntegerField("Finish Hours",
+        validators=[ InputRequired(), NumberRange(min=0, max=23) ],
+        widget=NumberInput(min=0, max=23)
+    )
+    finish_time_minutes = IntegerField("Finish Minutes",
+        validators=[ InputRequired(), NumberRange(min=0, max=59) ],
+        widget=NumberInput(min=0, max=59)
+    )
 
 
 class DeleteRoundForm(FlaskForm):
