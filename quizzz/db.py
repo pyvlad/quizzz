@@ -54,8 +54,9 @@ def init_db():
     """
     Create new tables if they don't exist yet.
     """
-    engine = create_engine(current_app.config["DATABASE_URI"])
-    Base.metadata.create_all(engine)
+    db = get_db_session()
+    engine = db.bind
+    Base.metadata.create_all(db.bind)
 
 
 @click.command('init-db')

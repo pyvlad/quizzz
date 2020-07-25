@@ -9,7 +9,6 @@ Pytest uses fixtures by matching their function names
 with the names of arguments in the test functions.
 """
 import os
-import tempfile
 
 import pytest
 from quizzz import create_app
@@ -27,11 +26,9 @@ from . import data
 @pytest.fixture
 def app():
     """ Calls the factory and configures the application for testing. """
-    db_fd, db_path = tempfile.mkstemp()
-
     app = create_app({
         'TESTING': True,
-        'DATABASE_URI': 'sqlite:///' + db_path,
+        'DATABASE_URI': 'sqlite://',
         'SQLALCHEMY_ECHO': False,
         'WTF_CSRF_ENABLED': False
     })
@@ -55,9 +52,6 @@ def app():
         db.commit()
 
     yield app
-
-    os.close(db_fd)
-    os.unlink(db_path)
 
 
 @pytest.fixture
