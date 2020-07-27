@@ -3,11 +3,12 @@ import re
 from flask import g, request, render_template, flash, redirect, url_for
 
 from quizzz.flashing import Flashing
+from quizzz.forms import EmptyForm
 
 from . import bp
 from .models import Message
 from .queries import get_chat_messages, get_own_message_by_id
-from .forms import MessageForm, MessageDeleteForm
+from .forms import MessageForm
 
 
 
@@ -29,7 +30,7 @@ def edit(message_id):
         msg.group = g.group
 
     form = MessageForm(text=msg.text) # request.form is added automatically as 1st arg by flask-wtf
-    delete_form = MessageDeleteForm()
+    delete_form = EmptyForm()
 
     if request.method == 'POST':
         # browser creates "\r\n" linebreaks which messes up validation
@@ -57,7 +58,7 @@ def edit(message_id):
 def delete(id):
     msg = get_own_message_by_id(id)
 
-    form = MessageDeleteForm()
+    form = EmptyForm()
 
     if form.validate():
         g.db.delete(msg)

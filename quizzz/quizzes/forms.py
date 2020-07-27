@@ -7,10 +7,6 @@ from wtforms.validators import DataRequired, Length
 from quizzz.forms import ValidatedTextInput, ValidatedTextArea
 
 
-class QuizDeleteForm(FlaskForm):
-    pass
-
-
 class OptionForm(Form):
     text = StringField(validators=[
                 DataRequired(message="Option text cannot not be empty."),

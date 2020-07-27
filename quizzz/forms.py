@@ -1,6 +1,12 @@
+from flask_wtf import FlaskForm
 from wtforms.widgets import html_params
 from wtforms.validators import Length, Regexp
 from markupsafe import Markup, escape
+
+
+class EmptyForm(FlaskForm):
+    """ Reusable empty form with a CSRF token. """
+    pass
 
 
 def add_params_from_field_validators_to_kwargs(kwargs, field):

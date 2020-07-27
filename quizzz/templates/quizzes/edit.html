@@ -81,7 +81,7 @@
             </div>
           </div>
           <div class="quiz-form__row">
-            <fieldset class="quiz-form__fieldset" >
+            <fieldset class="quiz-form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
               {% for subfield in form.is_finalized %}
                 <div class="quiz-form__fieldset-item">
                   {{ subfield(required=True) }}

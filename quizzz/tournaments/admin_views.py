@@ -4,11 +4,12 @@ from flask import g, flash, request, redirect, url_for, abort, render_template
 
 from quizzz.permissions import USER, check_user_permissions
 from quizzz.flashing import Flashing
+from quizzz.forms import EmptyForm
 
 from . import bp
 from .models import Tournament, Round
 from .queries import get_tournament_by_id, get_quiz_pool, get_round_by_id
-from .forms import TournamentForm, DeleteTournamentForm, RoundForm, DeleteRoundForm
+from .forms import TournamentForm, RoundForm
 
 
 
@@ -50,7 +51,7 @@ def edit_tournament(tournament_id):
         }
     }
 
-    delete_form = DeleteTournamentForm()
+    delete_form = EmptyForm()
 
     return render_template('tournaments/edit.html', form=form, delete_form=delete_form, data=data)
 
@@ -63,11 +64,15 @@ def delete_tournament(tournament_id):
     """
     check_user_permissions(USER.IS_GROUP_ADMIN)
 
-    tournament = get_tournament_by_id(tournament_id)
+    form = EmptyForm()
 
-    g.db.delete(tournament)
-    g.db.commit()
-    flash("Tournament has been deleted.", Flashing.SUCCESS)
+    if form.validate():
+        tournament = get_tournament_by_id(tournament_id)
+        g.db.delete(tournament)
+        g.db.commit()
+        flash("Tournament has been deleted.", Flashing.SUCCESS)
+    else:
+        flash("Invalid form submitted.", Flashing.ERROR)
 
     return redirect(url_for('tournaments.index', filter="all"))
 
@@ -143,7 +148,7 @@ def edit_round(tournament_id, round_id):
         }
     }
 
-    delete_form = DeleteRoundForm()
+    delete_form = EmptyForm()
 
     return render_template('tournaments/edit_round.html', form=form, delete_form=delete_form, data=data)
 
@@ -153,9 +158,14 @@ def edit_round(tournament_id, round_id):
 def delete_round(round_id):
     check_user_permissions(USER.IS_GROUP_ADMIN)
 
-    round = get_round_by_id(round_id)
-    g.db.delete(round)
-    g.db.commit()
-    flash("Quiz round has been deleted.", Flashing.SUCCESS)
+    form = EmptyForm()
+
+    if form.validate():
+        round = get_round_by_id(round_id)
+        g.db.delete(round)
+        g.db.commit()
+        flash("Quiz round has been deleted.", Flashing.SUCCESS)
+    else:
+        flash("Invalid form submitted.", Flashing.ERROR)
 
     return redirect(url_for('tournaments.index'))

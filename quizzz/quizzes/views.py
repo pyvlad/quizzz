@@ -3,11 +3,12 @@ import traceback
 from flask import current_app, render_template, g, flash, request, redirect, url_for, abort
 
 from quizzz.flashing import Flashing
+from quizzz.forms import EmptyForm
 
 from . import bp
 from .models import Quiz
 from .queries import get_own_quiz_by_id, get_user_group_quizzes
-from .forms import make_quiz_form, QuizDeleteForm
+from .forms import make_quiz_form
 
 
 
@@ -30,7 +31,6 @@ def index():
 
 @bp.route('/<int:quiz_id>/edit', methods=('GET', 'POST'))
 def edit(quiz_id):
-
     # load or initialize quiz object with questions
     if quiz_id:
         quiz = get_own_quiz_by_id(quiz_id, with_questions=True)
@@ -98,7 +98,7 @@ def edit(quiz_id):
         "read_only": quiz.is_finalized,
     }
 
-    delete_form = QuizDeleteForm()
+    delete_form = EmptyForm()
 
     return render_template('quizzes/edit.html', form=form, delete_form=delete_form, data=data)
 
@@ -106,12 +106,17 @@ def edit(quiz_id):
 
 @bp.route('/<int:quiz_id>/delete', methods=('POST',))
 def delete(quiz_id):
-    quiz = get_own_quiz_by_id(quiz_id)
+    form = EmptyForm()
 
-    if quiz.is_finalized:
-        abort(403, "Can not delete submitted quiz.")
+    if form.validate():
+        quiz = get_own_quiz_by_id(quiz_id)
+        if quiz.is_finalized:
+            abort(403, "Can not delete submitted quiz.")
 
-    g.db.delete(quiz)
-    g.db.commit()
+        g.db.delete(quiz)
+        g.db.commit()
+        flash("Quiz has been deleted.", Flashing.SUCCESS)
+    else:
+        flash("Invalid form submitted.", Flashing.ERROR)
 
     return redirect(url_for('quizzes.index'))

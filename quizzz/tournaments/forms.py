@@ -17,10 +17,6 @@ class TournamentForm(FlaskForm):
     is_active = BooleanField("Show tournament as active?")
 
 
-class DeleteTournamentForm(FlaskForm):
-    pass
-
-
 class RoundForm(FlaskForm):
     quiz_id = SelectField("Select Quiz", coerce=int)
     start_date = DateField("Start Date")
@@ -41,11 +37,6 @@ class RoundForm(FlaskForm):
         validators=[ InputRequired(), NumberRange(min=0, max=59) ],
         widget=NumberInput(min=0, max=59)
     )
-
-
-class DeleteRoundForm(FlaskForm):
-    pass
-
 
 
 class QuestionForm(Form):
