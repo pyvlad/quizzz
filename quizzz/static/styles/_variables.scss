@@ -2,6 +2,14 @@ $layout-breakpoint-sm: 600px;
 $layout-breakpoint-md: 960px;
 $layout-breakpoint-lg: 1200px;
 
+$NCOLUMNS: 12;
+$BREAKPOINTS: (
+  '': 0,
+  'xs': 0,
+  'sm': $layout-breakpoint-sm,
+  'md': $layout-breakpoint-md,
+  'lg': $layout-breakpoint-lg
+);
 
 $main-color: #352000;
 $main-color-dark: #352000;

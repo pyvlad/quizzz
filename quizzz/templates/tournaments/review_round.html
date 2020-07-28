@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-  <div class="paper">
+  <div class="paper-lg bg-grey p-2 p-sm-4">
     <div class="quiz-form">
       <div class="quiz-form__item">
         <div class="quiz-form__header">
@@ -48,7 +48,7 @@
                 {% else %}
                   <tr>
                 {% endif %}
-                  <td class="pr_sm">
+                  <td class="pr-2">
                     {% if option.is_correct and (question.answer.option_id == option.id) %}
                       [&#10003;]
                     {% elif (question.answer.option_id == option.id) %}

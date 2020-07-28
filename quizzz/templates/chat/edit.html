@@ -17,49 +17,53 @@
 {% endblock %}
 
 {% block content %}
-  <div class="paper paper_narrow paper_sm-disabled">
-    <div class="form">
-      <form method="post">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 paper-sm bg-grey p-2 p-md-4 my-4">
+        <div class="form">
+          <form method="post">
 
-        {{ form.hidden_tag() }}
+            {{ form.hidden_tag() }}
 
-        <div class="form__header">
+            <div class="form__header">
+              {% if data.message_id %}
+                Edit Your Message
+              {% else %}
+                Create New Message
+              {% endif %}
+            </div>
+
+            <div class="form__item">
+              <div class="form__help">
+                Please enter your message below.
+              </div>
+            </div>
+
+            <div class="form__item">
+              {{ form.text(class="form__textarea form__textarea_md") }}
+            </div>
+
+            <div class="form__item">
+              <input class="button button_action"
+                type="submit"
+                value="Submit"
+              />
+            </div>
+          </form>
           {% if data.message_id %}
-            Edit Your Message
-          {% else %}
-            Create New Message
+            <div class="form__item">
+              <form action="{{ url_for('chat.delete', id=data.message_id) }}" method="post">
+                {{ delete_form.hidden_tag() }}
+                <input class="button button_danger"
+                  type="submit"
+                  value="Delete"
+                  onclick="return confirm('Are you sure?');"
+                />
+              </form>
+            </div>
           {% endif %}
         </div>
-
-        <div class="form__item">
-          <div class="form__help">
-            Please enter your message below.
-          </div>
-        </div>
-
-        <div class="form__item">
-          {{ form.text(class="form__textarea form__textarea_md") }}
-        </div>
-
-        <div class="form__item">
-          <input class="button button_action"
-            type="submit"
-            value="Submit"
-          />
-        </div>
-      </form>
-      {% if data.message_id %}
-        <div class="form__item">
-          <form action="{{ url_for('chat.delete', id=data.message_id) }}" method="post">
-            {{ delete_form.hidden_tag() }}
-            <input class="button button_danger"
-              type="submit"
-              value="Delete"
-              onclick="return confirm('Are you sure?');"
-            />
-          </form>
-        </div>
-      {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}

@@ -1,42 +1,60 @@
 /* Spacing */
-$sizes: (
-  "xs": 5px,
-  "sm": 10px,
-  "md": 1em,
-  "lg": 1.5em
+@import '_variables';
+@import '_mixins';
+
+
+$SIZES: (
+  "1": 5px,
+  "2": 10px,
+  "3": 1em,
+  "4": 1.5em
 );
 
-@each $k, $v in $sizes {
-  .m_#{$k} {
-    margin: $v;
-  }
-  .mx_#{$k} {
-    margin-left: $v;
-    margin-right: $v;
-  }
-  .my_#{$k} {
-    margin-top: $v;
-    margin-bottom: $v;
-  }
-  .mb_#{$k} {
-    margin-bottom: $v;
-  }
 
-  .p_#{$k} {
-    padding: $v;
+@mixin create-spacing-classes($modifier, $breakpoint) {
+  $modsuffix: get-modsuffix($modifier);
+
+  @include create-media-query($breakpoint) {
+
+    @each $k, $v in $SIZES {
+      .m#{$modsuffix}-#{$k} {
+        margin: $v;
+      }
+      .mx#{$modsuffix}-#{$k} {
+        margin-left: $v;
+        margin-right: $v;
+      }
+      .my#{$modsuffix}-#{$k} {
+        margin-top: $v;
+        margin-bottom: $v;
+      }
+      .mb#{$modsuffix}-#{$k} {
+        margin-bottom: $v;
+      }
+
+      .p#{$modsuffix}-#{$k} {
+        padding: $v;
+      }
+      .px#{$modsuffix}-#{$k} {
+        padding-left: $v;
+        padding-right: $v;
+      }
+      .py#{$modsuffix}-#{$k} {
+        padding-top: $v;
+        padding-bottom: $v;
+      }
+      .pl#{$modsuffix}-#{$k} {
+        padding-left: $v;
+      }
+      .pr#{$modsuffix}-#{$k} {
+        padding-right: $v;
+      }
+    }
   }
-  .px_#{$k} {
-    padding-left: $v;
-    padding-right: $v;
-  }
-  .py_#{$k} {
-    padding-top: $v;
-    padding-bottom: $v;
-  }
-  .pl_#{$k} {
-    padding-left: $v;
-  }
-  .pr_#{$k} {
-    padding-right: $v;
-  }
+}
+
+
+
+@each $modifier, $breakpoint in $BREAKPOINTS {
+  @include create-spacing-classes($modifier, $breakpoint);
 }

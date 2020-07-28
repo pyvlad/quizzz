@@ -28,29 +28,27 @@
           {% endfor %}
         </ul>
       </div>
-      <div class="col-12 col-sm-6 col-md-4 col-md-offset-1 p_md">
-        <div class="paper paper_sm-disabled">
-          <form class="form"
-                action="{{ url_for('groups.join') }}"
-                method="post">
+      <div class="col-12 col-sm-offset-1 col-sm-5 col-md-4 p-2 px-sm-4 paper-md bg-grey">
+        <form class="form"
+              action="{{ url_for('groups.join') }}"
+              method="post">
 
-            {{ form.hidden_tag() }}
+          {{ form.hidden_tag() }}
 
-            <div class="form__header">Join Group</div>
-            <div class="form__item">
-              <div class="form__help">
-                You need to know invitation code to join an existing group.
-              </div>
+          <div class="form__header">Join Group</div>
+          <div class="form__item">
+            <div class="form__help">
+              You need to know invitation code to join an existing group.
             </div>
-            <div class="form__item">
-              {{ form.invitation_code.label(class="form__label") }}
-              {{ form.invitation_code(class="form__input") }}
-            </div>
-            <div class="form__item">
-              <button class="button button_action">Submit</button>
-            </div>
-          </form>
-        </div>
+          </div>
+          <div class="form__item">
+            {{ form.invitation_code.label(class="form__label") }}
+            {{ form.invitation_code(class="form__input") }}
+          </div>
+          <div class="form__item">
+            <button class="button button_action">Submit</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

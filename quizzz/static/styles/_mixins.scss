@@ -1,0 +1,20 @@
+@mixin create-media-query($breakpoint, $which: "min") {
+  @if($breakpoint == 0) {
+    @content;
+  } @else {
+    @media screen and (#{$which}-width: $breakpoint) {
+      @content;
+    }
+  }
+}
+
+
+@function get-modsuffix($modifier) {
+  $result: '';
+  @if ($modifier == '') {
+    $result: '';
+  } @else {
+    $result: '-#{$modifier}';
+  }
+  @return $result;
+}

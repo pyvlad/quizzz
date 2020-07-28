@@ -1,21 +1,20 @@
 @import "_variables";
+@import "_mixins";
 
-.paper {
-  background-color: $grey-color-lightest;
-  border: 1px solid $grey-color;
-  border-radius: 3px;
-  padding: 2em;
-  box-shadow: 0 0 10px $grey-color-dark;
 
-  &_narrow {
-    max-width: 400px;
-    margin: 0 auto;
-  }
+@mixin create-spacing-classes($modifier, $breakpoint) {
+  $modsuffix: get-modsuffix($modifier);
 
-  &_sm-disabled {
-    @media (max-width: $layout-breakpoint-sm) {
-      border: none;
-      box-shadow: none;
+  @include create-media-query($breakpoint) {
+    .paper#{$modsuffix} {
+      border: 1px solid $grey-color;
+      border-radius: 3px;
+      box-shadow: 0 0 10px $grey-color-medium;
     }
   }
+}
+
+
+@each $modifier, $breakpoint in $BREAKPOINTS {
+  @include create-spacing-classes($modifier, $breakpoint);
 }
