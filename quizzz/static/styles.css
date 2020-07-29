@@ -824,6 +824,11 @@
   color: white;
 }
 
+.pagination {
+  display: flex;
+  justify-content: space-between;
+}
+
 /* Message Board */
 .message {
   margin: 1em 0;

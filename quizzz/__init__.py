@@ -15,7 +15,8 @@ def create_app(test_config=None):
         DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'db.sqlite'), # /// for absolute paths
         QUESTIONS_PER_QUIZ=2,
         OPTIONS_PER_QUESTION=4,
-        SQLALCHEMY_ECHO=True
+        SQLALCHEMY_ECHO=True,
+        CHAT_MESSAGES_PER_PAGE=2,
     )
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)    # instance config if it exists

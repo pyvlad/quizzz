@@ -2,7 +2,7 @@ from flask import g, render_template
 
 from . import bp
 from quizzz.quizzes.queries import get_user_group_quizzes
-from quizzz.chat.queries import get_chat_messages
+from quizzz.chat.queries import get_recent_chat_messages
 
 
 @bp.route('/')
@@ -16,7 +16,7 @@ def show_group_page():
     num_user_quizzes_in_progress = get_user_group_quizzes(which="in-progress", return_count=True)
     num_user_quizzes_finalized = get_user_group_quizzes(which="finalized", return_count=True)
 
-    chat_messages = get_chat_messages(limit=5)
+    chat_messages = get_recent_chat_messages(limit=5)
 
     data = {
         "group": {

@@ -1,22 +1,26 @@
 import re
 
-from flask import g, request, render_template, flash, redirect, url_for
+from flask import current_app, g, request, render_template, flash, redirect, url_for
 
 from quizzz.flashing import Flashing
 from quizzz.forms import EmptyForm
 
 from . import bp
 from .models import Message
-from .queries import get_chat_messages, get_own_message_by_id
+from .queries import get_paginated_chat_messages, get_own_message_by_id
 from .forms import MessageForm
 
 
 
 @bp.route('/')
 def index():
-    data = {
-        "messages": get_chat_messages()
-    }
+    try:
+        page = int(request.args.get("page", 1))
+    except (TypeError, ValueError):
+        abort(404)
+    per_page = current_app.config["CHAT_MESSAGES_PER_PAGE"]
+    data = get_paginated_chat_messages(page, per_page, round_id=None)
+
     return render_template('chat/index.html', data=data)
 
 
