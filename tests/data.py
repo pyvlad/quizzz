@@ -2,17 +2,20 @@ USERS = {
     "bob": {
         "id": 1,
         "name": "bob",
-        "password": "dog"
+        "password": "dog",
+        "email": "bob@example.com",
     },
     "alice": {
         "id": 2,
         "name": "alice",
-        "password": "cat"
+        "password": "cat",
+        "email": "alice@example.com",
     },
     "ben": {
         "id": 3,
         "name": "ben",
-        "password": "frog"
+        "password": "frog",
+        "email": "ben@example.com",
     }
 }
 

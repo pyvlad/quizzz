@@ -26,7 +26,7 @@ def test_session_rollback_on_context_teardown(app):
     """
     with app.app_context():
         db = get_db_session()
-        db.add(User.from_credentials(name="some_user", password="some_pass"))
+        db.add(User.from_credentials(name="some_user", password="some_pass", email="some_user@example.com"))
         res = db.query(User).all()
         assert len(res) == len(USERS) + 1
 

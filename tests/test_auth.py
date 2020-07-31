@@ -35,8 +35,12 @@ def test_register(client, app):
     """
     assert client.get('/auth/register').status_code == 200
 
-    response = client.post('/auth/register',
-        data={'username': 'new_user', 'password': 'new_pass', 'password2': 'new_pass'})
+    response = client.post('/auth/register', data={
+        'username': 'new_user',
+        'password': 'new_pass',
+        'password2': 'new_pass',
+        'email': 'new_user@example.com',
+    })
     assert 'http://localhost/' == response.headers['Location']
 
     with app.app_context():

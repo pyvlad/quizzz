@@ -38,6 +38,14 @@
 
           <div class="form__item">
             <div class="form__label">
+              {{ form.email.label }}
+            </div>
+            {{ form.email(class="form__input", placeholder="enter your email") }}
+            {{ render_form_errors(form.email) }}
+          </div>
+
+          <div class="form__item">
+            <div class="form__label">
               {{ form.password.label }}
             </div>
             {{ form.password(class="form__input", placeholder="enter your password") }}
