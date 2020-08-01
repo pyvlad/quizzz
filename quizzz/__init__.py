@@ -26,7 +26,7 @@ def create_app(test_config=None):
         MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None,
         MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
         MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD'),
-        MAIL_SENDER = os.environ.get("MAIL_SENDER") or os.environ.get("MAIL_USERNAME"),
+        MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER") or os.environ.get("MAIL_USERNAME"),
         PASSWORD_RESET_TOKEN_VALIDITY=600
     )
     if test_config is None:

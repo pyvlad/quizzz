@@ -30,7 +30,8 @@ def app():
         'TESTING': True,
         'DATABASE_URI': 'sqlite://',
         'SQLALCHEMY_ECHO': False,
-        'WTF_CSRF_ENABLED': False
+        'WTF_CSRF_ENABLED': False,
+        'MAIL_DEFAULT_SENDER': 'test@example.com',
     })
 
     with app.app_context():

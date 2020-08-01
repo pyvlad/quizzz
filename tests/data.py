@@ -4,18 +4,21 @@ USERS = {
         "name": "bob",
         "password": "dog",
         "email": "bob@example.com",
+        "is_confirmed": True,
     },
     "alice": {
         "id": 2,
         "name": "alice",
         "password": "cat",
         "email": "alice@example.com",
+        "is_confirmed": True,
     },
     "ben": {
         "id": 3,
         "name": "ben",
         "password": "frog",
         "email": "ben@example.com",
+        "is_confirmed": True,
     }
 }
 

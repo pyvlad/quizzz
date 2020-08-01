@@ -1,7 +1,9 @@
 import uuid
 import datetime
 
+from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer
 import sqlalchemy as sa
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -20,6 +22,7 @@ class User(Base):
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     is_deleted = sa.Column(sa.Boolean, default=False)
+    is_confirmed = sa.Column(sa.Boolean, default=False)
 
     memberships = relationship("Member", back_populates="user")
     messages = relationship("Message", back_populates="user")
@@ -48,6 +51,19 @@ class User(Base):
         token.create_uuid()
         token.user = self
         return token
+
+    def generate_confirmation_token(self, valid_seconds=3600):
+        s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'], valid_seconds)
+        return s.dumps({'user_id': self.uuid}).decode('utf-8')
+
+    @staticmethod
+    def get_user_uuid_from_confirmation_token(token):
+        s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return None
+        return data.get('user_id')
 
     def __repr__(self):
         return '<User %r>' % (self.name)

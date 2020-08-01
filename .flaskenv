@@ -9,4 +9,4 @@ MAIL_PORT=8025
 # MAIL_USE_SSL=1
 # MAIL_USERNAME=flask.python@mail.ru
 # MAIL_PASSWORD=crimson99
-MAIL_SENDER="Фласк Питонов <flask.python@mail.ru>"
+MAIL_DEFAULT_SENDER="Фласк Питонов <flask.python@mail.ru>"

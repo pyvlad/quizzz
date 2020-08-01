@@ -6,7 +6,7 @@ from quizzz.flashing import Flashing
 from . import bp
 from .models import User, PasswordResetToken
 from .forms import RegistrationForm, LoginForm, RequestResetPasswordForm, ResetPasswordForm
-from .helpers import send_password_reset_email
+from .helpers import send_password_reset_email, send_confirmation_email
 
 
 
@@ -31,8 +31,13 @@ def register():
             g.db.add(user)
             g.db.commit()
 
-            flash(f'User {username} has been registered! Welcome to the website!', Flashing.SUCCESS)
+            send_confirmation_email(user)
+            flash('A confirmation email has been sent to you by email. '
+                'Check your inbox/spam folder and click on the link there to complete registration.',
+                Flashing.MESSAGE)
+            # flash(f'User {username} has been registered!', Flashing.SUCCESS)
             session['user_id'] = user.uuid
+
             return redirect(url_for('index'))
         else:
             flash("Please fix the errors and submit the form again.", Flashing.ERROR)
@@ -64,7 +69,12 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user.uuid
-            return redirect(url_for('index'))
+
+            next = request.args.get("next", None)
+            if next:
+                return redirect(next)
+            else:
+                return redirect(url_for('index'))
         else:
             flash(error, Flashing.ERROR)
 
@@ -104,7 +114,7 @@ def reset_password(token_id):
 
     token = g.db.query(PasswordResetToken).filter_by(uuid=token_id).first()
     if token is None:
-        flash("The link for password reset was broken.")
+        flash("The link for password reset was broken.", flashing.ERROR)
         return redirect(url_for('index'))
 
     if token.has_expired(valid_seconds=current_app.config["PASSWORD_RESET_TOKEN_VALIDITY"]):
@@ -125,3 +135,48 @@ def reset_password(token_id):
         return redirect(url_for('auth.login'))
 
     return render_template('auth/reset_password.html', form=form)
+
+
+
+@bp.route('/confirm/<token>')
+def confirm(token):
+    if not g.user:
+        flash("You need to be logged in to confirm your email.")
+        return redirect(url_for('auth.login', next=url_for('auth.confirm', token=token)))
+    if g.user and g.user.is_confirmed:
+        flash("Your email is already confirmed.")
+        return redirect(url_for('index'))
+
+    user_uuid = User.get_user_uuid_from_confirmation_token(token)
+    if user_uuid and g.user.uuid == user_uuid:
+        user = g.db.query(User).filter_by(uuid=user_uuid).first()
+        user.is_confirmed = True
+        g.db.add(user)
+        g.db.commit()
+        flash('Your email has been confirmed. Welcome to Quizzz!', Flashing.SUCCESS)
+    else:
+        flash('The confirmation link is invalid or has expired.', Flashing.ERROR)
+
+    return redirect(url_for('index'))
+
+
+
+@bp.route('/confirm')
+def resend_confirm():
+    if not g.user:
+        flash("You need to be logged in to request confirmation email.")
+    elif g.user and g.user.is_confirmed:
+        flash("Your account is already confirmed.")
+    else:
+        send_confirmation_email(g.user)
+        flash('A new confirmation email has been sent to you. Check your inbox/spam folder '
+            'and click on the link there to complete registration.', Flashing.SUCCESS)
+    return redirect(url_for('index'))
+
+
+
+@bp.route('/unconfirmed')
+def unconfirmed():
+    if not g.user or (g.user and g.user.is_confirmed):
+        return redirect(url_for('index'))
+    return render_template('auth/unconfirmed.html')
