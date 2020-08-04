@@ -47,6 +47,10 @@ def create_app(test_config=None):
     # initialize mail support
     mail.init_app(app)
 
+    # initialize momentjs support
+    from .momentjs import momentjs
+    app.jinja_env.globals['momentjs'] = momentjs
+
     # register blueprints
     from . import home
     app.register_blueprint(home.bp)

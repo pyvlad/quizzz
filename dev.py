@@ -18,7 +18,7 @@ with app.app_context():
     db_session = get_db_session()
 
     # add some users
-    bob = User.from_credentials(name="bob", password="dog", email="bob@example.com")
+    bob = User.from_credentials(name="bob", password="dog", email="bob@example.com", is_confirmed=True)
     alice = User.from_credentials(name="alice", password="cat", email="alice@example.com")
 
     # add some groups

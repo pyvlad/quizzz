@@ -43,9 +43,9 @@
                 </div>
                 <div class="list__text-secondary">
                   {% if quiz.time_updated %}
-                    {{ quiz.time_updated.strftime('%Y-%m-%d %H:%M') }}
+                    {{ momentjs(quiz.time_updated).calendar() }}
                   {% else %}
-                    {{ quiz.time_created.strftime('%Y-%m-%d %H:%M') }}
+                    {{ momentjs(quiz.time_created).calendar() }}
                   {% endif %}
                 </div>
               </a>
@@ -65,9 +65,9 @@
                 </div>
                 <div class="list__text-secondary">
                   {% if quiz.time_updated %}
-                    {{ quiz.time_updated.strftime('%Y-%m-%d %H:%M') }}
+                    {{ momentjs(quiz.time_updated).calendar() }}
                   {% else %}
-                    {{ quiz.time_created.strftime('%Y-%m-%d %H:%M') }}
+                    {{ momentjs(quiz.time_created).calendar() }}
                   {% endif %}
                 </div>
               </a>

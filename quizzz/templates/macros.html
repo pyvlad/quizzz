@@ -15,10 +15,11 @@
   <article class="message {% if msg.is_own %}message_own{% endif %}">
     <div class="message__details">
       <div class="message__details-item">{{ msg.user_name }}</div>
-      <div class="message__details-item">{{ msg.time_created.strftime('%Y-%m-%d %H:%M') }}</div>
+      <div class="message__details-item moment-date">{{ msg.time_created.isoformat() + "Z" }}</div>
+      <!-- <div class="message__details-item">{{ msg.time_created.strftime('%Y-%m-%d %H:%M') }}</div> -->
       {% if msg.time_updated %}
         <div class="message__details-item">
-          edited at {{ msg.time_updated.strftime('%Y-%m-%d %H:%M') }}
+          edited: <span class="moment-date">{{ msg.time_updated.isoformat() + "Z" }}</span>
         </div>
       {% endif %}
       {% if msg.is_own %}

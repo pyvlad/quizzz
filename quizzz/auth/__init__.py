@@ -23,8 +23,9 @@ def load_logged_in_user():
     if user_uuid is None:
         g.user = None
     else:
-        g.user = g.db.query(models.User).filter(models.User.uuid == user_uuid).one()
-        if not g.user.is_confirmed and request.blueprint != 'auth':
-            return redirect(url_for('auth.unconfirmed'))
-        if g.user.is_deleted:
-            g.user = None
+        g.user = g.db.query(models.User).filter(models.User.uuid == user_uuid).first()
+        if g.user:
+            if not g.user.is_confirmed and request.blueprint != 'auth':
+                return redirect(url_for('auth.unconfirmed'))
+            if g.user.is_deleted:
+                g.user = None
