@@ -12,17 +12,8 @@
   <meta charset='utf-8'/>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <title>{% block title %}{% endblock %} | Quizzz</title>
-  <script  src='/static/js/moment.min.js'></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      let dates = document.querySelectorAll(".moment-date");
-
-      for (let date of dates) {
-        const obj = moment(date.innerHTML.trim());
-        date.innerHTML = `${obj.format('D MMM YYYY h:mm a')} (<i>${obj.fromNow()}</i>)`;
-      }
-    });
-  </script>
+  <script defer src='/static/js/moment.min.js'></script>
+  <script defer src='/static/js/script.js'></script>
   <link rel='stylesheet' href="{{ url_for('static', filename='styles.css') }}"/>
   {% block head %}{% endblock %}
 </head>

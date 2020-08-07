@@ -14,21 +14,23 @@
 {% macro render_chat_message(msg) %}
   <article class="message {% if msg.is_own %}message_own{% endif %}">
     <div class="message__details">
-      <div class="message__details-item">{{ msg.user_name }}</div>
-      <div class="message__details-item moment-date">{{ msg.time_created.isoformat() + "Z" }}</div>
-      <!-- <div class="message__details-item">{{ msg.time_created.strftime('%Y-%m-%d %H:%M') }}</div> -->
-      {% if msg.time_updated %}
-        <div class="message__details-item">
-          edited: <span class="moment-date">{{ msg.time_updated.isoformat() + "Z" }}</span>
-        </div>
-      {% endif %}
+      <div class="message__details-item message__author">{{ msg.user_name }}</div>
+      <div class="message__details-item">
+        {{ momentjs(msg.time_created).format() }}
+        (<i>{{ momentjs(msg.time_created).fromNow(refresh=True) }}</i>)
+      </div>
       {% if msg.is_own %}
-        <a class="message__details-item"
+        <a class="message__edit"
            href="{{ url_for('chat.edit', message_id=msg.id) }}">
-           Edit
+           ✎
         </a>
       {% endif %}
     </div>
     <p class="message__text">{{ msg.text }}</p>
+    {% if msg.time_updated %}
+      <div class="message__edited">
+        last edit: {{ momentjs(msg.time_updated).format() }}
+      </div>
+    {% endif %}
   </article>
 {% endmacro %}

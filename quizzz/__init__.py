@@ -2,8 +2,10 @@ import os
 
 from flask import Flask, render_template, g, redirect, url_for
 from flask_mail import Mail
+from .momentjs import MomentJS
 
 mail = Mail()
+momentjs = MomentJS()
 
 
 def create_app(test_config=None):
@@ -48,8 +50,7 @@ def create_app(test_config=None):
     mail.init_app(app)
 
     # initialize momentjs support
-    from .momentjs import momentjs
-    app.jinja_env.globals['momentjs'] = momentjs
+    momentjs.init_app(app)
 
     # register blueprints
     from . import home
