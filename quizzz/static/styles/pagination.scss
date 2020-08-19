@@ -1,4 +1,23 @@
+@import '_variables';
+
+
 .pagination {
   display: flex;
   justify-content: space-between;
+}
+
+.pagination-button {
+  text-decoration: none;
+  outline: none;
+  margin: 5px;
+  padding: 5px;
+  color: $tab-color-dark;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+
+  &:hover {
+    background-color: $tab-color-dark;
+    color: $white-color;
+  }
 }

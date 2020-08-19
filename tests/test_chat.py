@@ -7,13 +7,13 @@ from quizzz.chat.models import Message
 from .data import MESSAGES, USERS
 
 
-def test_index(client, auth):
+def test_api_index(client, auth):
     """
     The <index> view should display messages that were added with the test data.
     When logged in as the author, there should be a link to edit a message.
     """
     auth.login_as("bob")
-    response = client.get('/groups/1/chat/')
+    response = client.get('/groups/1/chat/api/')
     for msg in MESSAGES:
         # group 1 messages should be displayed:
         if msg["group_id"] == 1:
@@ -23,9 +23,9 @@ def test_index(client, auth):
         # group 1 messages that belong to bob should be editable:
         href = f"/groups/{msg['group_id']}/chat/{msg['id']}/edit"
         if msg["group_id"] == 1 and msg["user_id"] == USERS["bob"]["id"]:
-            assert f'href="{href}"'.encode() in response.data
+            assert href.encode() in response.data
         else:
-            assert f'href="{href}"'.encode() not in response.data
+            assert href.encode() not in response.data
 
 
 

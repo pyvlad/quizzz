@@ -829,6 +829,21 @@
   justify-content: space-between;
 }
 
+.pagination-button {
+  text-decoration: none;
+  outline: none;
+  margin: 5px;
+  padding: 5px;
+  color: darkblue;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+}
+.pagination-button:hover {
+  background-color: darkblue;
+  color: white;
+}
+
 /* Message Board */
 .message {
   margin: 1em 0;

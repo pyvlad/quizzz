@@ -1,4 +1,4 @@
-from flask import g, abort
+from flask import g, abort, url_for
 
 from quizzz.auth.models import User
 from quizzz.pagination import paginate
@@ -21,7 +21,8 @@ def _make_message(msg, user_id, user_name):
         "user_name": user_name,
         "time_created": msg.time_created,
         "time_updated": msg.time_updated,
-        "is_own": g.user.id == user_id
+        "is_own": g.user.id == user_id,
+        "edit_url": url_for("chat.edit", message_id=msg.id) if (g.user.id == user_id) else ""
     }
 
 
@@ -50,6 +51,10 @@ def get_paginated_chat_messages(page, per_page, round_id=None):
             "next_num": pag.next_num,
             "has_prev": pag.has_prev,
             "prev_num": pag.prev_num,
+            "link_to_first": url_for('chat.api_index', page=1),
+            "link_to_last": url_for('chat.api_index', page=pag.pages),
+            "prev_link": url_for('chat.api_index', page=pag.page-1) if pag.has_prev else "",
+            "next_link": url_for('chat.api_index', page=pag.page+1) if pag.has_next else "",
         },
         "messages": [_make_message(msg, user_id, user_name)
                      for msg, user_id, user_name in pag.get_items()]

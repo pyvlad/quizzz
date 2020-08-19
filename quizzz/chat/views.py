@@ -1,9 +1,10 @@
 import re
 
-from flask import current_app, g, request, render_template, flash, redirect, url_for
+from flask import escape, current_app, g, request, render_template, flash, redirect, url_for, jsonify
 
 from quizzz.flashing import Flashing
 from quizzz.forms import EmptyForm
+from quizzz.momentjs import momentjs
 
 from . import bp
 from .models import Message
@@ -14,14 +15,24 @@ from .forms import MessageForm
 
 @bp.route('/')
 def index():
+    return render_template('chat/index.html')
+
+
+@bp.route('/api/')
+def api_index():
     try:
         page = int(request.args.get("page", 1))
     except (TypeError, ValueError):
-        abort(404)
+        abort(400)
     per_page = current_app.config["CHAT_MESSAGES_PER_PAGE"]
     data = get_paginated_chat_messages(page, per_page, round_id=None)
+    # mutate messages for use in JS:
+    for msg in data["messages"]:
+        msg["time_created"] = momentjs(msg["time_created"])._timestamp_as_iso_8601()
+        msg["time_updated"] = momentjs(msg["time_updated"])._timestamp_as_iso_8601() if msg["time_updated"] else ""
+        msg["text"] = escape(msg["text"])
 
-    return render_template('chat/index.html', data=data)
+    return jsonify(data)
 
 
 @bp.route('/<int:message_id>/edit', methods=('GET', 'POST'))
