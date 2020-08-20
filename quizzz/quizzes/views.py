@@ -4,6 +4,7 @@ from flask import current_app, render_template, g, flash, request, redirect, url
 
 from quizzz.flashing import Flashing
 from quizzz.forms import EmptyForm
+from quizzz.momentjs import momentjs
 
 from . import bp
 from .models import Quiz
@@ -17,12 +18,22 @@ def index():
     """
     Get list of quizzes of logged in user in current group.
     """
-    user_quizzes_in_progress = get_user_group_quizzes(which="in-progress")
-    user_quizzes_finalized = get_user_group_quizzes(which="finalized")
+    user_quizzes = get_user_group_quizzes()
 
     data = {
-        "user_quizzes_in_progress": user_quizzes_in_progress,
-        "user_quizzes_finalized": user_quizzes_finalized
+        "user_quizzes": [
+            {
+                "id": quiz.id,
+                "topic": quiz.topic,
+                "is_submitted": quiz.is_finalized,
+                "last_update": (
+                    momentjs(quiz.time_updated)._timestamp_as_iso_8601()
+                    if quiz.time_updated
+                    else momentjs(quiz.time_created)._timestamp_as_iso_8601()
+                ),
+                "edit_url": url_for('quizzes.edit', quiz_id=quiz.id)
+            } for quiz in user_quizzes
+        ]
     }
 
     return render_template('quizzes/index.html', data=data)

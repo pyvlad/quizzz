@@ -56,7 +56,7 @@ def test_index(client, auth):
 
     # the only quiz's topic
     quiz_topic = QUIZZES["quiz1"]["topic"].encode()
-    update_link = b'href="/groups/1/quizzes/1/edit"'
+    update_link = b'/groups/1/quizzes/1/edit'
 
     # alice doesn't have any quizzes
     auth.logout()
