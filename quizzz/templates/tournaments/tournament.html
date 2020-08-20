@@ -16,40 +16,52 @@
 {% block content %}
   <h2 class="heading heading_primary">Tournament Page</h2>
 
-  <h3 class="heading heading_secondary">Current Rounds</h3>
-  <ul class="list">
-    {% for round in data.rounds %}
-      <li class="list__item {% if not round.is_taken %}list__item_active{% endif %}">
-        <a class="list__linked-content"
-           href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
-          <div class="list__text-primary">{{ round.quiz.topic }}</div>
-          <div class="list__text-secondary">by {{ round.quiz.author }}</div>
-          <div class="list__text-secondary">
-            {{ round.start_time.strftime("%A, %d %b %Y at %H:%M") }} - {{ round.finish_time.strftime("%A, %d %b %Y at %H:%M") }}
-          </div>
-          <div class="list__text-secondary">
-            {{ round.time_left.days }} days
-            {{ round.time_left.hours }} hours
-            {{ round.time_left.minutes }} minutes left
-          </div>
-        </a>
-        {% if data.has_edit_permissions %}
-          <div class="list__extras">
-            <a href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=round.id) }}">
-              Edit Round
+  {% if data.has_edit_permissions %}
+    <div class="admin-actions">
+      <a class="admin-actions__item button button_action"
+         href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
+        Add Round
+      </a>
+    </div>
+  {% endif %}
+
+  <h3 class="heading heading_secondary">Rounds</h3>
+  <div class="tabs" id="roundFilters"></div>
+  <table class="table table--full-width my-3">
+    <thead>
+      <tr>
+        <th width="5%">#</th>
+        <th width="25%">Name</th>
+        <th width="25%">Author</th>
+        <th width="25%">Finish Time</th>
+        <th width="10%">Played</th>
+        <th width="10%">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="roundRows">
+      {% for round in data.rounds %}
+        <!-- <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}">
+          <td class="table__td table__td--centered">{{ loop.index }}</td>
+          <td class="table__td">
+            <a href="{{ url_for('tournaments.show_round', round_id=round.id) }}">
+              {{ round.quiz.topic }}
             </a>
-          </div>
-        {% endif %}
-      </li>
-    {% else %}
-      <p>No rounds are currently available for play.</p>
-    {% endfor %}
-  </ul>
-  <p>
-    <a href="{{ url_for('tournaments.show_rounds', tournament_id=data.tournament.id) }}">
-      View All Rounds
-    </a>
-  </p>
+          </td>
+          <td class="table__td table__td--centered">{{ round.quiz.author }}</td>
+          <td class="table__td table__td--centered">
+
+          </td>
+          <td class="table__td table__td--centered">{{ (round.is_taken and "yes") or "no" }}</td>
+          <td class="table__td table__td--centered">
+            {% if data.has_edit_permissions %}
+            <a href="{{ url_for('tournaments.edit_round',
+              tournament_id=data.tournament.id, round_id=round.id) }}">✎</a>
+            {% endif %}
+          </td>
+        </tr> -->
+      {% endfor %}
+    </tbody>
+  </table>
 
   <section class="my-4">
     <h3 class="heading heading_secondary">Overall Standings</h3>
@@ -75,4 +87,116 @@
       <p>Tournament standings will be here.</p>
     {% endif %}
   </section>
+{% endblock %}
+
+{% block bottom %}
+<script>
+  let globalFilters = {{ data.filters|tojson }};
+  let globalRounds = {{ data.rounds|tojson }};
+  let hasEditPermissions = {{ data.has_edit_permissions|tojson }};
+
+  const selectFilter = function(e) {
+    e.preventDefault();
+    console.log(e);
+    console.log(this);
+    globalFilters = globalFilters.map(([k,v]) => {
+      return (k === this.dataset.value) ? [k,true] : [k,false];
+    });
+    renderFilters();
+    renderRows();
+  }
+
+  const renderFilters = () => {
+    const parent = document.getElementById("roundFilters");
+    parent.innerHTML = "";
+    for (let [k,v] of globalFilters) {
+      const link = document.createElement("a");
+      link.className = "tabs__button";
+      link.dataset.value = k;
+      if (v) link.classList.add("tabs__button_active");
+      link.href = "?filter=" + k;
+      link.onclick = selectFilter;
+      link.innerHTML = k[0].toUpperCase() + k.slice(1);
+      parent.append(link);
+    }
+  }
+
+  const makeRoundRow = (round, num) => {
+    const tr = document.createElement("tr");
+    tr.className = "table__tr";
+    tr.classList.add(((num + 1) % 2) ? "table__tr--odd" : "table__tr--even");
+
+    const td1 = document.createElement("td");
+    td1.className = "table__td table__td--centered";
+    td1.innerHTML = num + 1;
+    tr.append(td1);
+
+    const td2 = document.createElement("td");
+    td2.className = "table__td";
+    td2.innerHTML = `<a href="${ round.view_url }">${ round.quiz.topic }</a>`;
+    tr.append(td2);
+
+    const td3 = document.createElement("td");
+    td3.className = "table__td table__td--centered";
+    td3.innerHTML = round.quiz.author;
+    tr.append(td3);
+
+    const td4 = document.createElement("td");
+    td4.className = "table__td table__td--centered";
+    const relTimeSpan = document.createElement("span");
+    relTimeSpan.dataset.timestamp = round.finish_time;
+    relTimeSpan.dataset.func = "fromNow";
+    relTimeSpan.dataset.refresh = 10000;
+    renderMomentDate(relTimeSpan); // adds innerHTML to element
+    td4.append(relTimeSpan);
+    tr.append(td4);
+
+    const td5 = document.createElement("td");
+    td5.className = "table__td table__td--centered";
+    td5.innerHTML = (round.is_taken) ? "yes" : "no";
+    tr.append(td5);
+
+    const td6 = document.createElement("td");
+    td6.className = "table__td table__td--centered";
+    if (hasEditPermissions) td6.innerHTML = `<a href="${round.edit_url}">✎</a>`;
+    tr.append(td6);
+
+    return tr;
+  }
+
+  const renderRows = () => {
+    // apply current filter
+    const activeFilter = globalFilters.reduce((acc, [k,v]) => v ? k : acc, "all");
+    const rows = (activeFilter === "all")
+      ? globalRounds
+      : globalRounds.filter(r => r.status === activeFilter);
+
+    // sort selected rows
+    if (activeFilter === "finished" || activeFilter === "all") {
+      rows.sort((a,b) => (a.finish_time > b.finish_time) ? -1 : 1);
+    } else {
+      rows.sort((a,b) => (a.finish_time > b.finish_time) ? 1 : -1);
+    }
+
+    // re-render
+    const node = document.getElementById("roundRows");
+    node.innerHTML = "";
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      tr.className = "table__tr table__tr--odd";
+      tr.innerHTML = '<td class="table__td" colspan="6">No rounds available.</td>';
+      node.append(tr);
+    } else {
+      rows.forEach((r,i) => {
+        node.append(makeRoundRow(r,i));
+      })
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderFilters();
+    renderRows();
+  });
+
+</script>
 {% endblock %}
