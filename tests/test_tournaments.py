@@ -66,9 +66,9 @@ def test_index(client, auth):
     check_permissions(client, auth, '/groups/1/tournaments/')
 
     tournament_name = TOURNAMENTS["tournament1"]["name"].encode()
-    view_link = b'href="/groups/1/tournaments/1/"'
-    create_link = b'href="/groups/1/tournaments/0/edit"'
-    update_link = b'href="/groups/1/tournaments/1/edit"'
+    view_link = b'/groups/1/tournaments/1/'
+    create_link = b'/groups/1/tournaments/0/edit'
+    update_link = b'/groups/1/tournaments/1/edit'
 
     # alice is not group admin:
     auth.login_as("alice")
@@ -77,7 +77,7 @@ def test_index(client, auth):
     assert tournament_name in response.data
     assert view_link in response.data
     assert create_link not in response.data
-    assert update_link not in response.data
+    assert update_link in response.data # it is in <script> data
 
     # bob is group admin
     auth.login_as("bob")
@@ -150,10 +150,9 @@ def test_show_tournament(app, client, auth):
     check_permissions(client, auth, '/groups/1/tournaments/1/')
 
     LINKS = {
-        "edit": b'href="/groups/1/tournaments/1/edit"',
-        "add_round": b'href="/groups/1/tournaments/1/rounds/0/edit"',
-        "view_round": b'href="/groups/1/rounds/1/"',
-        "edit_round": b'href="/groups/1/tournaments/1/rounds/1/edit"'
+        "add_round": b'/groups/1/tournaments/1/rounds/0/edit',
+        "view_round": b'/groups/1/rounds/1/',
+        "edit_round": b'/groups/1/tournaments/1/rounds/1/edit'
     }
     def check_links(items, response_data):
         for link_name, presence in items:
@@ -166,19 +165,19 @@ def test_show_tournament(app, client, auth):
     auth.login_as("alice")
     response = client.get('/groups/1/tournaments/1/')
     assert response.status_code == 200
-    check_links([("edit", False), ("add_round", False), ("view_round", False)], response.data)
+    check_links([("add_round", False), ("view_round", False)], response.data)
 
     # bob is group admin:
     auth.login_as("bob")
     response = client.get('/groups/1/tournaments/1/')
     assert response.status_code == 200
-    check_links([("edit", False), ("add_round", True), ("view_round", False)], response.data)
+    check_links([("add_round", True), ("view_round", False)], response.data)
 
     # tournament rounds should be listed once they're added:
     _finalize_first_quiz(app)
     client.post("/groups/1/tournaments/1/rounds/0/edit", data=ROUND_REQUEST_PAYLOAD)
     response = client.get('/groups/1/tournaments/1/')
-    check_links([("edit", False), ("add_round", True), ("view_round", True), ("edit_round", True)],
+    check_links([("add_round", True), ("view_round", True), ("edit_round", True)],
         response.data)
 
 

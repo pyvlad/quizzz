@@ -25,7 +25,7 @@
   {% endif %}
 
   <h3 class="heading heading_secondary">Tournaments</h3>
-  <div class="tabs" id="roundFilters"></div>
+  <div class="tabs" id="filterTabs"></div>
   <table class="table table--full-width my-3">
     <thead>
       <tr>
@@ -36,68 +36,16 @@
         <th width="10%">Actions</th>
       </tr>
     </thead>
-    <tbody id="tournamentRows">
-      <!-- {% for tournament in data.tournaments %} -->
-        <!-- <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}">
-          <td class="table__td table__td--centered">{{ loop.index }}</td>
-          <td class="table__td">
-            <a href="{{ url_for('tournaments.show_tournament', tournament_id=tournament.id) }}">
-              {{ tournament.name }}
-            </a>
-          </td>
-          <td class="table__td table__td--centered">{{ (tournament.is_active and "yes") or "" }}</td>
-          <td class="table__td table__td--centered">{{ tournament.time_created }}</td>
-          <td class="table__td table__td--centered">
-            {% if data.has_edit_permissions %}
-            <a href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}">
-              Edit
-            </a>
-            {% endif %}
-          </td>
-        </tr>
-      {% else %}
-        <tr class="table__tr table__tr--odd">
-          <td class="table__td" colspan="5">Nothing to see here.</td>
-        </tr> -->
-      <!-- {% endfor %} -->
-    </tbody>
+    <tbody id="tableRows"></tbody>
   </table>
 {% endblock %}
 
 
-
-
 {% block bottom %}
 <script>
-  let globalFilters = {{ data.filters|tojson }};
+  let filters = {{ data.filters|tojson }};
   let globalTournaments = {{ data.tournaments|tojson }};
   let hasEditPermissions = {{ data.has_edit_permissions|tojson }};
-
-  const selectFilter = function(e) {
-    e.preventDefault();
-    console.log(e);
-    console.log(this);
-    globalFilters = globalFilters.map(([k,v]) => {
-      return (k === this.dataset.value) ? [k,true] : [k,false];
-    });
-    renderFilters();
-    renderRows();
-  }
-
-  const renderFilters = () => {
-    const parent = document.getElementById("roundFilters");
-    parent.innerHTML = "";
-    for (let [k,v] of globalFilters) {
-      const link = document.createElement("a");
-      link.className = "tabs__button";
-      link.dataset.value = k;
-      if (v) link.classList.add("tabs__button_active");
-      link.href = "?filter=" + k;
-      link.onclick = selectFilter;
-      link.innerHTML = k[0].toUpperCase() + k.slice(1);
-      parent.append(link);
-    }
-  }
 
   const makeRow = (rowData, num) => {
     const tr = document.createElement("tr");
@@ -137,9 +85,8 @@
     return tr;
   }
 
-  const renderRows = () => {
+  const renderRows = (activeFilter) => {
     // apply current filter
-    const activeFilter = globalFilters.reduce((acc, [k,v]) => v ? k : acc, "all");
     let rows = globalTournaments;
     if (activeFilter === "active") rows = globalTournaments.filter(r => r.is_active)
     else if (activeFilter === "inactive") rows = globalTournaments.filter(r => !r.is_active);
@@ -152,7 +99,7 @@
     });
 
     // re-render
-    const node = document.getElementById("tournamentRows");
+    const node = document.getElementById("tableRows");
     node.innerHTML = "";
     if (!rows.length) {
       const tr = document.createElement("tr");
@@ -167,8 +114,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    renderFilters();
-    renderRows();
+    addFilters(filters, "filterTabs", renderRows);
   });
 
 </script>
