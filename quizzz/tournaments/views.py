@@ -19,16 +19,8 @@ from .queries import (
 )
 from .forms import make_play_round_form
 
-
-TOURNAMENT_FILTER_FUNCTIONS = {
-    "active": lambda x: x.is_active,
-    "inactive": lambda x: not x.is_active,
-    "all": lambda x: x
-}
-
-
+TOURNAMENT_FILTERS = ["active", "inactive", "all"]
 ROUND_FILTERS = ["current", "finished", "coming", "all"]
-
 
 
 @bp.route('/tournaments/')
@@ -37,7 +29,8 @@ def index():
     Get list of group tournaments.
     """
     filter_arg = request.args.get("filter", "active")
-    filter_func = TOURNAMENT_FILTER_FUNCTIONS[filter_arg]
+    if filter_arg not in TOURNAMENT_FILTERS:
+        abort(400)
 
     group_tournaments = g.group.tournaments
 
@@ -48,11 +41,13 @@ def index():
                 "name": tournament.name,
                 "is_active": tournament.is_active,
                 "time_created": tournament.time_created,
+                "view_url": url_for('tournaments.show_tournament', tournament_id=tournament.id),
+                "edit_url": url_for('tournaments.edit_tournament', tournament_id=tournament.id),
             }
-            for tournament in group_tournaments if filter_func(tournament)
+            for tournament in group_tournaments
         ],
         "has_edit_permissions": g.group_membership.is_admin,
-        "filters": {filtr: (filter_arg == filtr) for filtr in TOURNAMENT_FILTER_FUNCTIONS}
+        "filters": [(filtr, (filter_arg == filtr)) for filtr in TOURNAMENT_FILTERS]
     }
 
     return render_template('tournaments/index.html', data=data)

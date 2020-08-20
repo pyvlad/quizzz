@@ -24,15 +24,8 @@
     </div>
   {% endif %}
 
-  <div class="tabs">
-    {% for filter, is_active in data.filters.items() %}
-      <a class="tabs__button {{ (is_active and 'tabs__button_active') or '' }}"
-         href="?filter={{ filter }}">
-        {{ filter|capitalize }}
-      </a>
-    {% endfor %}
-  </div>
-
+  <h3 class="heading heading_secondary">Tournaments</h3>
+  <div class="tabs" id="roundFilters"></div>
   <table class="table table--full-width my-3">
     <thead>
       <tr>
@@ -43,9 +36,9 @@
         <th width="10%">Actions</th>
       </tr>
     </thead>
-    <tbody>
-      {% for tournament in data.tournaments %}
-        <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}">
+    <tbody id="tournamentRows">
+      <!-- {% for tournament in data.tournaments %} -->
+        <!-- <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}">
           <td class="table__td table__td--centered">{{ loop.index }}</td>
           <td class="table__td">
             <a href="{{ url_for('tournaments.show_tournament', tournament_id=tournament.id) }}">
@@ -65,8 +58,118 @@
       {% else %}
         <tr class="table__tr table__tr--odd">
           <td class="table__td" colspan="5">Nothing to see here.</td>
-        </tr>
-      {% endfor %}
+        </tr> -->
+      <!-- {% endfor %} -->
     </tbody>
   </table>
+{% endblock %}
+
+
+
+
+{% block bottom %}
+<script>
+  let globalFilters = {{ data.filters|tojson }};
+  let globalTournaments = {{ data.tournaments|tojson }};
+  let hasEditPermissions = {{ data.has_edit_permissions|tojson }};
+
+  const selectFilter = function(e) {
+    e.preventDefault();
+    console.log(e);
+    console.log(this);
+    globalFilters = globalFilters.map(([k,v]) => {
+      return (k === this.dataset.value) ? [k,true] : [k,false];
+    });
+    renderFilters();
+    renderRows();
+  }
+
+  const renderFilters = () => {
+    const parent = document.getElementById("roundFilters");
+    parent.innerHTML = "";
+    for (let [k,v] of globalFilters) {
+      const link = document.createElement("a");
+      link.className = "tabs__button";
+      link.dataset.value = k;
+      if (v) link.classList.add("tabs__button_active");
+      link.href = "?filter=" + k;
+      link.onclick = selectFilter;
+      link.innerHTML = k[0].toUpperCase() + k.slice(1);
+      parent.append(link);
+    }
+  }
+
+  const makeRow = (rowData, num) => {
+    const tr = document.createElement("tr");
+    tr.className = "table__tr";
+    tr.classList.add(((num + 1) % 2) ? "table__tr--odd" : "table__tr--even");
+
+    const td1 = document.createElement("td");
+    td1.className = "table__td table__td--centered";
+    td1.innerHTML = num + 1;
+    tr.append(td1);
+
+    const td2 = document.createElement("td");
+    td2.className = "table__td";
+    td2.innerHTML = `<a href="${ rowData.view_url }">${ rowData.name }</a>`;
+    tr.append(td2);
+
+    const td3 = document.createElement("td");
+    td3.className = "table__td table__td--centered";
+    td3.innerHTML = (rowData.is_active) ? "yes" : "no";
+    tr.append(td3);
+
+    const td4 = document.createElement("td");
+    td4.className = "table__td table__td--centered";
+    const relTimeSpan = document.createElement("span");
+    relTimeSpan.dataset.timestamp = rowData.time_created;
+    relTimeSpan.dataset.func = "fromNow";
+    relTimeSpan.dataset.refresh = 60000;
+    renderMomentDate(relTimeSpan); // adds innerHTML to element
+    td4.append(relTimeSpan);
+    tr.append(td4);
+
+    const td5 = document.createElement("td");
+    td5.className = "table__td table__td--centered";
+    if (hasEditPermissions) td5.innerHTML = `<a href="${rowData.edit_url}">✎</a>`;
+    tr.append(td5);
+
+    return tr;
+  }
+
+  const renderRows = () => {
+    // apply current filter
+    const activeFilter = globalFilters.reduce((acc, [k,v]) => v ? k : acc, "all");
+    let rows = globalTournaments;
+    if (activeFilter === "active") rows = globalTournaments.filter(r => r.is_active)
+    else if (activeFilter === "inactive") rows = globalTournaments.filter(r => !r.is_active);
+
+    // sort selected rows
+    rows.sort((a,b) => {
+      if (a.is_active && !b.is_active) return -1;
+      if (!a.is_active && b.is_active) return 1;
+      if (a.time_created > b.time_created) return -1;
+    });
+
+    // re-render
+    const node = document.getElementById("tournamentRows");
+    node.innerHTML = "";
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      tr.className = "table__tr table__tr--odd";
+      tr.innerHTML = '<td class="table__td" colspan="5">No tournaments available.</td>';
+      node.append(tr);
+    } else {
+      rows.forEach((r,i) => {
+        node.append(makeRow(r,i));
+      })
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderFilters();
+    renderRows();
+  });
+
+</script>
 {% endblock %}
