@@ -1,32 +1,59 @@
-from flask import g, render_template
+from flask import g, render_template, current_app
 
 from . import bp
+from quizzz.auth.models import User
+from quizzz.groups.models import Member
 from quizzz.quizzes.queries import get_user_group_quizzes
-from quizzz.chat.queries import get_recent_chat_messages
+from quizzz.chat.queries import get_paginated_chat_messages
+from quizzz.auth import login_required
+
 
 
 @bp.route('/')
 def show_group_page():
-    group_tournaments = g.group.tournaments
-    current_tournaments = [
-        { "id": tournament.id, "name": tournament.name }
-        for tournament in group_tournaments if tournament.is_active
-    ]
-
+    num_current_tournaments = len([t for t in g.group.tournaments if t.is_active])
     num_user_quizzes_in_progress = get_user_group_quizzes(which="in-progress", return_count=True)
     num_user_quizzes_finalized = get_user_group_quizzes(which="finalized", return_count=True)
-
-    chat_messages = get_recent_chat_messages(limit=5)
+    chat_data = get_paginated_chat_messages(
+        1, current_app.config["CHAT_MESSAGES_PER_PAGE"], round_id=None)
+    num_members = len(g.group.members)
 
     data = {
         "group": {
             "id": g.group.id,
             "name": g.group.name
         },
-        "current_tournaments": current_tournaments,
+        "num_current_tournaments": num_current_tournaments,
         "num_user_quizzes_in_progress": num_user_quizzes_in_progress,
         "num_user_quizzes_finalized": num_user_quizzes_finalized,
-        "chat_messages": chat_messages
+        "num_chat_messages": chat_data["pagination"]["total_items"],
+        "last_message": (chat_data["messages"][0]
+            if chat_data["messages"] else None),
+        "num_members": num_members
     }
 
     return render_template('group/group_page.html', data=data)
+
+
+
+@bp.route('/members')
+@login_required
+def show_members():
+    members = g.db.query(Member, User.name, User.time_created)\
+        .join(User, Member.user_id == User.id)\
+        .filter(Member.group_id == g.group.id)\
+        .order_by(User.name.asc())\
+        .all()
+
+    data = {
+        "members": [
+            {
+                "user_id": m.id,
+                "name": username,
+                "time_created": time_created,
+                "is_admin": m.is_admin
+            } for m, username, time_created in members
+        ]
+    }
+
+    return render_template('group/members.html', data=data)
