@@ -1,11 +1,8 @@
-from flask import g, render_template, current_app, url_for
+from flask import g, render_template, current_app
 
 from . import bp
-from quizzz.auth.models import User
-from quizzz.groups.models import Member
 from quizzz.quizzes.queries import get_user_group_quizzes
 from quizzz.chat.queries import get_paginated_chat_messages
-from quizzz.auth import login_required
 
 
 
@@ -33,29 +30,3 @@ def show_group_page():
     }
 
     return render_template('group/group_page.html', data=data)
-
-
-
-@bp.route('/members')
-@login_required
-def show_members():
-    members = g.db.query(Member, User.name, User.time_created)\
-        .join(User, Member.user_id == User.id)\
-        .filter(Member.group_id == g.group.id)\
-        .order_by(User.name.asc())\
-        .all()
-
-    data = {
-        "members": [
-            {
-                "user_id": m.id,
-                "name": username,
-                "time_created": time_created,
-                "is_admin": m.is_admin,
-                "edit_url": url_for("groups.remove_member", user_id=m.user_id),
-            } for m, username, time_created in members
-        ],
-        "is_admin": g.group_membership and g.group_membership.is_admin
-    }
-
-    return render_template('group/members.html', data=data)

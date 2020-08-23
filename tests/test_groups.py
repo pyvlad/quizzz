@@ -8,7 +8,7 @@ from .data import GROUPS, MEMBERSHIPS, USERS
 
 def test_user_groups(client, auth):
     """
-    Test the <show_user_groups> view:
+    Test the <index> view:
     a. it should not be available to anonymous users;
     b. it should list only groups and group links that belong to current user;
     c. there should be a form to join new groups;
@@ -32,7 +32,7 @@ def test_user_groups(client, auth):
     for group_name in other_group_names:
         assert group_name.encode() not in response.data
 
-    assert b"/groups/join_group/" in response.data
+    assert b"/groups/join" in response.data
 
 
 
@@ -44,17 +44,17 @@ def test_join_group(app, client, auth):
     c. friendly messages are shown on joining joined group or on invalid invitation code;
     d. joining another group works;
     """
-    response = client.post('/groups/join_group/')
+    response = client.post('/groups/join')
     assert response.status_code == 401
 
     auth.login_as("bob")
-    response = client.post('/groups/join_group/', data={})
+    response = client.post('/groups/join', data={})
     assert response.status_code == 302
     assert b'Invalid form submitted.' in client.get(response.headers["LOCATION"]).data
 
     initial_user_groups = [m["group_id"] for m in MEMBERSHIPS if m["user_id"] == USERS["bob"]["id"]]
 
-    response = client.post('/groups/join_group/',
+    response = client.post('/groups/join',
         data={"invitation_code": GROUPS["group2"]["invitation_code"]}, follow_redirects=True)
     assert b"Joined!" in response.data
     with app.app_context():
@@ -63,11 +63,11 @@ def test_join_group(app, client, auth):
         new_user_groups = db.query(Member.group_id).filter(Member.user_id == USERS["bob"]["id"]).all()
         assert len(new_user_groups) == len(initial_user_groups) + 1
 
-    response = client.post('/groups/join_group/',
+    response = client.post('/groups/join',
         data={"invitation_code": GROUPS["group1"]["invitation_code"]}, follow_redirects=True)
     assert b"You are already a member of this group!" in response.data
 
-    response = client.post('/groups/join_group/',
+    response = client.post('/groups/join',
         data={"invitation_code": "some wrong code"}, follow_redirects=True)
     assert b"Invalid invitation code!" in response.data
 

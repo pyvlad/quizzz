@@ -8,7 +8,7 @@
 {% block header %}
   {{
     render_header([
-      ("Groups", url_for("groups.show_user_groups")),
+      ("Groups", url_for("groups.index")),
       (g.group.name, url_for("group.show_group_page")),
       ("My Quizzes", url_for("quizzes.index")),
       ((data.quiz_id and "Edit Quiz") or "New Quiz", "")

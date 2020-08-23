@@ -6,7 +6,7 @@
 {% block header %}
   {{
     render_header([
-      ("Groups", url_for("groups.show_user_groups")),
+      ("Groups", url_for("groups.index")),
       (data.group.name, ""),
     ])
   }}
@@ -51,7 +51,7 @@
                 {% endif %}
               </p>
               <h3 class="heading heading_secondary">
-                <a href="{{ url_for('group.show_members') }}">Members</a>
+                <a href="{{ url_for('groups.list_members') }}">Members</a>
               </h3>
               <p>The group contains <strong>{{ data.num_members }}</strong> members.</p>
             </div>

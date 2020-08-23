@@ -5,7 +5,7 @@
 {% block header %}
   {{
     render_header([
-      ("Groups", url_for("groups.show_user_groups")),
+      ("Groups", url_for("groups.index")),
       (g.group.name, url_for("group.show_group_page")),
       ("Tournaments", url_for("tournaments.index")),
       (data.tournament.name, "")

@@ -8,7 +8,8 @@ What do I want instead?
 2. When <url_for> is used, all endpoints that expect <group_id>
     should receive it automatically from g.group_id.
 """
-from flask import g
+from flask import g, request, abort
+from quizzz.groups.models import Group, Member
 
 
 def init_app(app):
@@ -37,6 +38,37 @@ def init_app(app):
             return
         if app.url_map.is_endpoint_expecting(endpoint, 'group_id'):
             values['group_id'] = g.group_id
+
+
+    @app.before_request
+    def load_group_and_membership():
+        """
+        Load group and membership from DB if 'group_id' is in g.
+        """
+        # TODO delete this in production
+        if '/static/' in request.path:
+            return
+
+        if "group_id" in g:
+            # TODO: currently <group_id> in URL requires login and group membership
+            # do I want to keep it this way?
+            if g.user is None:
+                abort(401, "You are not logged in.")
+
+            result = g.db.query(Group, Member)\
+                .join(Member, Group.id == Member.group_id)\
+                .filter(Member.user_id == g.user.id)\
+                .filter(Group.id == g.group_id)\
+                .first()
+
+            if result is None:
+                abort(403, "You are not a member of this group.")
+            else:
+                g.group, g.group_membership = result
+
+        else:
+            g.group = None
+            g.group_membership = None
 
 
     return app

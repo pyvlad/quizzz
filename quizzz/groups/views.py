@@ -15,7 +15,12 @@ from .forms import InvitationCodeForm
 
 @bp.route('/')
 @login_required
-def show_user_groups():
+def index():
+    """
+    Index page for group management.
+    Shows list of groups that a user is a member of.
+    Provides a form to join new groups.
+    """
     user_groups = g.db.query(Member, Group)\
         .filter(Member.user_id == g.user.id)\
         .filter(Member.group_id == Group.id)\
@@ -34,16 +39,19 @@ def show_user_groups():
     form = InvitationCodeForm()
     leave_form = EmptyForm()
 
-    return render_template('groups/user_groups.html', form=form, leave_form=leave_form, data=data)
+    return render_template('groups/index.html', form=form, leave_form=leave_form, data=data)
 
-# TODOS:
-# 1. add 'leave' button
-# 2. add 'remove' button with 'with_results'/"without results"
-# 3. add 'ban' button - "remove" and add to list of "banned users"
 
-@bp.route('/join_group/', methods=("POST",))
+
+# ----- MEMBERSHIP MANAGEMENT -----
+# a. JOIN/LEAVE
+@bp.route('/join', methods=("POST",))
 @login_required
 def join():
+    """
+    Join an existing group by a known invitation code.
+    Creates a new basic membership.
+    """
     form = InvitationCodeForm()
 
     if form.validate():
@@ -64,72 +72,93 @@ def join():
     else:
         flash("Invalid form submitted.", Flashing.ERROR)
 
-    return redirect(url_for('groups.show_user_groups'))
+    return redirect(url_for('groups.index'))
 
 
 
 @bp.route('/<int:group_id>/leave', methods=('POST',))
-@login_required
 def leave():
+    """
+    Leave a group you are a member of.
+    Deletes existing membership.
+    """
     form = EmptyForm()
-    group_id = g.group_id   # see url_preprocessors for whole app
 
     if form.validate():
-        result = g.db.query(Group, Member)\
-            .join(Member, Group.id == Member.group_id)\
-            .filter(Member.user_id == g.user.id)\
-            .filter(Group.id == group_id)\
-            .first()
-
-        if result is None:
-            abort(403, "You are not a member of this group.")
-
-        group, membership = result
-        if membership is None:
-            abort(403, "You are not a member of this group.")
-
-        if membership.is_admin:
+        # g.group and g.group_membership are handled in url_processors
+        if g.group_membership.is_admin:
             abort(403, "You are an admin, you cannot leave!")
 
-        g.db.delete(membership) # TODO: mark as deleted instead
+        g.db.delete(g.group_membership) # TODO: mark as deleted instead
         g.db.commit()
         flash("You have left that group.", Flashing.SUCCESS)
     else:
         flash("Invalid form submitted.", Flashing.ERROR)
 
-    return redirect(url_for('groups.show_user_groups'))
+    return redirect(url_for('groups.index'))
 
 
 
-@bp.route('/<int:group_id>/edit_member/<int:user_id>', methods=('GET', 'POST'))
-@login_required
-def remove_member(user_id):
+# b. LIST MEMBERS
+@bp.route('/<int:group_id>/members/')
+def list_members():
+    members = g.db.query(Member, User.name, User.time_created)\
+        .join(User, Member.user_id == User.id)\
+        .filter(Member.group_id == g.group.id)\
+        .order_by(User.name.asc())\
+        .all()
+
+    data = {
+        "members": [
+            {
+                "user_id": m.id,
+                "name": username,
+                "time_created": time_created,
+                "is_admin": m.is_admin,
+                "edit_url": url_for("groups.edit_member", user_id=m.user_id),
+            } for m, username, time_created in members
+        ],
+        "is_admin": g.group_membership and g.group_membership.is_admin
+    }
+
+    return render_template('groups/members.html', data=data)
+
+
+
+# c. EDIT MEMBER (FOR GROUP ADMINS)
+@bp.route('/<int:group_id>/members/<int:user_id>/edit', methods=('GET', 'POST'))
+def edit_member(user_id):
+    """
+    Modify user membership parameters:
+    - delete user membership;
+    - ban user from entering group (TODO);
+    - delete user results (TODO);
+    - give user admin rights (TODO);
+    """
     check_user_permissions(USER.IS_GROUP_ADMIN)
-
-    group_id = g.group_id   # see url_preprocessors for whole app
 
     result = g.db.query(User, Member)\
         .join(Member, User.id == Member.user_id)\
         .filter(User.id == user_id)\
-        .filter(Member.group_id == group_id)\
+        .filter(Member.group_id == g.group_id)\
         .first()
 
     if result is None:
         abort(400, "No such user.")
-
     user, membership = result
     if not membership:
         abort(400, "User is not a member of this group.")
-    if membership.is_admin:
-        abort(403, "You cannot remove an admin!")
 
     form = EmptyForm()
     if request.method == 'POST':
         if form.validate():
+            if membership.is_admin:
+                abort(403, "Group admin cannot be removed!")
+
             g.db.delete(membership)
             g.db.commit()
             flash("User %s has been removed." % user.name, Flashing.SUCCESS)
-            return redirect(url_for('group.show_members'))
+            return redirect(url_for('groups.list_members'))
         else:
             flash("Invalid form submitted.", Flashing.ERROR)
 
@@ -137,4 +166,4 @@ def remove_member(user_id):
         "username": user.name
     }
 
-    return render_template('groups/remove_member.html', form=form, data=data)
+    return render_template('groups/edit_member.html', form=form, data=data)
