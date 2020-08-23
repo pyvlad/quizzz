@@ -1,4 +1,4 @@
-from flask import g, render_template, current_app
+from flask import g, render_template, current_app, url_for
 
 from . import bp
 from quizzz.auth.models import User
@@ -51,9 +51,11 @@ def show_members():
                 "user_id": m.id,
                 "name": username,
                 "time_created": time_created,
-                "is_admin": m.is_admin
+                "is_admin": m.is_admin,
+                "edit_url": url_for("groups.remove_member", user_id=m.user_id),
             } for m, username, time_created in members
-        ]
+        ],
+        "is_admin": g.group_membership and g.group_membership.is_admin
     }
 
     return render_template('group/members.html', data=data)

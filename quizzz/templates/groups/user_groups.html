@@ -22,6 +22,16 @@
                   {{ group.name }}
                 </div>
               </a>
+              <div class="list__extras">
+                <form action="{{ url_for('groups.leave', group_id=group.id) }}" method="post">
+                  {{ leave_form.hidden_tag() }}
+                  <input
+                    type="submit"
+                    value="Leave"
+                    onclick="return confirm('Are you sure?');"
+                  />
+                </form>
+              </div>
             </li>
           {% else %}
             <p>You are not a member of any group yet.</p>

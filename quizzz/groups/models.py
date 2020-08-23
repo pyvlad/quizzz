@@ -9,8 +9,9 @@ class Group(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
 
-    created = sa.Column(sa.DateTime, server_default=func.now())
     name = sa.Column(sa.String(100), nullable=False, unique=True)
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
     confirmation_needed = sa.Column(sa.Boolean, default=False)
 
@@ -30,6 +31,9 @@ class Member(Base):
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
+    is_deleted = sa.Column(sa.Boolean, default=False)
     is_admin = sa.Column(sa.Boolean, default=False)
 
     user = relationship("User", back_populates="memberships")

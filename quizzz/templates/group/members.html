@@ -20,10 +20,11 @@
     <thead>
       <tr>
         <th width="5%">#</th>
-        <th width="45%">Name</th>
+        <th width="40%">Name</th>
         <th width="10%">ID</th>
         <th width="25%">Account Created</th>
-        <th width="15%">Status</th>
+        <th width="10%">Status</th>
+        <th width="10%">Actions</th>
       </tr>
     </thead>
     <tbody id="tableRows"></tbody>
@@ -34,6 +35,7 @@
 {% block bottom %}
 <script>
   let globalMembers = {{ data.members|tojson }};
+  let isAdmin = {{ data.is_admin|tojson }}
 
   const makeRow = (rowData, num) => {
     const tr = document.createElement("tr");
@@ -69,6 +71,11 @@
     td5.className = "table__td table__td--centered";
     td5.innerHTML = rowData.is_admin ? "admin" : "";
     tr.append(td5);
+
+    const td6 = document.createElement("td");
+    td6.className = "table__td table__td--centered";
+    if (isAdmin) td6.innerHTML = `<a href="${rowData.edit_url}">✎</a>`;
+    tr.append(td6);
 
     return tr;
   }
