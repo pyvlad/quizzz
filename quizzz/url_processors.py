@@ -55,20 +55,20 @@ def init_app(app):
             if g.user is None:
                 abort(401, "You are not logged in.")
 
-            result = g.db.query(Group, Member)\
-                .join(Member, Group.id == Member.group_id)\
-                .filter(Member.user_id == g.user.id)\
-                .filter(Group.id == g.group_id)\
-                .first()
-
-            if result is None:
-                abort(403, "You are not a member of this group.")
+            if g.group_id == 0:
+                g.group, g.group_membership = (None, None)
             else:
-                g.group, g.group_membership = result
+                result = g.db.query(Group, Member)\
+                    .join(Member, Group.id == Member.group_id)\
+                    .filter(Member.user_id == g.user.id)\
+                    .filter(Group.id == g.group_id)\
+                    .first()
+                if result is None:
+                    abort(403, "You are not a member of this group.")
+                else:
+                    g.group, g.group_membership = result
 
         else:
-            g.group = None
-            g.group_membership = None
-
+            g.group, g.group_membership = (None, None)
 
     return app

@@ -1,3 +1,5 @@
+import traceback
+
 from sqlalchemy.orm import selectinload
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
@@ -9,7 +11,7 @@ from quizzz.permissions import USER, check_user_permissions
 
 from . import bp
 from .models import Group, Member
-from .forms import InvitationCodeForm
+from .forms import InvitationCodeForm, GroupForm
 
 
 
@@ -33,13 +35,84 @@ def index():
                 "name": group.name,
                 "is_admin": m.is_admin
             } for m, group in user_groups
-        ]
+        ],
+        "has_edit_permissions": g.user.can_create_groups,
     }
 
     form = InvitationCodeForm()
     leave_form = EmptyForm()
 
     return render_template('groups/index.html', form=form, leave_form=leave_form, data=data)
+
+
+# ----- CREATE/EDIT -----
+@bp.route('/<int:group_id>/edit', methods=("GET", "POST"))
+def edit():
+    """
+    Edit group.
+    """
+    if g.group_id == 0:
+        if not g.user.can_create_groups:
+            abort(403, "You cannot create groups.")
+    else:
+        check_user_permissions(USER.IS_GROUP_ADMIN)
+
+    group = (Group() if not g.group_id else g.group)
+    membership = (Member(user=g.user, group=group, is_admin=True)
+        if not g.group_membership else g.group_membership)
+
+    if request.method == 'POST':
+        form = GroupForm()
+        group.populate_from_wtform(form)
+
+        try:
+            g.db.add(group)
+            g.db.add(membership)
+            g.db.commit()
+        except:
+            traceback.print_exc()
+            g.db.rollback()
+            flash("Group could not be created!", Flashing.ERROR)
+        else:
+            flash("Group successfully created/updated.", Flashing.SUCCESS)
+            return redirect(url_for('groups.index'))
+
+    else:
+        form = GroupForm(
+            name=group.name,
+            invitation_code=group.invitation_code,
+            confirmation_needed=group.confirmation_needed,
+        )
+
+    data = {
+        "group": {
+            "id": group.id,
+            "name": group.name
+        }
+    }
+
+    delete_form = EmptyForm()
+
+    return render_template('groups/edit.html', form=form, delete_form=delete_form, data=data)
+
+
+@bp.route('/<int:group_id>/delete', methods=('POST',))
+def delete():
+    """
+    Delete group.
+    """
+    check_user_permissions(USER.IS_GROUP_ADMIN)
+
+    form = EmptyForm()
+
+    if form.validate():
+        g.db.delete(g.group)
+        g.db.commit()
+        flash("Group has been deleted.", Flashing.SUCCESS)
+    else:
+        flash("Invalid form submitted.", Flashing.ERROR)
+
+    return redirect(url_for('groups.index'))
 
 
 

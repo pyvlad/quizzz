@@ -23,6 +23,7 @@ class User(Base):
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     is_deleted = sa.Column(sa.Boolean, default=False)
     is_confirmed = sa.Column(sa.Boolean, default=False)
+    can_create_groups = sa.Column(sa.Boolean, default=False)
 
     memberships = relationship("Member", back_populates="user")
     messages = relationship("Message", back_populates="user")

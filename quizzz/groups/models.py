@@ -15,13 +15,20 @@ class Group(Base):
     invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
     confirmation_needed = sa.Column(sa.Boolean, default=False)
 
-    members = relationship("Member", back_populates="group")
-    messages = relationship("Message", back_populates="group")
-    quizzes = relationship("Quiz", back_populates="group")
-    tournaments = relationship("Tournament", back_populates="group", order_by="Tournament.time_created.desc()")
+    members = relationship("Member", back_populates="group", cascade="all, delete, delete-orphan")
+    messages = relationship("Message", back_populates="group", cascade="all, delete, delete-orphan")
+    quizzes = relationship("Quiz", back_populates="group", cascade="all, delete, delete-orphan")
+    tournaments = relationship("Tournament", back_populates="group",
+        order_by="Tournament.time_created.desc()", cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return "<Group %r>" % self.name
+
+    def populate_from_wtform(self, form):
+        self.name = form.name.data
+        self.invitation_code = form.invitation_code.data
+        self.confirmation_needed = bool(form.confirmation_needed.data)
+        return self
 
 
 class Member(Base):

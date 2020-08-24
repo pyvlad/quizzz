@@ -9,6 +9,15 @@
 {% block content %}
   <h2 class="heading heading_primary">Your Groups</h2>
 
+  {% if data.has_edit_permissions %}
+    <div class="admin-actions">
+      <a class="admin-actions__item button button_action"
+         href="{{ url_for('groups.edit', group_id=0) }}">
+        Create New Group
+      </a>
+    </div>
+  {% endif %}
+
   <div class="container">
     <div class="row">
       <div class="col-12 col-sm-6">
@@ -23,6 +32,9 @@
                 </div>
               </a>
               <div class="list__extras">
+                {% if group.is_admin %}
+                  <a href="{{ url_for('groups.edit', group_id=group.id) }}">Edit</a>
+                {% else %}
                 <form action="{{ url_for('groups.leave', group_id=group.id) }}" method="post">
                   {{ leave_form.hidden_tag() }}
                   <input
@@ -31,6 +43,7 @@
                     onclick="return confirm('Are you sure?');"
                   />
                 </form>
+                {% endif %}
               </div>
             </li>
           {% else %}
