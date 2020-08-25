@@ -8,7 +8,11 @@ from quizzz.forms import EmptyForm
 
 from . import bp
 from .models import Tournament, Round
-from .queries import get_tournament_by_id, get_quiz_pool, get_round_by_id
+from .queries import (
+    get_tournament_by_id,
+    get_round_by_id,
+    get_quiz_pool
+)
 from .forms import TournamentForm, RoundForm
 
 
@@ -35,7 +39,7 @@ def edit_tournament(tournament_id):
             flash("Tournament could not be created!", Flashing.ERROR)
         else:
             flash("Tournament successfully created/updated.", Flashing.SUCCESS)
-            return redirect(url_for('tournaments.index', filter="all"))
+            return redirect(url_for('tournaments.index'))
 
     else:
         form = TournamentForm(
@@ -74,7 +78,7 @@ def delete_tournament(tournament_id):
     else:
         flash("Invalid form submitted.", Flashing.ERROR)
 
-    return redirect(url_for('tournaments.index', filter="all"))
+    return redirect(url_for('tournaments.index'))
 
 
 
@@ -111,7 +115,7 @@ def edit_round(tournament_id, round_id):
                 flash("Quiz Round could not be updated!", Flashing.ERROR)
             else:
                 flash("Quiz Round has been created/updated.", Flashing.SUCCESS)
-                return redirect(url_for('tournaments.show_tournament', tournament_id=tournament_id))
+                return redirect(url_for('tournaments.show_tournament_page', tournament_id=tournament_id))
         else:
             flash("Invalid form submitted.")
     else:

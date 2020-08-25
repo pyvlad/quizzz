@@ -41,7 +41,7 @@ def index():
                 "name": tournament.name,
                 "is_active": tournament.is_active,
                 "time_created": tournament.time_created,
-                "view_url": url_for('tournaments.show_tournament', tournament_id=tournament.id),
+                "view_url": url_for('tournaments.show_tournament_page', tournament_id=tournament.id),
                 "edit_url": url_for('tournaments.edit_tournament', tournament_id=tournament.id),
             }
             for tournament in group_tournaments
@@ -77,7 +77,7 @@ def _get_rounds(tournament_obj, played_round_ids={}, now=None):
 
 
 @bp.route('/tournaments/<int:tournament_id>/')
-def show_tournament(tournament_id):
+def show_tournament_page(tournament_id):
     """
     Show tournament details.
     """
@@ -93,7 +93,7 @@ def show_tournament(tournament_id):
     for r in rounds:
         r["finish_time"] = momentjs(r["finish_time"])._timestamp_as_iso_8601()
         r["edit_url"] = url_for('tournaments.edit_round', tournament_id=tournament.id, round_id=r["id"])
-        r["view_url"] = url_for('tournaments.show_round', round_id=r["id"])
+        r["view_url"] = url_for('tournaments.show_round_page', round_id=r["id"])
 
     data = {
         "tournament": {
@@ -111,10 +111,13 @@ def show_tournament(tournament_id):
 
 
 
+# ----- ROUNDS -----
 @bp.route('/rounds/<int:round_id>/')
-def show_round(round_id):
+def show_round_page(round_id):
     """
-    Show round details.
+    Show round details:
+    - tournament, quiz, and round descriptions;
+    - round standings (sorted list of plays);
     """
     round = get_round_with_details_by_id(round_id)
     users_played = set(play.user.id for play in round.plays)

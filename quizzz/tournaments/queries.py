@@ -58,9 +58,6 @@ def get_tournament_standings(tournament_id):
     return standings
 
 
-def get_usernames(user_list):
-    return
-
 
 def get_round_by_id(round_id):
     round = g.db.query(Round).filter(Round.id == round_id).first()

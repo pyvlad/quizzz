@@ -8,7 +8,7 @@
       ("Groups", url_for("groups.index")),
       (g.group.name, url_for("group.show_group_page", group_id=g.group.id)),
       ("Tournaments", url_for("tournaments.index")),
-      (data.tournament.name, url_for("tournaments.show_tournament", tournament_id=data.tournament.id)),
+      (data.tournament.name, url_for("tournaments.show_tournament_page", tournament_id=data.tournament.id)),
       (data.round.name or "Round %s" % data.round.id, "")
     ])
   }}

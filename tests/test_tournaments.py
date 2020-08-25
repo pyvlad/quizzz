@@ -140,9 +140,9 @@ def test_create_round(app, client, auth):
 
 
 
-def test_show_tournament(app, client, auth):
+def test_show_tournament_page(app, client, auth):
     """
-    Test the 'show_tournament' view:
+    Test the 'show_tournament_page' view:
     a. it should be available to authenticated group members;
     b. group admin should have access to "edit tournament", "add round", "edit round" links;
     c. users should have access to "view_round" links for each round.
@@ -182,9 +182,9 @@ def test_show_tournament(app, client, auth):
 
 
 
-def test_show_round(app, client, auth):
+def test_show_round_page(app, client, auth):
     """
-    Test the 'show_tournament' view:
+    Test the 'show_round_page' view:
     """
     # add the round
     auth.login_as("bob")

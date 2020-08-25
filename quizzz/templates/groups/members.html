@@ -74,7 +74,7 @@
 
     const td6 = document.createElement("td");
     td6.className = "table__td table__td--centered";
-    if (isAdmin) td6.innerHTML = `<a href="${rowData.edit_url}">✎</a>`;
+    if (isAdmin && !rowData.is_admin) td6.innerHTML = `<a href="${rowData.edit_url}">✎</a>`;
     tr.append(td6);
 
     return tr;
