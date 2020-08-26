@@ -8,11 +8,7 @@ from quizzz.forms import EmptyForm
 
 from . import bp
 from .models import Tournament, Round
-from .queries import (
-    get_tournament_by_id,
-    get_round_by_id,
-    get_quiz_pool
-)
+from .queries import query_tournament_by_id, query_round_by_id, query_quiz_pool
 from .forms import TournamentForm, RoundForm
 
 
@@ -24,7 +20,7 @@ def edit_tournament(tournament_id):
     """
     check_user_permissions(USER.IS_GROUP_ADMIN)
 
-    tournament = (Tournament() if not tournament_id else get_tournament_by_id(tournament_id))
+    tournament = (Tournament() if not tournament_id else query_tournament_by_id(tournament_id))
 
     if request.method == 'POST':
         form = TournamentForm()
@@ -71,7 +67,7 @@ def delete_tournament(tournament_id):
     form = EmptyForm()
 
     if form.validate():
-        tournament = get_tournament_by_id(tournament_id)
+        tournament = query_tournament_by_id(tournament_id)
         g.db.delete(tournament)
         g.db.commit()
         flash("Tournament has been deleted.", Flashing.SUCCESS)
@@ -87,9 +83,9 @@ def delete_tournament(tournament_id):
 def edit_round(tournament_id, round_id):
     check_user_permissions(USER.IS_GROUP_ADMIN)
 
-    tournament = get_tournament_by_id(tournament_id)
-    quiz_pool = get_quiz_pool(g.group_id)
-    round = Round() if not round_id else get_round_by_id(round_id)
+    tournament = query_tournament_by_id(tournament_id)
+    quiz_pool = query_quiz_pool(g.group_id)
+    round = Round() if not round_id else query_round_by_id(round_id)
 
     choices = [
         (quiz.id, "%s by %s" % (quiz.topic, author_name))
@@ -165,7 +161,7 @@ def delete_round(round_id):
     form = EmptyForm()
 
     if form.validate():
-        round = get_round_by_id(round_id)
+        round = query_round_by_id(round_id)
         g.db.delete(round)
         g.db.commit()
         flash("Quiz round has been deleted.", Flashing.SUCCESS)

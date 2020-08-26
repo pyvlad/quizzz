@@ -3,7 +3,7 @@ import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from flask import g, request
+from flask import g, request, abort
 
 from quizzz.db import Base
 
@@ -77,10 +77,20 @@ class Round(Base):
             "minutes": int(((seconds_left % (60 * 60 * 24)) % (60 * 60)) // 60),
         }
 
+    def get_status(self, now=None):
+        if now is None:
+            now = datetime.datetime.utcnow()
+        if now < self.start_time:
+            return "coming"
+        elif now > self.finish_time:
+            return "finished"
+        else:
+            return "current"
+
     @property
     def is_active(self):
-        now = datetime.datetime.utcnow()
-        return (now > self.start_time) and (now < self.finish_time)
+        return self.get_status() == "current"
+
 
 
 class Play(Base):
@@ -135,18 +145,27 @@ class Play(Base):
     def populate_from_wtform(self, form):
         quiz = self.round.quiz
 
+        available_answers = {
+            str(question.id): { str(option.id): option for option in question.options}
+            for question in quiz.questions
+        }
+
         answers = []
-        for qnum, question in enumerate(quiz.questions):
-            options_by_id = { str(option.id): option for option in question.options }
+        for q in form.questions:
+            # submitted question_id and option_id:
+            question_id = q.form.question_id.data       # string
+            option_id = q.form.answer.data              # string
 
-            selected_option_id = form.questions[qnum].form.answer.data  # string
-            selected_option = options_by_id.get(selected_option_id)
+            options = available_answers.get(question_id)
+            if options is None:
+                abort(400, "Question ID from another quiz was submitted.")
 
-            answers += [PlayAnswer(play=self, option=selected_option)]
+            selected_option = options.get(option_id, None)
+            answers += [PlayAnswer(play=self, question_id=int(question_id), option=selected_option)]
 
         self.answers = answers
         self.is_submitted = True
-        self.result = len([answer for answer in answers if answer.option.is_correct])
+        self.result = len([answer for answer in answers if (answer.option and answer.option.is_correct)])
 
         return self
 
@@ -158,7 +177,8 @@ class PlayAnswer(Base):
     id = sa.Column(sa.Integer, primary_key=True)
 
     play_id = sa.Column(sa.Integer, sa.ForeignKey('plays.id', ondelete='CASCADE'), nullable=False)
-    option_id = sa.Column(sa.Integer, sa.ForeignKey('options.id'), nullable=False)
+    question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id'), nullable=False)
+    option_id = sa.Column(sa.Integer, sa.ForeignKey('options.id'))
 
     play = relationship("Play", back_populates="answers")
     option = relationship("Option", back_populates="answers")

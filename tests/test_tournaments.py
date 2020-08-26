@@ -1,5 +1,3 @@
-import datetime
-
 import pytest
 import sqlalchemy
 from flask import g, session
@@ -10,24 +8,8 @@ from quizzz.tournaments.models import Tournament, Round, Play, PlayAnswer
 from quizzz.quizzes.models import Quiz
 
 from .data import TOURNAMENTS
-
-NOW = datetime.datetime.utcnow()
-LATER = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-
-TOURNAMENT_REQUEST_PAYLOAD = {
-    "tournament_name": "Tournament 2",
-    "is_active": True
-}
-
-ROUND_REQUEST_PAYLOAD = {
-    "quiz_id": 1,
-    "start_date": NOW.strftime("%Y-%m-%d"),
-    "start_time_hours": NOW.hour,
-    "start_time_minutes": NOW.minute,
-    "finish_date": LATER.strftime("%Y-%m-%d"),
-    "finish_time_hours": LATER.hour,
-    "finish_time_minutes": LATER.minute,
-}
+from .request_data import NOW, LATER, QUIZ_REQUEST_PAYLOAD, TOURNAMENT_REQUEST_PAYLOAD, \
+    ROUND_REQUEST_PAYLOAD, VALID_PLAY_DATA
 
 
 def _finalize_first_quiz(app):
@@ -36,7 +18,6 @@ def _finalize_first_quiz(app):
         quiz = db.query(Quiz).filter(Quiz.id == 1).first()
         quiz.is_finalized = True
         db.commit()
-
 
 
 def check_permissions(client, auth, url, admin_only=False):
@@ -184,7 +165,7 @@ def test_show_tournament_page(app, client, auth):
 
 def test_show_round_page(app, client, auth):
     """
-    Test the 'show_round_page' view:
+    Test the 'show_round_page' view.
     """
     # add the round
     auth.login_as("bob")
@@ -205,7 +186,7 @@ def test_show_round_page(app, client, auth):
 
     # play the round
     response = client.post('/groups/1/rounds/1/start', data={})
-    response = client.post(response.headers['Location'], data={"questions-0-answer": "4", "questions-1-answer": "8"})
+    response = client.post(response.headers['Location'], data=VALID_PLAY_DATA)
 
     # view should contain alice's result now
     response = client.get('/groups/1/rounds/1/')
@@ -218,8 +199,13 @@ def test_show_round_page(app, client, auth):
     assert b'<td class="results-table__cell">2</td>' in response.data
 
 
-def test_start_round(app, client, auth):
 
+def test_start_round(app, client, auth):
+    """
+    Test the 'start_round' view:
+    a. it should be available to authenticated group members;
+    b. when clicked multiple times, same play should be used.
+    """
     auth.login_as("bob")
 
     # can't play non-existent round
@@ -242,50 +228,73 @@ def test_start_round(app, client, auth):
     auth.login_as("bob")
     response = client.post("/groups/1/rounds/1/start", data={})
     assert response.status_code == 302
-    assert response.headers['Location'] == "http://localhost/groups/1/plays/1/"
+    assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
+    with app.app_context():
+        db = get_db_session()
+        play = db.query(Play).filter(Play.user_id == 1).filter(Play.round_id == 1).first()
+        assert play.is_submitted is False
+        assert len(play.answers) == 0
+        assert play.result is None
+        time_started = play.server_started
+        play_id = play.id
 
-    # when clicked multiple times, same link should be returned
+    # when clicked multiple times, same play should be used
     response = client.post("/groups/1/rounds/1/start", data={})
     assert response.status_code == 302
-    assert response.headers['Location'] == "http://localhost/groups/1/plays/1/"
+    assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
+    with app.app_context():
+        db = get_db_session()
+        play2 = db.query(Play).filter(Play.user_id == 1).filter(Play.round_id == 1).first()
+        assert play2.id == play_id
+        assert play.server_started == time_started
 
-    # another user should get a different link
+    # another user should be able to start her play as well
     auth.login_as("alice")
     response = client.post("/groups/1/rounds/1/start", data={})
     assert response.status_code == 302
-    assert response.headers['Location'] == "http://localhost/groups/1/plays/2/"
+    assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
+    with app.app_context():
+        db = get_db_session()
+        play3 = db.query(Play).filter(Play.user_id == 2).filter(Play.round_id == 1).first()
+        assert play3.id != play_id
 
 
 
 def test_play_round(app, client, auth):
+    """
+    Test the 'play_round' view:
+    a. it should be available to authenticated group members who clicked 'start round';
+    b. correct form submission should create Play.answers collection,
+       toggle Play.is_submitted, calculate result, and stop the timer.
+    c. user can only play round once.
+    """
     # add a new round
     auth.login_as("bob")
     _finalize_first_quiz(app)
     client.post("/groups/1/tournaments/1/rounds/0/edit", data=ROUND_REQUEST_PAYLOAD)
 
+    # anonymous users shouldn't be able to play...
+    auth.logout()
+    assert client.get("/groups/1/rounds/1/play").status_code == 401
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 401
+
+    # ...neither should non-group members...
+    auth.login_as("ben")
+    assert client.get("/groups/1/rounds/1/play").status_code == 403
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 403
+
+    # ...non-started play is unavailable as well...
+    auth.login_as("bob")
+    assert client.get("/groups/1/rounds/1/play").status_code == 403
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 403
+
     # start bob's play
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302  # play 1
-
     # start alice's play
     auth.login_as("alice")
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # play 2
 
-    # alice shouldn't be able to access bob's play...
-    assert client.get("/groups/1/plays/1/").status_code == 403
-    assert client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "8"}).status_code == 403
-    assert client.get("/groups/1/plays/3/").status_code == 403
-    # ...neither should anonymouse users...
-    auth.logout()
-    assert client.get("/groups/1/plays/1/").status_code == 401
-    assert client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "8"}).status_code == 401
-    assert client.get("/groups/1/plays/3/").status_code == 401
-    # ...or non-group members
-    auth.login_as("ben")
-    assert client.get("/groups/1/plays/1/").status_code == 403
-    assert client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "8"}).status_code == 403
-    assert client.get("/groups/1/plays/3/").status_code == 403
-
-    # there should be 2 plays in DB and no submitted plays yet
+    # there should be 2 plays in DB at this point and no submitted plays yet
     with app.app_context():
         db = get_db_session()
         play_submitted = db.query(Play).filter(Play.is_submitted == True).first()
@@ -293,36 +302,11 @@ def test_play_round(app, client, auth):
         plays_in_progress = db.query(Play).all()
         assert len(plays_in_progress) == 2
 
-    auth.login_as("bob")
-
-    # submitting incomplete form should show error and not submit quiz
-    response = client.post("/groups/1/plays/1/", data={"questions-0-answer": "4"})
-    assert response.status_code == 200
-    assert b'Invalid form submitted.' in response.data
-    with app.app_context():
-        db = get_db_session()
-        play = db.query(Play).filter(Play.id == 1).first()
-        assert play.is_submitted is False
-        assert len(play.answers) == 0
-
-    # submitting invalid option ids (including for other questions)
-    # # should return error and not submit quiz:
-    # with pytest.raises(sqlalchemy.exc.IntegrityError):
-    #     client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "4"}) # would raise 500
-    # should return form validation error
-    response = client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "4"})
-    assert response.status_code == 200
-    assert b"Invalid form submitted" in response.data
-    with app.app_context():
-        db = get_db_session()
-        play = db.query(Play).filter(Play.id == 1).first()
-        assert play.is_submitted is False
-        assert len(play.answers) == 0
-
     # submit correct form
-    request = client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "8"})
-    assert request.status_code == 302
-    assert request.headers["LOCATION"] == "http://localhost/groups/1/rounds/1/review"
+    auth.login_as("bob")
+    response = client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA)
+    assert response.status_code == 302
+    assert response.headers["LOCATION"] == "http://localhost/groups/1/rounds/1/review"
     with app.app_context():
         db = get_db_session()
         play = db.query(Play).filter(Play.id == 1).first()
@@ -331,8 +315,13 @@ def test_play_round(app, client, auth):
         assert play.result == 2
         time_taken = play.get_server_time()
 
+    # further attempts to play should return an error
+    assert client.get("/groups/1/rounds/1/play").status_code == 403
+
     # further submissions should return an error and not change results
-    request = client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "6"})
+    valid_play_data = VALID_PLAY_DATA.copy()
+    valid_play_data["questions-1-answer"] = "6"
+    request = client.post("/groups/1/rounds/1/play", data=valid_play_data)
     assert request.status_code == 403
     with app.app_context():
         db = get_db_session()
@@ -341,6 +330,138 @@ def test_play_round(app, client, auth):
         assert len(play.answers) == 2
         assert play.result == 2
         assert play.get_server_time() == time_taken
+
+
+
+def test_play_round_errors(app, client, auth):
+    """
+    Test that a submitted form deviating from the expected form
+    is invalidated as expected.
+    """
+    # add a new round
+    auth.login_as("bob")
+    _finalize_first_quiz(app)
+    client.post("/groups/1/tournaments/1/rounds/0/edit", data=ROUND_REQUEST_PAYLOAD)
+
+    # start bob's play
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302  # play 1
+
+    def assert_play_not_in_db():
+        with app.app_context():
+            db = get_db_session()
+            play = db.query(Play).filter(Play.id == 1).first()
+            assert play.is_submitted is False
+            assert len(play.answers) == 0
+
+    # submitting invalid forms
+    # (a) missing question_id
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    del invalid_play_data["questions-0-question_id"]
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert_play_not_in_db()
+
+    # (b) missing question (entirely)
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    del invalid_play_data["questions-1-question_id"]
+    del invalid_play_data["questions-1-answer"]
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert_play_not_in_db()
+
+    # (c) invalid option id (including for other questions)
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    invalid_play_data["questions-1-answer"] = invalid_play_data["questions-0-answer"]
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert_play_not_in_db()
+
+    # (d) same added twice replacing another question
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    invalid_play_data["questions-1-question_id"] = invalid_play_data["questions-0-question_id"]
+    invalid_play_data["questions-1-answer"] = invalid_play_data["questions-0-answer"]
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert_play_not_in_db()
+
+    # (e) bad value
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    invalid_play_data["questions-1-question_id"] = ""
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert_play_not_in_db()
+
+    # (f) question from another quiz
+    # add another quiz and query first question
+    response = client.post('/groups/1/quizzes/0/edit', data=QUIZ_REQUEST_PAYLOAD)
+    with app.app_context():
+        db = get_db_session()
+        quiz2 = db.query(Quiz).filter(Quiz.id == 2).first()
+        question_id = quiz2.questions[0].id
+        correct_option_id = [opt for opt in quiz2.questions[0].options if opt.is_correct][0].id
+    # plugging that question into another quiz triggers an error
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    invalid_play_data["questions-1-question_id"] = str(question_id)
+    invalid_play_data["questions-1-answer"] = str(correct_option_id)
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert_play_not_in_db()
+
+    # (g) extra repeats are stripped off
+    # correct submission happens
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    invalid_play_data["questions-2-question_id"] = invalid_play_data["questions-0-question_id"]
+    invalid_play_data["questions-2-answer"] = invalid_play_data["questions-0-answer"]
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 302
+    assert response.headers["LOCATION"] == "http://localhost/groups/1/rounds/1/review"
+    with app.app_context():
+        db = get_db_session()
+        play = db.query(Play).filter(Play.id == 1).first()
+        assert play.is_submitted is True
+        assert len(play.answers) == 2
+        assert play.result == 2
+
+    # example with expected sqlalchemy error:
+    # with pytest.raises(sqlalchemy.exc.IntegrityError):
+    #     client.post("/groups/1/rounds/1/play", data={"questions-0-answer": "4", "questions-1-answer": "4"}) # would raise 500
+
+
+
+def test_review_round(app, client, auth):
+    """ """
+    # add a new round
+    auth.login_as("bob")
+    _finalize_first_quiz(app)
+    client.post("/groups/1/tournaments/1/rounds/0/edit", data=ROUND_REQUEST_PAYLOAD)
+
+    # cannot review round if anonymous
+    auth.logout()
+    assert client.get("/groups/1/rounds/1/review").status_code == 401
+
+    # cannot review round of not group member
+    auth.login_as("ben")
+    assert client.get("/groups/1/rounds/1/review").status_code == 403
+
+    # cannot review round if not started a play yet
+    auth.login_as("bob")
+    assert client.get("/groups/1/rounds/1/review").status_code == 403
+
+    # start bob's play
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302  # play 1
+
+    # cannot review round of not submitted a play yet
+    assert client.get("/groups/1/rounds/1/review").status_code == 403
+
+    # submit bob's play
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 302
+
+    # can review now
+    assert client.get("/groups/1/rounds/1/review").status_code == 200
+
+    # other group members who have not played yet still cannot review round
+    auth.login_as("alice")
+    assert client.get("/groups/1/rounds/1/review").status_code == 403
 
 
 
@@ -354,7 +475,7 @@ def test_delete_round(app, client, auth):
     assert client.post("/groups/1/tournaments/1/rounds/0/edit",
         data=ROUND_REQUEST_PAYLOAD).status_code == 302 # add a new round
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # start play
-    assert client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "8"}).status_code == 302 # submit
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 302 # submit
 
     with app.app_context():
         db = get_db_session()
@@ -427,7 +548,7 @@ def test_delete_tournament(app, client, auth):
     assert client.post("/groups/1/tournaments/1/rounds/0/edit",
         data=ROUND_REQUEST_PAYLOAD).status_code == 302 # add a new round
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # start play
-    assert client.post("/groups/1/plays/1/", data={"questions-0-answer": "4", "questions-1-answer": "8"}).status_code == 302 # submit
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 302 # submit
 
     with app.app_context():
         db = get_db_session()

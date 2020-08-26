@@ -15,29 +15,29 @@
           </div>
         </div>
 
-        {% for question in data.questions %}
-        {% set question_form = form.questions[loop.index0].form %}
+        {% for question in form.questions %}
+        {% set question_form = question.form %}
         {% set outer_loop = loop %}
           <div class='quiz-form__item quiz-form__item_outlined'>
+            {{ question_form.question_id() }}
             <div class="quiz-form__row">
               <div class='quiz-form__helper-text'>
-                Question {{ question.number }}
+                Question {{ outer_loop.index }}
               </div>
             </div>
             <div class="quiz-form__row">
               <div class='quiz-form__label'>
-                {{ question.text }}
+                {{ data.questions.get(question_form.question_id.data, "") }}
               </div>
             </div>
             <div class="quiz-form__row">
               <fieldset class="quiz-form__fieldset">
                 {% for subfield in question_form.answer %}
-                {% set option = question.options[loop.index0] %}
                   <div class="quiz-form__fieldset-item">
                     {{ subfield() }}
                     <label class="quiz-form__fieldset-item-input"
                            for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
-                      {{ option.text }}
+                      {{ subfield.label.text }}
                     </label>
                   </div>
                 {% endfor %}

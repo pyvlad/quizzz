@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import Form
-from wtforms import StringField, BooleanField, SelectField, RadioField, FormField, FieldList, IntegerField
+from wtforms import StringField, BooleanField, SelectField, RadioField, FormField, FieldList, IntegerField, HiddenField
 from wtforms.fields.html5 import DateField
 from wtforms.widgets import TextArea
 from wtforms.widgets.html5 import NumberInput
@@ -40,13 +40,17 @@ class RoundForm(FlaskForm):
 
 
 class QuestionForm(Form):
-    answer = RadioField()   # choices are added dynamically in views
+    question_id = HiddenField(validators=[ InputRequired() ])
+    answer = RadioField(validators=[ Optional() ])   # choices are added dynamically in views
 
 
 def make_play_round_form(questions_per_quiz):
     class PlayRoundForm(FlaskForm):
         questions = FieldList(
             FormField(QuestionForm),
-            min_entries=questions_per_quiz
+            # create blank entries if provided input in formdata is not enough:
+            min_entries=questions_per_quiz,
+            # accept no more than this many entries as input, even if more exist in formdata:
+            max_entries=questions_per_quiz
         )
     return PlayRoundForm

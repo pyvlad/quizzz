@@ -16,7 +16,7 @@
 {% block content %}
   <h2 class="heading heading_primary">Tournament Page</h2>
 
-  {% if data.has_edit_permissions %}
+  {% if data.is_admin %}
     <div class="admin-actions">
       <a class="admin-actions__item button button_action"
          href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
@@ -43,7 +43,7 @@
 
   <section class="my-4">
     <h3 class="heading heading_secondary">Overall Standings</h3>
-    {% if data.standings %}
+    {% if data.tournament_standings %}
       <table class="results-table">
         <tr class="results-table__header-row">
           <td class="results-table__header-cell">#</td>
@@ -51,7 +51,7 @@
           <td class="results-table__header-cell">played</td>
           <td class="results-table__header-cell">points</td>
         </tr>
-        {% for obj in data.standings %}
+        {% for obj in data.tournament_standings %}
           <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
               {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
             <td class="results-table__cell">{{ loop.index }}</td>
@@ -71,7 +71,7 @@
 <script>
   let filters = {{ data.filters|tojson }};
   let globalRounds = {{ data.rounds|tojson }};
-  let hasEditPermissions = {{ data.has_edit_permissions|tojson }};
+  let hasEditPermissions = {{ data.is_admin|tojson }};
 
   const makeRoundRow = (round, num) => {
     const tr = document.createElement("tr");

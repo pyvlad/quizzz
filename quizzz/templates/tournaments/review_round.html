@@ -19,16 +19,16 @@
     <div class="quiz-form">
       <div class="quiz-form__item">
         <div class="quiz-form__header">
-          "{{ data.quiz_topic }}"
+          "{{ data.round.quiz.topic }}"
         </div>
       </div>
 
       {% for question in data.questions %}
         <div class='quiz-form__item quiz-form__item_outlined
-            quiz-form__item_{% if question.answer.is_correct %}correct{% else %}wrong{% endif %}'>
+            quiz-form__item_{% if question.is_answer_correct %}correct{% else %}wrong{% endif %}'>
           <div class="quiz-form__row">
             <div class='quiz-form__helper-text'>
-              Question {{ question.number }}
+              Question {{ loop.index }}
             </div>
           </div>
 
@@ -43,15 +43,15 @@
               {% for option in question.options %}
                 {% if option.is_correct %}
                   <tr class="correct">
-                {% elif (question.answer.option_id == option.id) %}
+                {% elif option.is_selected %}
                   <tr class="wrong">
                 {% else %}
                   <tr>
                 {% endif %}
                   <td class="pr-2">
-                    {% if option.is_correct and (question.answer.option_id == option.id) %}
+                    {% if option.is_correct and option.is_selected %}
                       [&#10003;]
-                    {% elif (question.answer.option_id == option.id) %}
+                    {% elif option.is_selected %}
                       [X]
                     {% endif %}
                   </td>

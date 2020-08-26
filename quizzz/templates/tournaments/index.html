@@ -15,7 +15,7 @@
 {% block content %}
   <h2 class="heading heading_primary">Group Tournaments</h2>
 
-  {% if data.has_edit_permissions %}
+  {% if data.is_admin %}
     <div class="admin-actions">
       <a class="admin-actions__item button button_action"
          href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
@@ -45,7 +45,7 @@
 <script>
   let filters = {{ data.filters|tojson }};
   let globalTournaments = {{ data.tournaments|tojson }};
-  let hasEditPermissions = {{ data.has_edit_permissions|tojson }};
+  let hasEditPermissions = {{ data.is_admin|tojson }};
 
   const makeRow = (rowData, num) => {
     const tr = document.createElement("tr");

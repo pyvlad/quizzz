@@ -5,24 +5,7 @@ from quizzz.auth.models import User
 from quizzz.quizzes.models import Quiz, Question, Option
 
 from .data import USERS, QUIZZES, QUIZ_QUESTIONS, QUESTION_OPTIONS
-
-
-REQUEST_PAYLOAD = {
-    "topic": "Quiz 2",
-    "is_finalized": "0",
-    "questions-0-text": "What is love?",
-    "questions-0-answer": "3",
-    "questions-0-options-0-text": "baby, don't hurt me",
-    "questions-0-options-1-text": "don't hurt me",
-    "questions-0-options-2-text": "no more",
-    "questions-0-options-3-text": "all of these",
-    "questions-1-text": "How much is the fish?",
-    "questions-1-answer": "3",
-    "questions-1-options-0-text": "lala-lalala-la-la",
-    "questions-1-options-1-text": "lalalala",
-    "questions-1-options-2-text": "lala-lalala-la-lalala",
-    "questions-1-options-3-text": "all of these"
-}
+from .request_data import QUIZ_REQUEST_PAYLOAD
 
 
 def test_models(app):
@@ -112,13 +95,13 @@ def test_create(client, auth, app):
     assert response.status_code == 200
 
     # POST request should rdirect to <update> view
-    response = client.post('/groups/1/quizzes/0/edit', data=REQUEST_PAYLOAD)
+    response = client.post('/groups/1/quizzes/0/edit', data=QUIZ_REQUEST_PAYLOAD)
     assert f'http://localhost/groups/1/quizzes/{len(QUIZZES)+1}/edit' == response.headers['Location']
 
     # new quiz should be in database now
     with app.app_context():
         db = get_db_session()
-        quiz = db.query(Quiz).filter(Quiz.topic == REQUEST_PAYLOAD["topic"]).first()
+        quiz = db.query(Quiz).filter(Quiz.topic == QUIZ_REQUEST_PAYLOAD["topic"]).first()
         assert quiz is not None
 
 
@@ -158,7 +141,7 @@ def test_update(client, auth, app):
     quiz_id = 1
 
     # use new quiz data to update first quiz:
-    request_payload = REQUEST_PAYLOAD.copy()
+    request_payload = QUIZ_REQUEST_PAYLOAD.copy()
     request_payload["topic"] = new_topic
 
     auth.login_as("bob")
@@ -186,7 +169,7 @@ def test_create_update_validate(client, auth, path):
     """
     auth.login_as("bob")
 
-    request_payload = REQUEST_PAYLOAD.copy()
+    request_payload = QUIZ_REQUEST_PAYLOAD.copy()
     del request_payload["topic"] # will raise key error on request.form['topic']
 
     response = client.post(path, data=request_payload)
@@ -206,12 +189,12 @@ def test_update_finalized(client, auth, app):
     auth.login_as("bob")
 
     # use new quiz data to update first quiz:
-    request_payload = REQUEST_PAYLOAD.copy()
+    request_payload = QUIZ_REQUEST_PAYLOAD.copy()
     request_payload["is_finalized"] = "1"
     response = client.post(f'/groups/1/quizzes/{quiz_id}/edit', data=request_payload)
 
     # try modifying it:
-    request_payload = REQUEST_PAYLOAD.copy()
+    request_payload = QUIZ_REQUEST_PAYLOAD.copy()
     request_payload["is_finalized"] = "0"
     request_payload["topic"] = "blablabla"
 

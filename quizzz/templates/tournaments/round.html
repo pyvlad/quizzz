@@ -20,30 +20,42 @@
   <table>
     <tr>
       <td>Topic</td>
-      <td>{{ data.quiz.topic }}</td>
+      <td>{{ data.round.quiz.topic }}</td>
     </tr>
     <tr>
       <td>Author</td>
-      <td>{{ data.quiz.author }}</td>
+      <td>{{ data.round.quiz.author }}</td>
     </tr>
     <tr>
       <td>Start Time</td>
-      <td>{{ data.round.start_time.strftime("%A, %d %b %Y at %H:%M") }}</td>
+      <td>
+        <span class="momentjs-date"
+          data-timestamp="{{data.round.start_time}}"
+          data-func="format"
+          data-format="MMM D, YYYY [at] h:mm a">
+        <span>
+      </td>
     </tr>
     <tr>
       <td>Finish Time</td>
-      <td>{{ data.round.finish_time.strftime("%A, %d %b %Y at %H:%M") }}</td>
+      <td>
+        <span class="momentjs-date"
+          data-timestamp="{{data.round.finish_time}}"
+          data-func="format"
+          data-format="MMM D, YYYY [at] h:mm a">
+        <span>
+      </td>
     </tr>
     <tr>
       <td class="pr-4">Your Action</td>
       <td>
-        {% if not data.is_taken and data.round.is_active %}
+        {% if not data.round.is_taken and data.round.status == "current" %}
           <form action="{{ url_for('tournaments.start_round', round_id=data.round.id) }}" method="post">
             <button class="button button_action my-3">
               Take Quiz
             </button>
           <form>
-        {% elif data.is_taken %}
+        {% elif data.round.is_taken %}
           <a class="button button_action my-3"
              href="{{ url_for('tournaments.review_round', round_id=data.round.id) }}">
             Review Quiz
@@ -55,7 +67,7 @@
 
   <section class="my-4">
     <h3 class="heading heading_secondary">Standings</h3>
-    {% if data.quiz.plays %}
+    {% if data.round_standings %}
       <table class="results-table">
         <tr class="results-table__header-row">
           <td class="results-table__header-cell">#</td>
@@ -64,7 +76,7 @@
           <td class="results-table__header-cell">time</td>
           <td class="results-table__header-cell">score</td>
         </tr>
-        {% for obj in data.quiz.plays %}
+        {% for obj in data.round_standings %}
           <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
               {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
             <td class="results-table__cell">{{ loop.index }}</td>
