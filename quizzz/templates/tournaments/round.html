@@ -49,13 +49,13 @@
     <tr>
       <td class="pr-4">Your Action</td>
       <td>
-        {% if not data.round.is_taken and data.round.status == "current" %}
+        {% if not data.round.is_taken and data.round.status == "current" and not data.round.is_author %}
           <form action="{{ url_for('tournaments.start_round', round_id=data.round.id) }}" method="post">
             <button class="button button_action my-3">
               Take Quiz
             </button>
           <form>
-        {% elif data.round.is_taken %}
+        {% elif data.round.is_taken or data.round.is_author %}
           <a class="button button_action my-3"
              href="{{ url_for('tournaments.review_round', round_id=data.round.id) }}">
             Review Quiz
@@ -81,14 +81,19 @@
               {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
             <td class="results-table__cell">{{ loop.index }}</td>
             <td class="results-table__cell">{{ obj.user }}</td>
-            <td class="results-table__cell">{{ obj.result }}</td>
-            <td class="results-table__cell">{{ obj.time|round(2) }}</td>
-            <td class="results-table__cell"><strong>{{ obj.score|round(1) }}</strong></td>
+            <td class="results-table__cell results-table__cell--centered">{{ obj.result }}</td>
+            <td class="results-table__cell results-table__cell--centered">{{ obj.time|round(2) }}</td>
+            <td class="results-table__cell results-table__cell--centered">
+              <strong>{{ obj.score|round(1) }}</strong>
+            </td>
           </tr>
         {% endfor %}
       </table>
     {% else %}
       <p>No one has taken this quiz yet.</p>
     {% endif %}
+    <br/>
+    <p>As the author of this quiz, <strong>{{ data.round.quiz.author }}</strong>
+      earns {{ data.round.author_score }} point(s).
   </section>
 {% endblock %}

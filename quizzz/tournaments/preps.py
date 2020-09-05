@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 
 from flask import url_for
 from quizzz.momentjs import momentjs
@@ -34,6 +35,8 @@ def prep_round(round, user_id, now=None):
         "finish_time": momentjs(round.finish_time)._timestamp_as_iso_8601(),
         "status": round.get_status(now=now),
         "is_taken": user_id in users_played,
+        "is_author": round.is_authored_by(user_id),
+        "author_score": round.get_author_score(),
         "edit_url": url_for('tournaments.edit_round', tournament_id=round.tournament.id, round_id=round.id), # TODO get rid of round.tournament?
         "view_url": url_for('tournaments.show_round_page', round_id=round.id),
         "quiz": {
@@ -86,29 +89,46 @@ def prep_round_standings(round_plays):
 def prep_tournament_standings(tournament_obj):
     """
     Given <tournament> ORM object with pre-loaded
-    <tournament.rounds>, <round.plays>, <play.user> related objects,
+    <tournament.rounds>, <round.quiz>, <quiz.author>, <round.plays>, <play.user> related objects,
     calculate and return a jsonifiable list for the "standings" table
     of the "show_tournament_page" view.
     """
-    total_points = {}
-    total_plays = {}
+    points_total = defaultdict(int)
+    points_played = defaultdict(int)
+    points_authored = defaultdict(int)
+    rounds_total = defaultdict(int)
+    rounds_played = defaultdict(int)
+    rounds_authored = defaultdict(int)
     user_names = {}
 
     for round in tournament_obj.rounds:
         round_standings = prep_round_standings(round.plays)
         for play in round_standings:
             user_id = play["user_id"]
-            total_plays[user_id] = total_plays.get(user_id, 0) + 1
-            total_points[user_id] = total_points.get(user_id, 0) + play["points"]
+            rounds_total[user_id] += 1
+            rounds_played[user_id] += 1
+            points_total[user_id] += play["points"]
+            points_played[user_id] += play["points"]
             user_names[user_id] = user_names.get(user_id, play["user"])
+        author_id = round.quiz.author_id
+        if author_id:
+            rounds_total[author_id] += 1
+            rounds_authored[author_id] += 1
+            points_total[author_id] += round.get_author_score()
+            points_authored[author_id] += round.get_author_score()
+            user_names[author_id] = user_names.get(author_id, round.quiz.author.name)
 
     standings = [
         {
             "user_id": x[0],
             "user": user_names[x[0]],
             "points": x[1],
-            "rounds": total_plays[x[0]]
-        } for x in sorted(total_points.items(), key=lambda x:x[1], reverse=True)
+            "rounds": rounds_total[x[0]],
+            "points_played": points_played.get(x[0], 0),
+            "points_authored": points_authored.get(x[0], 0),
+            "rounds_played": rounds_played.get(x[0], 0),
+            "rounds_authored": rounds_authored.get(x[0], 0)
+        } for x in sorted(points_total.items(), key=lambda x:x[1], reverse=True)
     ]
 
     return standings

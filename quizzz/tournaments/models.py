@@ -91,6 +91,11 @@ class Round(Base):
     def is_active(self):
         return self.get_status() == "current"
 
+    def get_author_score(self):
+        return len(self.plays)
+
+    def is_authored_by(self, user_id):
+        return self.quiz.author_id == user_id
 
 
 class Play(Base):

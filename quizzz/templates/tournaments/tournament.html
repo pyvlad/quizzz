@@ -48,16 +48,24 @@
         <tr class="results-table__header-row">
           <td class="results-table__header-cell">#</td>
           <td class="results-table__header-cell">user</td>
-          <td class="results-table__header-cell">played</td>
+          <td class="results-table__header-cell">rounds</td>
+          <td class="results-table__header-cell">p/a</td>
           <td class="results-table__header-cell">points</td>
+          <td class="results-table__header-cell">p/a</td>
         </tr>
         {% for obj in data.tournament_standings %}
           <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
               {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
             <td class="results-table__cell">{{ loop.index }}</td>
             <td class="results-table__cell">{{ obj.user }}</td>
-            <td class="results-table__cell">{{ obj.rounds }}</td>
-            <td class="results-table__cell">{{ obj.points }}</td>
+            <td class="results-table__cell results-table__cell--centered">{{ obj.rounds }}</td>
+            <td class="results-table__cell results-table__cell--centered">
+                <small>{{ obj.rounds_played }}/{{ obj.rounds_authored }}</small>
+            </td>
+            <td class="results-table__cell results-table__cell--centered">{{ obj.points }}</td>
+            <td class="results-table__cell results-table__cell--centered">
+              <small>{{ obj.points_played }}/{{ obj.points_authored }}</small>
+            </td>
           </tr>
         {% endfor %}
       </table>

@@ -7,7 +7,7 @@ from quizzz.auth.models import User
 from quizzz.tournaments.models import Tournament, Round, Play, PlayAnswer
 from quizzz.quizzes.models import Quiz
 
-from .data import TOURNAMENTS
+from .data import TOURNAMENTS, GROUPS, USERS
 from .request_data import NOW, LATER, QUIZ_REQUEST_PAYLOAD, TOURNAMENT_REQUEST_PAYLOAD, \
     ROUND_REQUEST_PAYLOAD, VALID_PLAY_DATA
 
@@ -196,7 +196,7 @@ def test_show_round_page(app, client, auth):
     assert b"Review Quiz" in response.data
     assert b'href="/groups/1/rounds/1/review"' in response.data
     assert b'<td class="results-table__cell">alice</td>' in response.data
-    assert b'<td class="results-table__cell">2</td>' in response.data
+    assert b'<td class="results-table__cell results-table__cell--centered">2</td>' in response.data
 
 
 
@@ -224,14 +224,22 @@ def test_start_round(app, client, auth):
     auth.login_as("ben")    # ben is not group member
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 403
 
-    # group members should be able to play
+    # quiz author should not be able to play
     auth.login_as("bob")
+    response = client.post("/groups/1/rounds/1/start", data={})
+    assert response.status_code == 403
+
+    # group members should be able to play
+    auth.login_as("alice")
     response = client.post("/groups/1/rounds/1/start", data={})
     assert response.status_code == 302
     assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
     with app.app_context():
         db = get_db_session()
-        play = db.query(Play).filter(Play.user_id == 1).filter(Play.round_id == 1).first()
+        play = db.query(Play)\
+            .filter(Play.user_id == USERS["alice"]["id"])\
+            .filter(Play.round_id == 1)\
+            .first()
         assert play.is_submitted is False
         assert len(play.answers) == 0
         assert play.result is None
@@ -244,18 +252,25 @@ def test_start_round(app, client, auth):
     assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
     with app.app_context():
         db = get_db_session()
-        play2 = db.query(Play).filter(Play.user_id == 1).filter(Play.round_id == 1).first()
+        play2 = db.query(Play)\
+            .filter(Play.user_id == USERS["alice"]["id"])\
+            .filter(Play.round_id == 1)\
+            .first()
         assert play2.id == play_id
         assert play.server_started == time_started
 
-    # another user should be able to start her play as well
-    auth.login_as("alice")
+    # another user should be able to start his play as well
+    auth.login_as("ben")
+    client.post('/groups/join', data={"invitation_code": GROUPS["group1"]["invitation_code"]})
     response = client.post("/groups/1/rounds/1/start", data={})
     assert response.status_code == 302
     assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
     with app.app_context():
         db = get_db_session()
-        play3 = db.query(Play).filter(Play.user_id == 2).filter(Play.round_id == 1).first()
+        play3 = db.query(Play)\
+            .filter(Play.user_id == USERS["ben"]["id"])\
+            .filter(Play.round_id == 1)\
+            .first()
         assert play3.id != play_id
 
 
@@ -287,23 +302,22 @@ def test_play_round(app, client, auth):
     auth.login_as("bob")
     assert client.get("/groups/1/rounds/1/play").status_code == 403
     assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 403
-
-    # start bob's play
-    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302  # play 1
-    # start alice's play
     auth.login_as("alice")
-    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # play 2
+    assert client.get("/groups/1/rounds/1/play").status_code == 403
+    assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 403
 
-    # there should be 2 plays in DB at this point and no submitted plays yet
+    # start alice's play
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # play 1
+
+    # there should be 1 play in DB at this point and no submitted plays yet
     with app.app_context():
         db = get_db_session()
         play_submitted = db.query(Play).filter(Play.is_submitted == True).first()
         assert play_submitted is None
         plays_in_progress = db.query(Play).all()
-        assert len(plays_in_progress) == 2
+        assert len(plays_in_progress) == 1
 
     # submit correct form
-    auth.login_as("bob")
     response = client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA)
     assert response.status_code == 302
     assert response.headers["LOCATION"] == "http://localhost/groups/1/rounds/1/review"
@@ -343,7 +357,8 @@ def test_play_round_errors(app, client, auth):
     _finalize_first_quiz(app)
     client.post("/groups/1/tournaments/1/rounds/0/edit", data=ROUND_REQUEST_PAYLOAD)
 
-    # start bob's play
+    # start alice's play
+    auth.login_as("alice")
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302  # play 1
 
     def assert_play_not_in_db():
@@ -393,6 +408,7 @@ def test_play_round_errors(app, client, auth):
 
     # (f) question from another quiz
     # add another quiz and query first question
+    auth.login_as("bob")
     response = client.post('/groups/1/quizzes/0/edit', data=QUIZ_REQUEST_PAYLOAD)
     with app.app_context():
         db = get_db_session()
@@ -400,6 +416,7 @@ def test_play_round_errors(app, client, auth):
         question_id = quiz2.questions[0].id
         correct_option_id = [opt for opt in quiz2.questions[0].options if opt.is_correct][0].id
     # plugging that question into another quiz triggers an error
+    auth.login_as("alice")
     invalid_play_data = VALID_PLAY_DATA.copy()
     invalid_play_data["questions-1-question_id"] = str(question_id)
     invalid_play_data["questions-1-answer"] = str(correct_option_id)
@@ -443,24 +460,29 @@ def test_review_round(app, client, auth):
     auth.login_as("ben")
     assert client.get("/groups/1/rounds/1/review").status_code == 403
 
-    # cannot review round if not started a play yet
+    # can review if quiz author
     auth.login_as("bob")
+    assert client.get("/groups/1/rounds/1/review").status_code == 200
+
+    # cannot review round if not started a play yet
+    auth.login_as("alice")
     assert client.get("/groups/1/rounds/1/review").status_code == 403
 
-    # start bob's play
-    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302  # play 1
+    # start alice's play
+    assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302
 
     # cannot review round of not submitted a play yet
     assert client.get("/groups/1/rounds/1/review").status_code == 403
 
-    # submit bob's play
+    # submit alice's play
     assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 302
 
     # can review now
     assert client.get("/groups/1/rounds/1/review").status_code == 200
 
     # other group members who have not played yet still cannot review round
-    auth.login_as("alice")
+    auth.login_as("ben")
+    client.post('/groups/join', data={"invitation_code": GROUPS["group1"]["invitation_code"]})
     assert client.get("/groups/1/rounds/1/review").status_code == 403
 
 
@@ -474,6 +496,7 @@ def test_delete_round(app, client, auth):
     _finalize_first_quiz(app)
     assert client.post("/groups/1/tournaments/1/rounds/0/edit",
         data=ROUND_REQUEST_PAYLOAD).status_code == 302 # add a new round
+    auth.login_as("alice")
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # start play
     assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 302 # submit
 
@@ -547,6 +570,7 @@ def test_delete_tournament(app, client, auth):
     _finalize_first_quiz(app)
     assert client.post("/groups/1/tournaments/1/rounds/0/edit",
         data=ROUND_REQUEST_PAYLOAD).status_code == 302 # add a new round
+    auth.login_as("alice")
     assert client.post("/groups/1/rounds/1/start", data={}).status_code == 302 # start play
     assert client.post("/groups/1/rounds/1/play", data=VALID_PLAY_DATA).status_code == 302 # submit
 

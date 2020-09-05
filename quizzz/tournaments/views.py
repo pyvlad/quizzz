@@ -98,9 +98,11 @@ def start_round(round_id):
     Given a valid <play> object, redirect to the play view.
     When round is no longer active, no play can be started or re-loaded.
     """
-    round = query_round_by_id(round_id)
+    round = query_round_by_id(round_id, with_author=True)
     if not round.is_active:
         abort(403, "This round is not available (already finished or not started yet).")
+    if round.is_authored_by(g.user.id):
+        abort(403, "You cannot play your own quiz.")
 
     play = query_play(round_id, g.user.id, abort_if_none=False)
     if play and play.is_submitted:
@@ -179,11 +181,13 @@ def review_round(round_id):
     play = query_play(round_id, g.user.id, with_answers=True, abort_if_none=False)
 
     # (b) ensure the user cannot review correct answers before he submits his quiz
-    if not play or not play.is_submitted:
-        abort(403, "You can't review a quiz before you take it!")
+    if not round.is_authored_by(g.user.id):
+        if not play or not play.is_submitted:
+            abort(403, "You can't review a quiz before you take it!")
 
     # (c) prepare dict with selected options by question_id
-    answers_by_question_id = { pa.question_id: pa.option for pa in play.answers }
+    answers_by_question_id = ({} if round.is_authored_by(g.user.id)
+        else { pa.question_id: pa.option for pa in play.answers })
     selected_options = {}
     for question in round.quiz.questions:
         option = answers_by_question_id.get(question.id)
