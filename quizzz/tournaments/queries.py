@@ -33,7 +33,7 @@ def query_tournament_by_id(tournament_id, with_rounds=False, with_plays=False, a
 
 
 def query_round_by_id(round_id, with_questions=False, with_author=False,
-        with_plays=False, with_tournament=False, abort_if_none=True):
+        with_plays=False, with_play_answers=False, with_tournament=False, abort_if_none=True):
     """
     Query round data by <round_id>.
     Optionally loads related objects.
@@ -48,6 +48,8 @@ def query_round_by_id(round_id, with_questions=False, with_author=False,
         q = q.options(joinedload(Round.quiz).joinedload(Quiz.author))
     if with_plays:
         q = q.options(joinedload(Round.plays).joinedload(Play.user))
+    if with_play_answers:
+        q = q.options(joinedload(Round.plays).joinedload(Play.answers))
     if with_tournament:
         q = q.options(joinedload(Round.tournament))
 

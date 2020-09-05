@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from sqlalchemy.orm import joinedload
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
@@ -178,6 +180,8 @@ def review_round(round_id):
     """
     # (a) load round with questions and user's play with options selected
     round = query_round_by_id(round_id, with_questions=True, with_tournament=True)
+    round_with_answers = query_round_by_id(round.id, with_play_answers=True)
+    round_with_author = query_round_by_id(round.id, with_author=True)
     play = query_play(round_id, g.user.id, with_answers=True, abort_if_none=False)
 
     # (b) ensure the user cannot review correct answers before he submits his quiz
@@ -196,13 +200,20 @@ def review_round(round_id):
         question_dict["is_correct"] = option.is_correct if option else False
         selected_options[question.id] = question_dict
 
-    # (d) prepare data for rendering
+    # (d) summary of choices
+    choices_by_question_id = { question.id: defaultdict(int) for question in round.quiz.questions }
+    for play in round_with_answers.plays:
+        for pa in play.answers:
+            choices_by_question_id[pa.question_id][pa.option_id] += 1
+
+    # (e) prepare data for rendering
     data = {
         "tournament": prep_tournament(round.tournament),
         "round": {
             "id": round.id,
             "quiz": {
                 "topic": round.quiz.topic,
+                "author": round_with_author.quiz.author.name
             }
         },
         "questions": [
@@ -217,12 +228,14 @@ def review_round(round_id):
                         "text": option.text,
                         "is_correct": option.is_correct,
                         "is_selected": option.id == selected_options.get(question.id)["option_id"],
+                        "selected_by": choices_by_question_id[question.id].get(option.id, 0)
                     }
                     for option in question.options
                 ]
             }
             for question in round.quiz.questions
-        ]
+        ],
+        "total_plays": len(round_with_answers.plays)
     }
 
     return render_template('tournaments/review_round.html', data=data)

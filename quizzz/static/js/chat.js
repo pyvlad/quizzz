@@ -119,9 +119,13 @@ const loadChat = (url) => {
 
       const messagesDiv = document.getElementById("message_list");
       messagesDiv.innerHTML = "";
-      for (let message of messages) {
-        let messageHTML = makeChatMessageHTML(message);
-        messagesDiv.append(messageHTML);
+      if (messages.length) {
+          for (let message of messages) {
+            let messageHTML = makeChatMessageHTML(message);
+            messagesDiv.append(messageHTML);
+          }
+      } else {
+          messagesDiv.innerHTML = "<p>No messages here yet. Be the first to say something!</p>"
       }
 
       const paginationDiv = document.getElementById("pagination");
