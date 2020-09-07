@@ -5,15 +5,6 @@
   - {{ data.group.name }}
 {% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      ((data.group.id and "Edit Group") or "New Group", "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
   <div class="container">
     <div class="row">
@@ -54,7 +45,7 @@
             </div>
 
             <div class='form__item'>
-              <button class="button button_action">Save</button>
+              <button class="btn btn--secondary btn--block">Save</button>
             </div>
 
           </form>
@@ -64,7 +55,7 @@
                   method="post">
               {{ delete_form.hidden_tag() }}
               <div class='form__item'>
-                <button class="button button_danger"
+                <button class="btn btn--red btn--block"
                         onclick="return confirm('Are you sure?');">
                   Delete
                 </button>

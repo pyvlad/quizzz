@@ -1,4 +1,4 @@
-from flask import g, render_template, current_app
+from flask import g, render_template, current_app, url_for
 
 from . import bp
 from quizzz.quizzes.queries import get_user_group_quizzes
@@ -29,4 +29,9 @@ def show_group_page():
         "num_members": num_members
     }
 
-    return render_template('group/group_page.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (data["group"]["name"], ""),
+    ]
+
+    return render_template('group/group_page.html', data=data, navbar_items=navbar_items)

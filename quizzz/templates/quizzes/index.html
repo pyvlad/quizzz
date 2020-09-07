@@ -2,36 +2,28 @@
 
 {% block title %}My Quizzes - {{g.group.name}}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Your Quizzes", url_for("quizzes.index"))
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Your Quizzes</h2>
+  <h2 class="heading heading--1">Your Quizzes</h2>
 
-  <a href="{{ url_for('quizzes.edit', quiz_id=0) }}">
-    Create New Quiz
+  <a class="btn btn--primary"
+     href="{{ url_for('quizzes.edit', quiz_id=0) }}">
+    Create Quiz
   </a>
 
-  <h3 class="heading heading_secondary">Created Quizzes</h3>
-  <div class="tabs" id="filterTabs"></div>
-  <table class="table table--full-width my-3">
-    <thead>
-      <tr>
-        <th width="5%">#</th>
-        <th width="50%">Name</th>
-        <th width="10%">Submitted</th>
-        <th width="35%">Last Update</th>
-      </tr>
-    </thead>
-    <tbody id="tableRows"></tbody>
-  </table>
+  <div class="my-3">
+    <div class="tabs mb-2" id="filterTabs"></div>
+    <table class="table table--full-width">
+      <thead>
+        <tr>
+          <th width="5%">#</th>
+          <th width="50%">Name</th>
+          <th width="10%">Submitted</th>
+          <th width="35%">Last Update</th>
+        </tr>
+      </thead>
+      <tbody id="tableRows"></tbody>
+    </table>
+  </div>
 {% endblock %}
 
 
@@ -53,7 +45,7 @@
 
     const td2 = document.createElement("td");
     td2.className = "table__td";
-    td2.innerHTML = `<a href="${ rowData.edit_url }">${ rowData.topic }</a>`;
+    td2.innerHTML = `<a class="link" href="${ rowData.edit_url }">${ rowData.topic }</a>`;
     tr.append(td2);
 
     const td3 = document.createElement("td");
@@ -68,13 +60,22 @@
     relTimeSpan.dataset.func = "fromNow";
     relTimeSpan.dataset.refresh = 60000;
     renderMomentDate(relTimeSpan); // adds innerHTML to element
-    const timeSpan = document.createElement("span");
-    timeSpan.dataset.timestamp = rowData.last_update;
-    timeSpan.dataset.func = "format";
-    timeSpan.dataset.format = "MMM D, YYYY [at] h:mm a";
-    renderMomentDate(timeSpan);
-    td4.innerHTML = timeSpan.outerHTML + " <i>(" + relTimeSpan.outerHTML + ")</i>";
+
+    const timeDiv = document.createElement("div");
+    timeDiv.dataset.timestamp = rowData.last_update;
+    timeDiv.dataset.func = "format";
+    timeDiv.dataset.format = "MMM D, YYYY [at] h:mm a";
+    renderMomentDate(timeDiv);
+    timeDiv.hidden = true;
+
+    td4.append(relTimeSpan);
+    td4.append(timeDiv);
+    td4.onclick = () => {
+      timeDiv.hidden = !timeDiv.hidden;
+    }
     tr.append(td4);
+
+
 
     return tr;
   }
@@ -98,7 +99,7 @@
     if (!rows.length) {
       const tr = document.createElement("tr");
       tr.className = "table__tr table__tr--odd";
-      tr.innerHTML = '<td class="table__td" colspan="5">No such quizzes.</td>';
+      tr.innerHTML = '<td class="table__td" colspan="5">Nothing here.</td>';
       node.append(tr);
     } else {
       rows.forEach((r,i) => {

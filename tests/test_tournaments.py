@@ -195,8 +195,8 @@ def test_show_round_page(app, client, auth):
     assert b'action="/groups/1/rounds/1/start"' not in response.data
     assert b"Review Quiz" in response.data
     assert b'href="/groups/1/rounds/1/review"' in response.data
-    assert b'<td class="results-table__cell">alice</td>' in response.data
-    assert b'<td class="results-table__cell results-table__cell--centered">2</td>' in response.data
+    assert b'<td class="table__td">alice</td>' in response.data
+    assert b'<td class="table__td table__td--centered">2</td>' in response.data
 
 
 

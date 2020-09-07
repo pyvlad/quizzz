@@ -49,7 +49,7 @@ const addFilters = (filters, parentNodeId, onSelect) => {
         for (let [k,v] of filterSelection) {
             const link = document.createElement("a");
             link.className = "tabs__button";
-            if (v) link.classList.add("tabs__button_active");
+            if (v) link.classList.add("tabs__button--active");
             link.onclick = (e) => selectFilter(e, k);
             link.href = "?filter=" + k;
             link.innerHTML = k[0].toUpperCase() + k.slice(1);

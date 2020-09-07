@@ -1,0 +1,83 @@
+/* Group List */
+@import '_variables';
+
+$BORDER-RADIUS: 30px;
+$BORDER-WIDTH: 8px;
+$ACTIONS-HEIGHT: 60px;
+
+$COLOR1: $main-color;
+$COLOR2: $white-color;
+$TEXTCOLOR: $main-color-darker;
+
+
+.groups {
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+
+  &__li {
+    display: block;
+    width: 180px;
+    height: 180px;
+
+    position: relative;
+    margin: 20px;
+  }
+
+  &__li-link {
+    height: 100%;
+    width: 100%;
+
+    border: $BORDER-WIDTH solid $COLOR1;
+    border-radius: $BORDER-RADIUS;
+
+    text-decoration: none;
+    outline: none;
+
+    font-size: 1.2em;
+    font-variant: small-caps;
+    font-weight: bold;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: $COLOR2;
+    color: $TEXTCOLOR;
+
+    &:focus {
+      background-color: darken($COLOR2, 10%);
+    }
+    &:hover {
+      background-color: darken($COLOR2, 15%);
+    }
+    &:active {
+      background-color: darken($COLOR2, 20%);
+    }
+
+    &--with-actions {
+      padding-bottom: $ACTIONS-HEIGHT;
+    }
+  }
+
+
+  &__li-actions {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    height: $ACTIONS-HEIGHT;
+    width: 100%;
+    padding: $BORDER-WIDTH;
+
+    border-radius: 0 0 $BORDER-RADIUS $BORDER-RADIUS;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+
+    background-color: $COLOR1;
+  }
+}

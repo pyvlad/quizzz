@@ -1,11 +1,3 @@
-{% macro render_header(items) -%}
-  <header class="page-info my-1">
-    {% for (text, link) in items %}
-      <a class="page-info__item" href="{{ link }}">{{ text }}</a>
-    {% endfor %}
-  </header>
-{%- endmacro %}
-
 <!DOCTYPE html>
 <html lang='en'>
 <head>
@@ -20,51 +12,71 @@
 
 <body>
 <div class="page">
-  <header class="page__section page__section_header">
-    <div class="page__section-content site-header">
-      <a href="{{ url_for('index') }}" class="site-logo">
-        <img src="{{ url_for('static', filename='images/logo.svg') }}"
-             alt="Website Logo Cat"
-             class="site-logo__image"
-        />
-        <h1 class="site-logo__text">Quizzz</h1>
-      </a>
-      <nav class="menu">
-        {% if g.user %}
-          <div class="menu__item menu__item_username">
-            {{ g.user.name }}
-          </div>
-          <a class="menu__item menu__item_link"
-             href="{{ url_for('auth.logout') }}">
-             Log Out
-          </a>
-        {% else %}
-          <a class="menu__item menu__item_link"
-             href="{{ url_for('auth.register') }}">Register</a>
-          <a class="menu__item menu__item_link"
-             href="{{ url_for('auth.login') }}">Login</a>
-        {% endif %}
-      </nav>
+  <header class="page__section page__section--header">
+    <div class="container-fluid-lg px-2 py-1">
+      <div class="header">
+        <a href="{{ url_for('index') }}" class="logo">
+          <img class="logo__image mr-2"
+               src="{{ url_for('static', filename='images/logo.svg') }}"
+               alt="Website Logo Cat"
+          />
+          <h1 class="logo__text">Quizzz</h1>
+        </a>
+        <nav class="menu">
+          {% if g.user %}
+            <div class="menu__item menu__item--username">
+              {{ g.user.name }}
+            </div>
+            <a class="menu__item menu__item--link"
+               href="{{ url_for('auth.logout') }}">
+               Log Out
+            </a>
+          {% else %}
+            <a class="menu__item menu__item--link"
+               href="{{ url_for('auth.register') }}">Register</a>
+            <a class="menu__item menu__item--link"
+               href="{{ url_for('auth.login') }}">Login</a>
+          {% endif %}
+        </nav>
+      </div>
     </div>
   </header>
 
-  <section class="page__section page__section_main">
-    <div class="page__section-content">
-      {% block header %}{% endblock %}
-      <section class="flash-messages my-3">
-        {% for category, message in get_flashed_messages(with_categories=True) %}
-          <div class="flash-messages__item flash-messages__item_{{ category }} my-2 py-2 px-2">
-            {{ message }}
-          </div>
-        {% endfor %}
+  {% if navbar_items %}
+    <section class="page_section page__section--navbar">
+      <div class="container-fluid-lg px-2 py-2">
+        <header class="navbar">
+          {% for (text, link) in navbar_items %}
+            <a class="navbar__item" href="{{ link }}">{{ text }}</a>
+          {% endfor %}
+        </header>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="page__section page__section--main">
+    <div class="container-fluid-lg px-2">
+      {% set flashed_messages=get_flashed_messages(with_categories=True) %}
+      {% if flashed_messages %}
+        <section class="flash-messages my-3">
+          {% for category, message in flashed_messages %}
+            <div class="flash-messages__item flash-messages__item--{{ category }} my-2 p-2">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </section>
+      {% endif %}
+      <section class="my-3">
+        {% block content %}{% endblock %}
       </section>
-      {% block content %}{% endblock %}
     </div>
   </section>
 
-  <footer class="page__section page__section_footer">
-    <div class="page__section-content">
-      <p>(c) 2020</p>
+  <footer class="page__section page__section--footer">
+    <div class="container-fluid-lg px-2">
+      <div class="py-2">
+        <p>(c) 2020</p>
+      </div>
     </div>
   </footer>
 </div>

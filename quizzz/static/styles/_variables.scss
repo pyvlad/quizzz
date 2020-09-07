@@ -1,5 +1,5 @@
-$layout-breakpoint-sm: 600px;
-$layout-breakpoint-md: 960px;
+$layout-breakpoint-sm: 680px;
+$layout-breakpoint-md: 900px;
 $layout-breakpoint-lg: 1200px;
 
 $NCOLUMNS: 12;
@@ -8,48 +8,48 @@ $BREAKPOINTS: (
   'xs': 0,
   'sm': $layout-breakpoint-sm,
   'md': $layout-breakpoint-md,
-  'lg': $layout-breakpoint-lg
+  'lg': $layout-breakpoint-lg,
 );
 
-$main-color: #352000;
-$main-color-dark: #352000;
-$main-color-darker: darken($main-color, 10%);
-$main-color-light: lighten($main-color, 10%);
-$main-color-lighter: lighten($main-color, 20%);
 
-$grey-color: #ccc;
-$grey-color-light: #eee;
+$main-color: #683f00; // #352000;
+$main-color-dark: darken($main-color, 5%);
+$main-color-darker: darken($main-color, 10%);
+$main-color-darkest: darken($main-color, 15%);
+$main-color-light: lighten($main-color, 5%);
+$main-color-lighter: lighten($main-color, 10%);
+$main-color-lightest: lighten($main-color, 15%);
+
+$grey-color: #888;
+$grey-color-light: #ccc;
+$grey-color-lighter: #eee;
 $grey-color-lightest: #f6f6f6;
-$grey-color-medium: #888;
 $grey-color-dark: #444;
 $grey-color-darker: #333;
+$grey-color-darkest: #222;
+
+$blue-color: blue;
+$blue-color-light: lighten($blue-color, 7.5%);
+$blue-color-lighter: lighten($blue-color, 15%);
+$blue-color-lightest: lighten($blue-color, 22.5%);
+$blue-color-dark: darken($blue-color, 7.5%);
+$blue-color-darker: darken($blue-color, 15%);
+$blue-color-darkest: darkblue;
+
+$blue-color-pale: #2f7ad1;
+
+$red-color: red;
+$red-color-light: lighten($red-color, 7.5%);
+$red-color-lighter: lighten($red-color, 15%);
+$red-color-lightest: rgb(255, 230, 230);
+$red-color-dark: darken($red-color, 7.5%);
+$red-color-darker: darken($red-color, 15%);
+$red-color-darkest: darkred;
 
 $green-color: green;
 $green-color-light: #daffda;
 $green-color-dark: darkgreen;
 
-$red-color: red;
-$red-color-light: #faa;
-$red-color-lighter: rgb(255, 230, 230);
-$red-color-dark: darkred;
-
-$blue-color: #5995DA;
-$blue-color-light: #76AEED;
-$blue-color-dark: #407FC7;
-
-$tab-color-dark: darkblue;
-$tab-color: blue;
-$tab-color-light: #55d;
-
-$link-color: #05f;
-$link-color-dark: darken(#05f, 20%);
-
 $beige-color: beige;
 $black-color: black;
 $white-color: white;
-
-$shade-lightest: rgba(0,0,0,0.1);
-$shade-lighter: rgba(0,0,0,0.2);
-$shade-light: rgba(0,0,0,0.3);
-$red-shade: rgba(255,0,0,0.15);
-$green-shade: rgba(0,255,0,0.15);

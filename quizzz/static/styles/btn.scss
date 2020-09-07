@@ -1,0 +1,114 @@
+/* Button */
+@import '_variables';
+
+$COLOR-PRIMARY: $blue-color;
+$COLOR-SECONDARY: $blue-color-pale;
+$COLOR-GREY: $grey-color-light;
+$COLOR-RED: $red-color;
+
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0.5em 1em;
+
+  &::-moz-focus-inner {
+     border: 0;
+  }
+
+  &--large {
+    font-size: 1.5em;
+  }
+
+  &--small {
+    font-size: 0.8em;
+  }
+
+  &--mw100 {
+    min-width: 100px;
+    text-align: center;
+  }
+
+  &--mw150 {
+    min-width: 150px;
+    text-align: center;
+  }
+
+  &--mw200 {
+    min-width: 200px;
+    text-align: center;
+  }
+
+  &--block {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  &--rounded {
+    border-radius: 2em;
+  }
+
+  &--fab {
+    border-radius: 25px;
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    padding: 10px;
+    line-height: 1;
+    text-align: center;
+  }
+
+  &--primary {
+    color: $white-color;
+    background-color: $COLOR-PRIMARY;
+
+    &:hover {
+      background-color: darken($COLOR-PRIMARY, 10%);
+    }
+    &:active {
+      background-color: darken($COLOR-PRIMARY, 20%);
+    }
+  }
+
+  &--secondary {
+    color: $white-color;
+    background-color: $COLOR-SECONDARY;
+
+    &:hover {
+      background-color: darken($COLOR-SECONDARY, 10%);
+    }
+    &:active {
+      background-color: darken($COLOR-SECONDARY, 20%);
+    }
+  }
+
+  &--grey {
+    color: $grey-color-darkest;
+    background-color: $COLOR-GREY;
+
+    &:hover {
+      background-color: darken($COLOR-GREY, 10%);
+    }
+    &:active {
+      background-color: darken($COLOR-GREY, 20%);
+    }
+  }
+
+  &--red {
+    color: $white-color;
+    background-color: $COLOR-RED;
+
+    &:hover {
+      background-color: darken($COLOR-RED, 10%);
+    }
+    &:active {
+      background-color: darken($COLOR-RED, 20%);
+    }
+  }
+}

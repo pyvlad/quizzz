@@ -2,20 +2,10 @@
 
 {% block title %}Members - {{g.group.name}}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Members", "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Group Members</h2>
+  <h2 class="heading heading--1">Group Members</h2>
 
-  <h3 class="heading heading_secondary">Members List</h3>
+  <h3 class="heading heading--2">Members List</h3>
   <table class="table table--full-width my-3">
     <thead>
       <tr>
@@ -74,7 +64,9 @@
 
     const td6 = document.createElement("td");
     td6.className = "table__td table__td--centered";
-    if (isAdmin && !rowData.is_admin) td6.innerHTML = `<a href="${rowData.edit_url}">✎</a>`;
+    if (isAdmin && !rowData.is_admin) {
+      td6.innerHTML = `<a class="link link--decorated" href="${rowData.edit_url}">✎</a>`;
+    }
     tr.append(td6);
 
     return tr;

@@ -40,7 +40,13 @@ def index():
         "filters": [(filtr, (filter_arg == filtr)) for filtr in TOURNAMENT_FILTERS]
     }
 
-    return render_template('tournaments/index.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Tournaments", "")
+    ]
+
+    return render_template('tournaments/index.html', data=data, navbar_items=navbar_items)
 
 
 # --- single tournament / list of rounds / cumulative list of plays (tournament standings) ---
@@ -66,7 +72,14 @@ def show_tournament_page(tournament_id):
         "filters": [(filtr, (filter_arg == filtr)) for filtr in ROUND_FILTERS]
     }
 
-    return render_template('tournaments/tournament.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Tournaments", url_for("tournaments.index")),
+      (data["tournament"]["name"], "")
+    ]
+
+    return render_template('tournaments/tournament.html', data=data, navbar_items=navbar_items)
 
 
 # --- single round / list of plays (round standings) ---
@@ -85,7 +98,15 @@ def show_round_page(round_id):
         "round_standings": prep_round_standings(round.plays)
     }
 
-    return render_template('tournaments/round.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page", group_id=g.group.id)),
+      ("Tournaments", url_for("tournaments.index")),
+      (data["tournament"]["name"], url_for("tournaments.show_tournament_page", tournament_id=data["tournament"]["id"])),
+      ("Round Page", "")
+    ]
+
+    return render_template('tournaments/round.html', data=data, navbar_items=navbar_items)
 
 
 # --- start a play ---
@@ -238,4 +259,13 @@ def review_round(round_id):
         "total_plays": len(round_with_answers.plays)
     }
 
-    return render_template('tournaments/review_round.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page", group_id=g.group.id)),
+      ("Tournaments", url_for("tournaments.index")),
+      (data["tournament"]["name"], url_for("tournaments.show_tournament_page", tournament_id=data["tournament"]["id"])),
+      ("Round Page", url_for("tournaments.show_round_page", round_id=data["round"]["id"])),
+      ("Review", url_for("tournaments.review_round", round_id=data["round"]["id"]))
+    ]
+
+    return render_template('tournaments/review_round.html', data=data, navbar_items=navbar_items)

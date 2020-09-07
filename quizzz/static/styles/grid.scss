@@ -13,7 +13,7 @@
 
     @for $i from 1 through $NCOLUMNS {
       .col#{$modsuffix}-#{$i} {
-        flex-basis: $i / $NCOLUMNS * 100%;
+        width: $i / $NCOLUMNS * 100%;
       }
       .col#{$modsuffix}-offset-#{$i} {
         margin-left: $i / $NCOLUMNS * 100%;
@@ -36,13 +36,43 @@
 
 
 .container {
-  display: flex;
-  justify-content: space-between;
+  width: 100%;
+}
+
+.container-responsive {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+
+  @media screen and (min-width: $layout-breakpoint-sm) {
+    width: $layout-breakpoint-sm;
+  }
+
+  @media screen and (min-width: $layout-breakpoint-md) {
+    width: $layout-breakpoint-md;
+  }
+
+  @media screen and (min-width: $layout-breakpoint-lg) {
+    width: $layout-breakpoint-lg;
+  }
+}
+
+@each $modifier, $breakpoint in $BREAKPOINTS {
+  $modsuffix: get-modsuffix($modifier);
+
+  @include create-media-query($breakpoint) {
+    .container-fluid#{$modsuffix} {
+      width: 100%;
+      max-width: $breakpoint;
+      margin: 0 auto;
+    }
+  }
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   width: 100%;
 }
 

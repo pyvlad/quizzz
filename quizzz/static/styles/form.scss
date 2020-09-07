@@ -9,8 +9,7 @@
     font-weight: bold;
     font-size: 1.5em;
     line-height: 1.8;
-    border-bottom: 2px solid $grey-color;
-    text-align: center;
+    border-bottom: 2px solid $grey-color-light;
   }
 
   &__help {
@@ -19,6 +18,13 @@
 
   &__item {
     margin: 1em 0;
+
+    &--outlined {
+      border: 1px solid $grey-color-light;
+      border-radius: 3px;
+      padding: 1em;
+      background-color: $grey-color-lighter;
+    }
   }
 
   &__label {
@@ -26,6 +32,55 @@
     font-weight: bold;
     color: $grey-color-darker;
     line-height: 1.5;
+    margin-bottom: 0.5em;
+
+    &--secondary {
+      font-size: 1.1em;
+      color: $grey-color-dark;
+      text-decoration: underline;
+    }
+  }
+
+  &__input {
+    font-size: 16px;
+    border: 1px solid $grey-color-light;
+    border-radius: 3px;
+
+    padding: 0.5em;
+    margin: 0.25em 0;
+    width: 100%;
+  }
+
+  &__textarea {
+    font-size: 16px;
+    border: 1px solid $grey-color-light;
+    border-radius: 3px;
+
+    resize: none;
+    height: 60px;
+    padding: 0.5em;
+    margin: 0.25em 0;
+    width: 100%;
+
+    &--lg {
+      height: 250px;
+    }
+  }
+
+  &__fieldset {
+    border: none;
+    margin: 0.25em 0 0.25em 0.25em;
+  }
+
+  &__fieldset-item {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0.25em 0;
+  }
+
+  &__fieldset-item-input {
+    flex: 1;
+    padding-left: 10px;
   }
 
   &__input-help {
@@ -42,51 +97,26 @@
 
   &__error {
     color: $red-color;
-    border-left: 3px solid $red-color;
-    background-color: $red-color-lighter;
+    border-left: 3px solid $red-color-dark;
+    background-color: $red-color-lightest;
     padding: 0.5em;
   }
+}
 
-  &__input {
-    border: 1px solid $grey-color;
-    border-radius: 3px;
-    padding: 0.5em;
-    margin: 0.25em 0;
-    width: 100%;
-  }
 
-  &__textarea {
-    resize: none;
-    height: 60px;
-    padding: 0.5em;
-    margin: 0.25em 0;
-    width: 100%;
-
-    &_sm {
-      height: 150px;
-    }
-    &_lg {
-      height: 250px;
-    }
-    &_md {
-      height: 150px;
-    }
-  }
-
-  &__input:valid,
-  &__textarea:valid {
-    background-color: $green-color-light;
-  }
-  &__input:invalid,
-  &__textarea:invalid {
-    box-shadow: none;
-  }
-  &__input:focus,
-  &__textarea:focus {
-    box-shadow: 0 0 10px $grey-color;
-  }
-  &__input:focus:invalid,
-  &__textarea:focus:invalid {
-    box-shadow: 0 0 10px $red-color-light;
-  }
+.form--validated .form__input:valid,
+.form--validated .form__textarea:valid {
+  background-color: $green-color-light;
+}
+.form--validated .form__input:invalid,
+.form--validated .form__textarea:invalid {
+  box-shadow: none;
+}
+.form--validated .form__input:focus,
+.form--validated .form__textarea:focus {
+  box-shadow: 0 0 10px $grey-color-light;
+}
+.form--validated .form__input:focus:invalid,
+.form--validated .form__textarea:focus:invalid {
+  box-shadow: 0 0 10px $red-color-light;
 }

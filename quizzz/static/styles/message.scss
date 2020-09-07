@@ -4,26 +4,36 @@
 
 .message {
   margin: 1em 0;
-  background-color: $grey-color-light;
+  background-color: $grey-color-lighter;
   padding: 2px;
-  box-shadow: 3px 3px 5px $grey-color;
+  box-shadow: 3px 3px 5px $grey-color-light;
 
-  &_own {
-    background-color: $green-color-light;
+  &--own {
   }
 
   &__details {
     font-family: "Helvetica", "Arial", sans-serif;
-    font-size: 0.8em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  &__details-main {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 0.5em;
-    color: $grey-color-dark;
   }
 
   &__details-item {
-    margin-right: 2em;
-    margin-left: 5px;
+    font-size: 0.8em;
+    padding: 0.25em 1em;
+  }
+
+  &__author {
+    width: 100px;
+    font-size: 0.9em;
+    color: $grey-color-dark;
+    background-color: $grey-color-light;
+    font-weight: bold;
   }
 
   &__text {
@@ -32,19 +42,6 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     background-color: $grey-color-lightest;
-  }
-
-  &__author {
-    width: 100px;
-    background-color: rgba(255,255,255,0.2);
-    font-weight: bold;
-  }
-
-  &__edit {
-    font-weight: bold;
-    font-size: 1em;
-    padding: 0 10px;
-    text-decoration: none;
   }
 
   &__edited {

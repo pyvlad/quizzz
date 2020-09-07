@@ -2,53 +2,51 @@
 
 {% block title %}Login{% endblock %}
 
-{% block header %}
-  {{ render_header([("Login", "")]) }}
-{% endblock %}
-
 {% block content %}
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 paper-sm bg-grey p-2 p-md-4 my-2">
-        <form method="post" class="form">
+      <div class="col-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+        <div class="paper-sm bg-grey p-2 p-md-4 my-2">
+          <form method="post" class="form">
 
-          {{ form.hidden_tag() }}
+            {{ form.hidden_tag() }}
 
-          <div class="form__header">
-            Log In Form
-          </div>
-
-          <div class="form__item">
-            <div class="form__help">
-              In order to sign in, please enter your credentials below.
+            <div class="form__header">
+              Log In Form
             </div>
-          </div>
 
-          <div class="form__item">
-            <div class="form__label">
-              {{ form.username.label }}
+            <div class="form__item">
+              <div class="form__help">
+                Please enter your credentials.
+              </div>
             </div>
-            {{ form.username(class="form__input") }}
-          </div>
 
-          <div class="form__item">
-            <div class="form__label">
-              {{ form.password.label }}
+            <div class="form__item">
+              <div class="form__label">
+                {{ form.username.label }}
+              </div>
+              {{ form.username(class="form__input") }}
             </div>
-            {{ form.password(class="form__input") }}
-          </div>
 
-          <div class="form__item">
-            <input class="button button_action"
-              type="submit"
-              value="Log In"
-            />
-          </div>
-        </form>
-        <p>
-          Forgot Your Password?
-          <a href="{{ url_for('auth.reset_password_request') }}">Click to Reset It</a>
-        </p>
+            <div class="form__item">
+              <div class="form__label">
+                {{ form.password.label }}
+              </div>
+              {{ form.password(class="form__input") }}
+            </div>
+
+            <div class="form__item text-centered">
+              <input class="btn btn--primary btn--mw150"
+                type="submit"
+                value="Log In"
+              />
+            </div>
+          </form>
+          <p>
+            Forgot Your Password?
+            <a href="{{ url_for('auth.reset_password_request') }}">Click to Reset It</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>

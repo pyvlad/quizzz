@@ -1,5 +1,4 @@
-{% extends 'base.html' %}
-{% from 'macros.html' import render_chat_message %}
+{% extends 'base.html' %}=
 
 {% block head %}
   <script defer src='/static/js/chat.js'></script>
@@ -7,23 +6,14 @@
 
 {% block title %}Chat - {{ g.group.name }}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Chat", "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Group Chat</h2>
+  <h2 class="heading heading--1">Group Chat</h2>
 
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-offset-1 col-sm-10 col-md-offset-3 col-md-6">
-        <a href="{{ url_for('chat.edit', message_id=0) }}">
+      <div class="col-12 col-lg-8">
+        <a class="btn btn--secondary"
+           href="{{ url_for('chat.edit', message_id=0) }}">
           New Message
         </a>
         <div id="message_list"></div>

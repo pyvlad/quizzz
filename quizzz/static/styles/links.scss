@@ -1,0 +1,25 @@
+/* Link Styles */
+@import '_variables';
+
+
+.link {
+  color: $main-color-dark;
+  font-weight: bold;
+  text-decoration: none;
+
+  &:hover {
+    color: $main-color-light;
+  }
+  &:active {
+    color: $main-color-lighter;
+  }
+  &--decorated {
+    text-decoration: underline;
+  }
+  &--no-outline {
+    outline: none;
+  }
+  &--grey {
+    color: $grey-color-dark;
+  }
+}

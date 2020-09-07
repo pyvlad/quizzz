@@ -5,17 +5,6 @@
   - {{ g.group.name }}
 {% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Chat", url_for("chat.index")),
-      ("Message", "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
   <div class="container">
     <div class="row">
@@ -40,11 +29,11 @@
             </div>
 
             <div class="form__item">
-              {{ form.text(class="form__textarea form__textarea_md") }}
+              {{ form.text(class="form__textarea form__textarea--lg") }}
             </div>
 
             <div class="form__item">
-              <input class="button button_action"
+              <input class="btn btn--secondary btn--block"
                 type="submit"
                 value="Submit"
               />
@@ -54,7 +43,7 @@
             <div class="form__item">
               <form action="{{ url_for('chat.delete', id=data.message_id) }}" method="post">
                 {{ delete_form.hidden_tag() }}
-                <input class="button button_danger"
+                <input class="btn btn--red btn--block"
                   type="submit"
                   value="Delete"
                   onclick="return confirm('Are you sure?');"

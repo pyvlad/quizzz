@@ -4,13 +4,13 @@
 
 {% block content %}
   <div class="paper-lg bg-grey p-2 p-sm-4">
-    <div class="quiz-form">
+    <div class="form">
       <form action="" method="post">
 
         {{ form.hidden_tag() }}
 
-        <div class="quiz-form__item">
-          <div class="quiz-form__header">
+        <div class="form__item">
+          <div class="form__header">
             "{{ data.quiz_topic }}"
           </div>
         </div>
@@ -18,35 +18,29 @@
         {% for question in form.questions %}
         {% set question_form = question.form %}
         {% set outer_loop = loop %}
-          <div class='quiz-form__item quiz-form__item_outlined'>
+          <div class='form__item form__item--outlined'>
             {{ question_form.question_id() }}
-            <div class="quiz-form__row">
-              <div class='quiz-form__helper-text'>
-                Question {{ outer_loop.index }}
-              </div>
+            <div class='form__label form__label--secondary'>
+              Question {{ outer_loop.index }}
             </div>
-            <div class="quiz-form__row">
-              <div class='quiz-form__label'>
-                {{ data.questions.get(question_form.question_id.data, "") }}
-              </div>
+            <div class='form__label'>
+              {{ data.questions.get(question_form.question_id.data, "") }}
             </div>
-            <div class="quiz-form__row">
-              <fieldset class="quiz-form__fieldset">
-                {% for subfield in question_form.answer %}
-                  <div class="quiz-form__fieldset-item">
-                    {{ subfield() }}
-                    <label class="quiz-form__fieldset-item-input"
-                           for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
-                      {{ subfield.label.text }}
-                    </label>
-                  </div>
-                {% endfor %}
-              </fieldset>
-            </div>
+            <fieldset class="form__fieldset">
+              {% for subfield in question_form.answer %}
+                <div class="form__fieldset-item">
+                  {{ subfield() }}
+                  <label class="form__fieldset-item-input"
+                         for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
+                    {{ subfield.label.text }}
+                  </label>
+                </div>
+              {% endfor %}
+            </fieldset>
           </div>
         {% endfor %}
-        <div class='quiz-form__row'>
-          <button class="button button_action">Submit</button>
+        <div class='form__item'>
+          <button class="btn btn--primary">Submit</button>
         </div>
 
       </form>

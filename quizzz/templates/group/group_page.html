@@ -1,19 +1,9 @@
 {% extends 'base.html' %}
-{% from 'macros.html' import render_chat_message %}
 
 {% block title %}{{ data.group.name }}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (data.group.name, ""),
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Group: {{ data.group.name }}</h2>
+  <h2 class="heading heading--1">Group: {{ data.group.name }}</h2>
 
   <div class="container">
     <div class="row">
@@ -21,17 +11,21 @@
         <div class="container">
           <div class="row">
             <div class="col-12 col-sm-11">
-              <h3 class="heading heading_secondary">
-                <a href="{{ url_for('tournaments.index') }}">Tournaments</a>
-              </h3>
-              <p><strong>{{ data.num_current_tournaments }}</strong>
-                tournaments are currently in progress.</p>
-              <h3 class="heading heading_secondary">
-                <a href="{{ url_for('quizzes.index') }}">Your Quizzes</a>
-              </h3>
-              <p>You have <strong>{{ data.num_user_quizzes_in_progress }}</strong> unfinished
-                 and <strong>{{ data.num_user_quizzes_finalized }}</strong> submitted quizzes
-                 for this group.</p>
+              <div class="paper p-4 mb-4">
+                <h3 class="heading heading--2">
+                  <a class="link" href="{{ url_for('tournaments.index') }}">Tournaments</a>
+                </h3>
+                <p><strong>{{ data.num_current_tournaments }}</strong>
+                  tournaments are currently in progress.</p>
+              </div>
+              <div class="paper p-4 mb-4">
+                <h3 class="heading heading--2">
+                  <a class="link" href="{{ url_for('quizzes.index') }}">Your Quizzes</a>
+                </h3>
+                <p>You have <strong>{{ data.num_user_quizzes_in_progress }}</strong> unfinished
+                   and <strong>{{ data.num_user_quizzes_finalized }}</strong> submitted quizzes
+                   for this group.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -40,20 +34,24 @@
         <div class="container">
           <div class="row">
             <div class="col-12 col-sm-offset-1 col-sm-11">
-              <h3 class="heading heading_secondary">
-                <a href="{{ url_for('chat.index') }}">Chat</a>
-              </h3>
-              <p><strong>{{ data.num_chat_messages }}</strong>
-                messages in total.
-                {% if data.last_message %}
-                  Last message by <strong>{{ data.last_message.user_name }}</strong>
-                  at <strong>{{ momentjs(data.last_message.time_created).format() }}</strong>.
-                {% endif %}
-              </p>
-              <h3 class="heading heading_secondary">
-                <a href="{{ url_for('groups.list_members') }}">Members</a>
-              </h3>
-              <p>The group contains <strong>{{ data.num_members }}</strong> members.</p>
+              <div class="paper p-4 mb-4">
+                <h3 class="heading heading--2">
+                  <a class="link" href="{{ url_for('chat.index') }}">Chat</a>
+                </h3>
+                <p><strong>{{ data.num_chat_messages }}</strong>
+                  messages in total.
+                  {% if data.last_message %}
+                    Last message by <strong>{{ data.last_message.user_name }}</strong>
+                    at <strong>{{ momentjs(data.last_message.time_created).format() }}</strong>.
+                  {% endif %}
+                </p>
+              </div>
+              <div class="paper p-4 mb-4">
+                <h3 class="heading heading--2">
+                  <a class="link" href="{{ url_for('groups.list_members') }}">Members</a>
+                </h3>
+                <p>The group contains <strong>{{ data.num_members }}</strong> members.</p>
+              </div>
             </div>
           </div>
         </div>

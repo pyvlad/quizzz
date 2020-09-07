@@ -1,5 +1,6 @@
 @import '_variables';
 
+$COLOR: $blue-color-dark;
 
 .pagination {
   display: flex;
@@ -11,13 +12,13 @@
   outline: none;
   margin: 5px;
   padding: 5px;
-  color: $tab-color-dark;
+  color: $COLOR;
   cursor: pointer;
   border: none;
   border-radius: 10px;
 
   &:hover {
-    background-color: $tab-color-dark;
+    background-color: $COLOR;
     color: $white-color;
   }
 }

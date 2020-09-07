@@ -6,4 +6,5 @@ from . import bp
 def index():
     if g.user:
         return redirect(url_for('groups.index'))
+
     return render_template("home/index.html")

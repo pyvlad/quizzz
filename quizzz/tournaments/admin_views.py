@@ -53,7 +53,15 @@ def edit_tournament(tournament_id):
 
     delete_form = EmptyForm()
 
-    return render_template('tournaments/edit.html', form=form, delete_form=delete_form, data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Tournaments", url_for("tournaments.index")),
+      ((data["tournament"]["id"] and "Edit") or "New", "")
+    ]
+
+    return render_template('tournaments/edit.html', form=form, delete_form=delete_form,
+        data=data, navbar_items=navbar_items)
 
 
 
@@ -150,7 +158,16 @@ def edit_round(tournament_id, round_id):
 
     delete_form = EmptyForm()
 
-    return render_template('tournaments/edit_round.html', form=form, delete_form=delete_form, data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Tournaments", url_for("tournaments.index")),
+      (data["tournament"]["name"], url_for("tournaments.show_tournament_page", tournament_id=data["tournament"]["id"])),
+      ("Edit Round" if round_id else "New Round", "")
+    ]
+
+    return render_template('tournaments/edit_round.html', form=form, delete_form=delete_form,
+        data=data, navbar_items=navbar_items)
 
 
 

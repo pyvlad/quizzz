@@ -1,0 +1,29 @@
+/* Page Info (Site Navigation) */
+@import '_variables';
+
+
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  &__item {
+    display: block;
+
+    color: $grey-color-dark;
+    font-weight: bold;
+
+    text-decoration: none;
+    outline: none;
+
+    margin: 2px 5px;
+  }
+
+  &__item:hover {
+    text-shadow: 1px 1px 2px $grey-color-darker;
+  }
+
+  &__item:before {
+    content: "/ "
+  }
+}

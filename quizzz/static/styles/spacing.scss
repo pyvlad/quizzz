@@ -20,34 +20,49 @@ $SIZES: (
       .m#{$modsuffix}-#{$k} {
         margin: $v;
       }
-      .mx#{$modsuffix}-#{$k} {
-        margin-left: $v;
-        margin-right: $v;
-      }
       .my#{$modsuffix}-#{$k} {
         margin-top: $v;
         margin-bottom: $v;
       }
+      .mx#{$modsuffix}-#{$k} {
+        margin-left: $v;
+        margin-right: $v;
+      }
+      .mt#{$modsuffix}-#{$k} {
+        margin-top: $v;
+      }
+      .mr#{$modsuffix}-#{$k} {
+        margin-right: $v;
+      }
       .mb#{$modsuffix}-#{$k} {
         margin-bottom: $v;
+      }
+      .ml#{$modsuffix}-#{$k} {
+        margin-left: $v;
       }
 
       .p#{$modsuffix}-#{$k} {
         padding: $v;
       }
-      .px#{$modsuffix}-#{$k} {
-        padding-left: $v;
-        padding-right: $v;
-      }
       .py#{$modsuffix}-#{$k} {
         padding-top: $v;
         padding-bottom: $v;
       }
-      .pl#{$modsuffix}-#{$k} {
+      .px#{$modsuffix}-#{$k} {
         padding-left: $v;
+        padding-right: $v;
+      }
+      .pt#{$modsuffix}-#{$k} {
+        padding-top: $v;
       }
       .pr#{$modsuffix}-#{$k} {
         padding-right: $v;
+      }
+      .pb#{$modsuffix}-#{$k} {
+        padding-bottom: $v;
+      }
+      .pl#{$modsuffix}-#{$k} {
+        padding-left: $v;
       }
     }
   }

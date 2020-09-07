@@ -1,0 +1,30 @@
+@import '_variables';
+
+
+.text-centered {
+  text-align: center;
+}
+
+.text-justified {
+  text-align: justify;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-green {
+  color: $green-color;
+}
+
+.text-red {
+  color: $red-color;
+}
+
+.text-bold {
+  font-weight: bold;
+}

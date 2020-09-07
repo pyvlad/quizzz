@@ -1,0 +1,19 @@
+/* Sizing */
+
+$SIZES: (
+  "25": 25%,
+  "50": 50%,
+  "75": 75%,
+  "100": 100%,
+  "auto": auto
+);
+
+
+@each $key, $value in $SIZES {
+  .w-#{$key} {
+    width: $value;
+  }
+  .h-#{$key} {
+    height: $value;
+  }
+}

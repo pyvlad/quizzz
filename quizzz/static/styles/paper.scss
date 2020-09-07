@@ -7,9 +7,9 @@
 
   @include create-media-query($breakpoint) {
     .paper#{$modsuffix} {
-      border: 1px solid $grey-color;
+      border: 1px solid $grey-color-light;
       border-radius: 3px;
-      box-shadow: 0 0 10px $grey-color-medium;
+      box-shadow: 0 0 10px $grey-color;
     }
   }
 }

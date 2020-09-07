@@ -36,7 +36,13 @@ def index():
         ]
     }
 
-    return render_template('quizzes/index.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Your Quizzes", url_for("quizzes.index"))
+    ]
+
+    return render_template('quizzes/index.html', data=data, navbar_items=navbar_items)
 
 
 
@@ -111,7 +117,15 @@ def edit(quiz_id):
 
     delete_form = EmptyForm()
 
-    return render_template('quizzes/edit.html', form=form, delete_form=delete_form, data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("My Quizzes", url_for("quizzes.index")),
+      ((data["quiz_id"] and "Edit") or "New", "")
+    ]
+
+    return render_template('quizzes/edit.html', form=form, delete_form=delete_form,
+        data=data, navbar_items=navbar_items)
 
 
 

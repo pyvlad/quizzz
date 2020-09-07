@@ -1,17 +1,25 @@
 /* Headings */
 @import '_variables';
 
+$COLOR: $main-color-darkest;
+
 .heading {
   font-weight: bold;
   font-family: "Helvetica", "Arial", sans-serif;
-  margin-top: 0.5em;
   margin-bottom: 0.5em;
-  color: $main-color;
+  color: $COLOR;
 
-  &_primary {
+  &--1 {
     font-size: 2em;
   }
-  &_secondary {
-    font-size: 1.4em;
+  &--2 {
+    font-size: 1.5em;
+  }
+  &--3 {
+    font-size: 1.2em;
+  }
+
+  &--centered {
+    text-align: center;
   }
 }

@@ -2,76 +2,89 @@
 
 {% block title %}Groups{% endblock %}
 
-{% block header %}
-  {{ render_header([('Groups', "")]) }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Your Groups</h2>
-
-  {% if data.has_edit_permissions %}
-    <div class="admin-actions">
-      <a class="admin-actions__item button button_action"
-         href="{{ url_for('groups.edit', group_id=0) }}">
-        Create New Group
-      </a>
-    </div>
-  {% endif %}
+  <h2 class="heading heading--1">
+    Groups
+  </h2>
 
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-6">
-        <h3 class="heading heading_secondary">Memberships</h3>
-        <ul class="list">
-          {% for group in data.user_groups %}
-            <li class="list__item">
-              <a class="list__linked-content"
-                 href="{{ url_for('group.show_group_page', group_id=group.id) }}">
-                <div class="list__text-primary">
+      <div class="col-12 col-sm-8">
+        <h3 class="heading heading--2">
+          Your Groups
+        </h3>
+        <div class="paper-md bg-grey p-2 px-sm-4 mb-4">
+          <ul class="groups">
+            {% for group in data.user_groups %}
+              <li class="groups__li">
+                <a class="groups__li-link groups__li-link--with-actions" href="{{ group.view_url }}">
                   {{ group.name }}
+                </a>
+                <div class="groups__li-actions">
+                  {% if group.is_admin %}
+                    <a class="btn btn--grey btn--rounded" href="{{ group.edit_url }}">
+                      Edit
+                    </a>
+                  {% else %}
+                    <form action="{{ group.leave_url }}" method="post">
+                      {{ leave_form.hidden_tag() }}
+                      <input class="btn btn--red btn--rounded"
+                        type="submit" value="Leave"
+                        onclick="return confirm('Are you sure you want to leave this group?');" />
+                    </form>
+                  {% endif %}
                 </div>
-              </a>
-              <div class="list__extras">
-                {% if group.is_admin %}
-                  <a href="{{ url_for('groups.edit', group_id=group.id) }}">Edit</a>
-                {% else %}
-                <form action="{{ url_for('groups.leave', group_id=group.id) }}" method="post">
-                  {{ leave_form.hidden_tag() }}
-                  <input
-                    type="submit"
-                    value="Leave"
-                    onclick="return confirm('Are you sure?');"
-                  />
-                </form>
-                {% endif %}
-              </div>
-            </li>
-          {% else %}
-            <p>You are not a member of any group yet.</p>
-          {% endfor %}
-        </ul>
+              </li>
+            {% else %}
+              <p>You are not a member of any group yet.</p>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
-      <div class="col-12 col-sm-offset-1 col-sm-5 col-md-4 p-2 px-sm-4 paper-md bg-grey">
-        <form class="form"
-              action="{{ url_for('groups.join') }}"
-              method="post">
 
-          {{ form.hidden_tag() }}
-
-          <div class="form__header">Join Group</div>
-          <div class="form__item">
-            <div class="form__help">
-              You need to know invitation code to join an existing group.
+      <div class="col-12 col-sm-offset-1 col-sm-3">
+        <h3 class="heading heading--2">
+          Manage Groups
+        </h3>
+        {% if data.has_edit_permissions %}
+          <div class="paper-md bg-grey p-2 px-sm-4 mb-4">
+            <div class="form">
+              <div class="form__header">Create</div>
+              <div class="form__item">
+                <div class="form__help">
+                  Create new group.
+                </div>
+              </div>
+              <div class="form__item">
+                <a class="btn btn--primary btn--block"
+                   href="{{ url_for('groups.edit', group_id=0) }}">Create</a>
+              </div>
             </div>
           </div>
-          <div class="form__item">
-            {{ form.invitation_code.label(class="form__label") }}
-            {{ form.invitation_code(class="form__input") }}
-          </div>
-          <div class="form__item">
-            <button class="button button_action">Submit</button>
-          </div>
-        </form>
+        {% endif %}
+
+        <div class="paper-md bg-grey p-2 px-sm-4">
+          <form class="form"
+                action="{{ url_for('groups.join') }}"
+                method="post">
+
+            {{ form.hidden_tag() }}
+
+            <div class="form__header">Join</div>
+            <div class="form__item">
+              <div class="form__help">
+                To join an existing group, enter invitation code below and click submit.
+              </div>
+            </div>
+            <div class="form__item">
+              {{ form.invitation_code.label(class="form__label") }}
+              {{ form.invitation_code(class="form__input") }}
+            </div>
+            <div class="form__item">
+              <button class="btn btn--primary btn--block">Submit</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>

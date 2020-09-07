@@ -4,23 +4,23 @@
 
 @use 'styles/page';
 @use 'styles/header';
-@use 'styles/page-info';
+@use 'styles/navbar';
 @use 'styles/flash-messages';
 @use 'styles/paper';
 
-@use 'styles/button';
-@use 'styles/list';
+@use 'styles/btn';
 @use 'styles/tabs';
-
 @use 'styles/pagination';
-@use 'styles/message';
 @use 'styles/form';
-@use 'styles/quiz-form';
 @use 'styles/table';
-@use 'styles/results-table';
-@use 'styles/admin-actions';
 @use 'styles/headings';
+@use 'styles/links';
+@use 'styles/text';
+
 @use 'styles/home-logo';
+@use 'styles/groups';
+@use 'styles/message';
 
 @use 'styles/bg';
 @use 'styles/spacing';
+@use 'styles/sizing';

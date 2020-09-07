@@ -5,17 +5,17 @@
   &__item {
     font-weight: bold;
 
-    &_message {
+    &--message {
       background-color: $beige-color;
       color: $black-color;
     }
 
-    &_error {
-      background-color: $red-color-light;
+    &--error {
+      background-color: $red-color-lightest;
       color: $red-color-dark;
     }
 
-    &_success {
+    &--success {
       background-color: $green-color-light;
       color: $green-color-dark;
     }

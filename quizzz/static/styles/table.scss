@@ -3,9 +3,10 @@
 
 
 .table {
-  border-collapse: separate;
-  border-spacing: 1px;
-  border: 1px solid $grey-color;
+  border-collapse: collapse;
+  // add white border
+  // border-collapse: separate;
+  // border-spacing: 1px;
 
   &--full-width {
     width: 100%;
@@ -13,25 +14,38 @@
 
   thead tr {
     background-color: $grey-color-dark;
-    color: $grey-color-light;
+    color: $grey-color-lighter;
+    font-variant: small-caps;
   }
+  &--colorful {
+    thead tr {
+      background-color: $main-color-dark;
+      color: $grey-color-lighter;
+    }
+  }
+
   thead th {
     padding: 4px 10px;
     text-align: center;
     font-weight: bold;
+    border: 1px solid $grey-color-light;
   }
 
   &__tr {
     &--odd {
-      background-color: $grey-color-light;
+      background-color: $grey-color-lighter;
     }
     &--even {
       background-color: $white-color;
+    }
+    &--bold {
+      font-weight: bold;
     }
   }
 
   &__td {
     padding: 4px 10px;
+    border: 1px solid $grey-color-light;
 
     &--centered {
       text-align: center;

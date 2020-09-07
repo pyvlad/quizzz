@@ -2,42 +2,31 @@
 
 {% block title %}Tournaments - {{g.group.name}}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Tournaments", "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Group Tournaments</h2>
+  <h2 class="heading heading--1">Tournaments</h2>
 
   {% if data.is_admin %}
-    <div class="admin-actions">
-      <a class="admin-actions__item button button_action"
-         href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
-        New Tournament
-      </a>
-    </div>
+    <a class="btn btn--primary"
+       href="{{ url_for('tournaments.edit_tournament', tournament_id=0) }}">
+      Create Tournament
+    </a>
   {% endif %}
 
-  <h3 class="heading heading_secondary">Tournaments</h3>
-  <div class="tabs" id="filterTabs"></div>
-  <table class="table table--full-width my-3">
-    <thead>
-      <tr>
-        <th width="5%">#</th>
-        <th width="50%">Name</th>
-        <th width="10%">Active</th>
-        <th width="25%">Time Created</th>
-        <th width="10%">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="tableRows"></tbody>
-  </table>
+  <div class="my-3">
+    <div class="tabs mb-2" id="filterTabs"></div>
+    <table class="table table--full-width">
+      <thead>
+        <tr>
+          <th width="5%">#</th>
+          <th width="50%">Name</th>
+          <th width="10%">Active</th>
+          <th width="25%">Time Created</th>
+          <th width="10%">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableRows"></tbody>
+    </table>
+  </div>
 {% endblock %}
 
 
@@ -59,7 +48,7 @@
 
     const td2 = document.createElement("td");
     td2.className = "table__td";
-    td2.innerHTML = `<a href="${ rowData.view_url }">${ rowData.name }</a>`;
+    td2.innerHTML = `<a class="link" href="${ rowData.view_url }">${ rowData.name }</a>`;
     tr.append(td2);
 
     const td3 = document.createElement("td");
@@ -79,7 +68,7 @@
 
     const td5 = document.createElement("td");
     td5.className = "table__td table__td--centered";
-    if (hasEditPermissions) td5.innerHTML = `<a href="${rowData.edit_url}">✎</a>`;
+    if (hasEditPermissions) td5.innerHTML = `<a class="link link--decorated " href="${rowData.edit_url}">✎</a>`;
     tr.append(td5);
 
     return tr;

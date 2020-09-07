@@ -2,77 +2,76 @@
 
 {% block title %}{{ data.tournament.name }} Tournament - {{g.group.name}}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Tournaments", url_for("tournaments.index")),
-      (data.tournament.name, "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Tournament Page</h2>
+  <h2 class="heading heading--1">Tournament Page</h2>
 
   {% if data.is_admin %}
-    <div class="admin-actions">
-      <a class="admin-actions__item button button_action"
-         href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
-        Add Round
-      </a>
-    </div>
+    <a class="btn btn--primary"
+       href="{{ url_for('tournaments.edit_round', tournament_id=data.tournament.id, round_id=0) }}">
+      Create New Round
+    </a>
   {% endif %}
 
-  <h3 class="heading heading_secondary">Rounds</h3>
-  <div class="tabs" id="filterTabs"></div>
-  <table class="table table--full-width my-3">
-    <thead>
-      <tr>
-        <th width="5%">#</th>
-        <th width="25%">Name</th>
-        <th width="25%">Author</th>
-        <th width="25%">Finish Time</th>
-        <th width="10%">Played</th>
-        <th width="10%">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="tableRows"></tbody>
-  </table>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-lg-6 pr-lg-4">
+        <section class="my-4">
+          <h3 class="heading heading--2">Rounds</h3>
+          <div class="tabs mb-2" id="filterTabs"></div>
+          <table class="table table--full-width">
+            <thead>
+              <tr>
+                <th width="5%">#</th>
+                <th width="25%">Name</th>
+                <th width="25%">Author</th>
+                <th width="25%">Finish Time</th>
+                <th width="10%">Played</th>
+                <th width="10%">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableRows"></tbody>
+          </table>
+        </section>
+      </div>
 
-  <section class="my-4">
-    <h3 class="heading heading_secondary">Overall Standings</h3>
-    {% if data.tournament_standings %}
-      <table class="results-table">
-        <tr class="results-table__header-row">
-          <td class="results-table__header-cell">#</td>
-          <td class="results-table__header-cell">user</td>
-          <td class="results-table__header-cell">rounds</td>
-          <td class="results-table__header-cell">p/a</td>
-          <td class="results-table__header-cell">points</td>
-          <td class="results-table__header-cell">p/a</td>
-        </tr>
-        {% for obj in data.tournament_standings %}
-          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
-              {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
-            <td class="results-table__cell">{{ loop.index }}</td>
-            <td class="results-table__cell">{{ obj.user }}</td>
-            <td class="results-table__cell results-table__cell--centered">{{ obj.rounds }}</td>
-            <td class="results-table__cell results-table__cell--centered">
-                <small>{{ obj.rounds_played }}/{{ obj.rounds_authored }}</small>
-            </td>
-            <td class="results-table__cell results-table__cell--centered">{{ obj.points }}</td>
-            <td class="results-table__cell results-table__cell--centered">
-              <small>{{ obj.points_played }}/{{ obj.points_authored }}</small>
-            </td>
-          </tr>
-        {% endfor %}
-      </table>
-    {% else %}
-      <p>Tournament standings will be here.</p>
-    {% endif %}
-  </section>
+      <div class="col-12 col-lg-6 pl-lg-4">
+        <section class="my-4">
+          <h3 class="heading heading--2">Overall Standings</h3>
+          {% if data.tournament_standings %}
+            <table class="table table--full-width table--colorful">
+              <thead>
+                <tr class="">
+                  <th width="5%">#</th>
+                  <th width="45%">user</th>
+                  <th width="12.5%">rounds</th>
+                  <th width="12.5%">p/a</th>
+                  <th width="12.5%">points</th>
+                  <th width="12.5%">p/a</th>
+                </tr>
+              </thead>
+              {% for obj in data.tournament_standings %}
+                <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}
+                    {{ (obj.user_id == g.user.id and 'table__tr--bold') or '' }}">
+                  <td class="table__td table__td--centered">{{ loop.index }}</td>
+                  <td class="table__td">{{ obj.user }}</td>
+                  <td class="table__td table__td--centered">{{ obj.rounds }}</td>
+                  <td class="table__td table__td--centered">
+                      <small>{{ obj.rounds_played }}/{{ obj.rounds_authored }}</small>
+                  </td>
+                  <td class="table__td table__td--centered">{{ obj.points }}</td>
+                  <td class="table__td table__td--centered">
+                    <small>{{ obj.points_played }}/{{ obj.points_authored }}</small>
+                  </td>
+                </tr>
+              {% endfor %}
+            </table>
+          {% else %}
+            <p>Tournament standings will be here.</p>
+          {% endif %}
+        </section>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block bottom %}
@@ -93,7 +92,7 @@
 
     const td2 = document.createElement("td");
     td2.className = "table__td";
-    td2.innerHTML = `<a href="${ round.view_url }">${ round.quiz.topic }</a>`;
+    td2.innerHTML = `<a class="link" href="${ round.view_url }">${ round.quiz.topic }</a>`;
     tr.append(td2);
 
     const td3 = document.createElement("td");
@@ -118,7 +117,7 @@
 
     const td6 = document.createElement("td");
     td6.className = "table__td table__td--centered";
-    if (hasEditPermissions) td6.innerHTML = `<a href="${round.edit_url}">✎</a>`;
+    if (hasEditPermissions) td6.innerHTML = `<a class="link link--decorated" href="${round.edit_url}">✎</a>`;
     tr.append(td6);
 
     return tr;

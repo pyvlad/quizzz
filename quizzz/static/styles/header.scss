@@ -1,18 +1,16 @@
-/* Header */
+/* Page Header */
 @import '_variables';
 
 
-.site-header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.site-logo {
+.logo {
   display: flex;
   align-items: center;
-  color: $main-color-dark;
-  font-variant: small-caps;
   text-decoration: none;
   outline: none;
 
@@ -20,10 +18,11 @@
     height: 50px;
   }
   &__text {
-    padding: 5px;
-    text-shadow: 1px 1px 2px $main-color-dark;
-    font-weight: bold;
+    color: $main-color-darker;
     font-size: 36px;
+    font-weight: bold;
+    font-variant: small-caps;
+    text-shadow: 1px 1px 2px $main-color-darker;
   }
 }
 
@@ -32,26 +31,29 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
-  padding: 0 10px;
+  align-self: stretch;
+  background-color: $grey-color-light;
 
   &__item {
-    margin-left: 20px;
+    margin: 10px;
   }
-  &__item_link {
-    color: $link-color;
+  &__item--link {
+    color: $main-color-darker;
     font-weight: bold;
 
     text-decoration: none;
     outline: none;
   }
-  &__item_link:hover {
-    color: $link-color-dark;
+  &__item--link:hover {
+    color: $main-color-light;
   }
-  &__item_username {
-    background-color: $link-color;
+  &__item--username {
+    background-color: $main-color;
     color: $white-color;
+    text-shadow: 1px 1px 2px $black-color;
     font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 20px;
+    padding: 2px 12px;
+    border-radius: 1em;
+    border: 1px solid $main-color-darker;
   }
 }

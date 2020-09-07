@@ -33,7 +33,10 @@ def index():
             {
                 "id": group.id,
                 "name": group.name,
-                "is_admin": m.is_admin
+                "is_admin": m.is_admin,
+                "view_url": url_for('group.show_group_page', group_id=group.id),
+                "edit_url": url_for('groups.edit', group_id=group.id),
+                "leave_url": url_for('groups.leave', group_id=group.id),
             } for m, group in user_groups
         ],
         "has_edit_permissions": g.user.can_create_groups,
@@ -42,7 +45,10 @@ def index():
     form = InvitationCodeForm()
     leave_form = EmptyForm()
 
-    return render_template('groups/index.html', form=form, leave_form=leave_form, data=data)
+    navbar_items = [('Groups', "")]
+
+    return render_template('groups/index.html', form=form, leave_form=leave_form,
+        data=data, navbar_items=navbar_items)
 
 
 # ----- CREATE/EDIT -----
@@ -93,7 +99,14 @@ def edit():
 
     delete_form = EmptyForm()
 
-    return render_template('groups/edit.html', form=form, delete_form=delete_form, data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      ((data["group"]["id"] and "Edit Group") or "New Group", "")
+    ]
+
+    return render_template('groups/edit.html', form=form, delete_form=delete_form,
+        data=data, navbar_items=navbar_items)
+
 
 
 @bp.route('/<int:group_id>/delete', methods=('POST',))
@@ -194,7 +207,13 @@ def list_members():
         "is_admin": g.group_membership and g.group_membership.is_admin
     }
 
-    return render_template('groups/members.html', data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Members", "")
+    ]
+
+    return render_template('groups/members.html', data=data, navbar_items=navbar_items)
 
 
 
@@ -239,4 +258,11 @@ def edit_member(user_id):
         "username": user.name
     }
 
-    return render_template('groups/edit_member.html', form=form, data=data)
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Members", url_for("groups.list_members")),
+      (data["username"], "")
+    ]
+
+    return render_template('groups/edit_member.html', form=form, data=data, navbar_items=navbar_items)

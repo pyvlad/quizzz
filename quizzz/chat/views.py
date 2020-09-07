@@ -39,7 +39,13 @@ def _retrieve_round_id_and_run_checks():
 
 @bp.route('/')
 def index():
-    return render_template('chat/index.html')
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Chat", "")
+    ]
+
+    return render_template('chat/index.html', navbar_items=navbar_items)
 
 
 
@@ -95,9 +101,19 @@ def edit(message_id):
     for error in form.text.errors:
         flash(error, Flashing.ERROR)
 
-    return render_template('chat/edit.html',
-        form=form, delete_form=delete_form,
-        data={"message_id": msg.id})
+    data = {
+        "message_id": msg.id
+    }
+
+    navbar_items = [
+      ("Groups", url_for("groups.index")),
+      (g.group.name, url_for("group.show_group_page")),
+      ("Chat", url_for("chat.index")),
+      ("Message", "")
+    ]
+
+    return render_template('chat/edit.html', form=form, delete_form=delete_form,
+        data=data, navbar_items=navbar_items)
 
 
 

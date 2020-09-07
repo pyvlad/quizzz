@@ -2,20 +2,8 @@
 
 {% block title %}{{ data.tournament.name }} Round - {{g.group.name}}{% endblock %}
 
-{% block header %}
-  {{
-    render_header([
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page", group_id=g.group.id)),
-      ("Tournaments", url_for("tournaments.index")),
-      (data.tournament.name, url_for("tournaments.show_tournament_page", tournament_id=data.tournament.id)),
-      (data.round.name or "Round %s" % data.round.id, "")
-    ])
-  }}
-{% endblock %}
-
 {% block content %}
-  <h2 class="heading heading_primary">Round Page</h2>
+  <h2 class="heading heading--1">Round Page</h2>
 
   <table>
     <tr>
@@ -51,12 +39,12 @@
       <td>
         {% if not data.round.is_taken and data.round.status == "current" and not data.round.is_author %}
           <form action="{{ url_for('tournaments.start_round', round_id=data.round.id) }}" method="post">
-            <button class="button button_action my-3">
+            <button class="btn btn--primary my-3">
               Take Quiz
             </button>
           <form>
         {% elif data.round.is_taken or data.round.is_author %}
-          <a class="button button_action my-3"
+          <a class="btn btn--secondary my-3"
              href="{{ url_for('tournaments.review_round', round_id=data.round.id) }}">
             Review Quiz
           </a>
@@ -66,24 +54,26 @@
   </table>
 
   <section class="my-4">
-    <h3 class="heading heading_secondary">Standings</h3>
+    <h3 class="heading heading--2">Standings</h3>
     {% if data.round_standings %}
-      <table class="results-table">
-        <tr class="results-table__header-row">
-          <td class="results-table__header-cell">#</td>
-          <td class="results-table__header-cell">user</td>
-          <td class="results-table__header-cell">result</td>
-          <td class="results-table__header-cell">time</td>
-          <td class="results-table__header-cell">score</td>
-        </tr>
+      <table class="table table--full-width table--colorful">
+        <thead>
+          <tr>
+            <th width="10%">#</th>
+            <th width="42%">user</th>
+            <th width="16%">result</th>
+            <th width="16%">time</th>
+            <th width="16%">score</th>
+          </tr>
+        </thead>
         {% for obj in data.round_standings %}
-          <tr class="results-table__row results-table__row_{{ loop.cycle('odd', 'even') }}
-              {{ (obj.user_id == g.user.id and 'results-table__row_own') or '' }}">
-            <td class="results-table__cell">{{ loop.index }}</td>
-            <td class="results-table__cell">{{ obj.user }}</td>
-            <td class="results-table__cell results-table__cell--centered">{{ obj.result }}</td>
-            <td class="results-table__cell results-table__cell--centered">{{ obj.time|round(2) }}</td>
-            <td class="results-table__cell results-table__cell--centered">
+          <tr class="table__tr table__tr--{{ loop.cycle('odd', 'even') }}
+              {{ (obj.user_id == g.user.id and 'table__tr--bold') or '' }}">
+            <td class="table__td table__td--centered">{{ loop.index }}</td>
+            <td class="table__td">{{ obj.user }}</td>
+            <td class="table__td table__td--centered">{{ obj.result }}</td>
+            <td class="table__td table__td--centered">{{ (obj.time and obj.time|round(2)) or "" }}</td>
+            <td class="table__td table__td--centered">
               <strong>{{ obj.score|round(1) }}</strong>
             </td>
           </tr>

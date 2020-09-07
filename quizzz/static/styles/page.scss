@@ -7,27 +7,25 @@
   min-height: 100vh;
 
   &__section {
-    padding: 5px;
 
-    &_header {
+    &--header {
       background-color: $grey-color-light;
-      border-bottom: 2px solid $grey-color;
+      border-bottom: 2px solid $grey-color-light;
     }
 
-    &_main {
+    &--navbar {
+      background-color: $grey-color-lighter;
+      border-bottom: 2px solid $grey-color-light;
+    }
+
+    &--main {
       flex: 1;
     }
 
-    &_footer {
-      background-color: $grey-color-light;
-      border-top: 2px solid $grey-color;
+    &--footer {
+      background-color: $grey-color-lighter;
+      border-top: 2px solid $grey-color-light;
       color: $black-color;
     }
-  }
-
-  &__section-content {
-    width: 100%;
-    max-width: $layout-breakpoint-lg;
-    margin: 0 auto;
   }
 }

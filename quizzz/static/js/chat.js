@@ -1,38 +1,42 @@
 const makeChatMessageHTML = (msg) => {
     const article = document.createElement("article");
     article.className = "message";
-    if (msg.is_own) article.classList.add("message_own");
+    if (msg.is_own) article.classList.add("message--own");
 
     const detailsDiv = document.createElement("div");
     detailsDiv.className = "message__details";
     article.append(detailsDiv);
 
+    const containerDiv = document.createElement("div");
+    containerDiv.className = "message__details-main";
+
     const authorDiv = document.createElement("div");
     authorDiv.className = "message__details-item message__author";
     authorDiv.innerHTML = msg.user_name;
-    detailsDiv.append(authorDiv);
-
-    const timeSpan = document.createElement("span");
-    timeSpan.innerHTML = moment(msg.time_created).format("MMM D, YYYY [at] h:mm a");
-
-    const relTimeSpan = document.createElement("span");
-    relTimeSpan.dataset.timestamp = msg.time_created;
-    relTimeSpan.dataset.func = "fromNow";
-    relTimeSpan.dataset.refresh = 10000;
-    renderMomentDate(relTimeSpan); // adds innerHTML to element
-
-    const timeDiv = document.createElement("div");
-    timeDiv.className = "message__details-item";
-    timeDiv.innerHTML = timeSpan.outerHTML + "<i> (" + relTimeSpan.outerHTML + ")</i>";
-    detailsDiv.append(timeDiv);
+    containerDiv.append(authorDiv);
 
     if (msg.is_own) {
         const editLink = document.createElement("a");
         editLink.href = msg.edit_url;
-        editLink.className = "message__edit";
-        editLink.innerHTML = "✎";
-        detailsDiv.append(editLink);
+        editLink.className = "btn btn--secondary message__details-item";
+        editLink.innerHTML = "edit";
+        containerDiv.append(editLink);
     }
+
+    const relTimeDiv = document.createElement("div");
+    relTimeDiv.dataset.timestamp = msg.time_created;
+    relTimeDiv.dataset.func = "fromNow";
+    relTimeDiv.dataset.refresh = 10000;
+    renderMomentDate(relTimeDiv); // adds innerHTML to element
+    relTimeDiv.className = "message__details-item";
+    containerDiv.append(relTimeDiv);
+
+    detailsDiv.append(containerDiv);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.innerHTML = moment(msg.time_created).format("MMM D, YYYY [at] h:mm a");
+    timeDiv.className = "message__details-item";
+    detailsDiv.append(timeDiv);
 
     const msgText = document.createElement("p");
     msgText.className = "message__text";

@@ -12,7 +12,7 @@
 
 
 {% macro render_chat_message(msg) %}
-  <article class="message {% if msg.is_own %}message_own{% endif %}">
+  <article class="message {% if msg.is_own %}message--own{% endif %}">
     <div class="message__details">
       <div class="message__details-item message__author">{{ msg.user_name }}</div>
       <div class="message__details-item">
