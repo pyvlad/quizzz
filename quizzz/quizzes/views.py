@@ -8,7 +8,7 @@ from quizzz.momentjs import momentjs
 
 from . import bp
 from .models import Quiz
-from .queries import get_own_quiz_by_id, get_user_group_quizzes
+from .queries import query_quiz_by_id, query_user_quizzes
 from .forms import make_quiz_form
 
 
@@ -18,7 +18,10 @@ def index():
     """
     Get list of quizzes of logged in user in current group.
     """
-    user_quizzes = get_user_group_quizzes()
+    user_quizzes = query_user_quizzes(
+        user_id=g.user.id,
+        group_id=g.group.id
+    )
 
     data = {
         "user_quizzes": [
@@ -50,7 +53,9 @@ def index():
 def edit(quiz_id):
     # load or initialize quiz object with questions
     if quiz_id:
-        quiz = get_own_quiz_by_id(quiz_id, with_questions=True)
+        quiz = query_quiz_by_id(quiz_id, with_questions=True)
+        if quiz.author_id != g.user.id:
+            abort(403, "What do you think you're doing?")
     else:
         quiz = Quiz()
         quiz.is_finalized = False
@@ -88,7 +93,7 @@ def edit(quiz_id):
                     flash("Saved!", Flashing.MESSAGE)
                     return redirect(url_for('quizzes.edit', quiz_id=quiz.id))
         else:
-            flash("Bad form was submitted!")
+            flash("Bad form was submitted!", Flashing.ERROR)
 
     # if this is GET request, populate form from loaded/initialized ORM objects
     else:
@@ -134,7 +139,9 @@ def delete(quiz_id):
     form = EmptyForm()
 
     if form.validate():
-        quiz = get_own_quiz_by_id(quiz_id)
+        quiz = query_quiz_by_id(quiz_id)
+        if quiz.author_id != g.user.id:
+            abort(403, "What do you think you're doing?")
         if quiz.is_finalized:
             abort(403, "Can not delete submitted quiz.")
 

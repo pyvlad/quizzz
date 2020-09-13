@@ -1,7 +1,7 @@
 from flask import g, render_template, current_app, url_for
 
 from . import bp
-from quizzz.quizzes.queries import get_user_group_quizzes
+from quizzz.quizzes.queries import query_user_quizzes
 from quizzz.chat.queries import get_paginated_chat_messages
 
 
@@ -9,10 +9,23 @@ from quizzz.chat.queries import get_paginated_chat_messages
 @bp.route('/')
 def show_group_page():
     num_current_tournaments = len([t for t in g.group.tournaments if t.is_active])
-    num_user_quizzes_in_progress = get_user_group_quizzes(which="in-progress", return_count=True)
-    num_user_quizzes_finalized = get_user_group_quizzes(which="finalized", return_count=True)
+    num_user_quizzes_in_progress = query_user_quizzes(
+        user_id=g.user.id,
+        group_id=g.group.id,
+        which="in-progress",
+        return_count=True
+    )
+    num_user_quizzes_finalized = query_user_quizzes(
+        user_id=g.user.id,
+        group_id=g.group.id,
+        which="finalized",
+        return_count=True
+    )
     chat_data = get_paginated_chat_messages(
-        1, current_app.config["CHAT_MESSAGES_PER_PAGE"], round_id=None)
+        1,
+        current_app.config["CHAT_MESSAGES_PER_PAGE"],
+        round_id=None
+    )
     num_members = len(g.group.members)
 
     data = {
