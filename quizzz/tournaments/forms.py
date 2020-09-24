@@ -40,8 +40,12 @@ class RoundForm(FlaskForm):
 
 
 class QuestionForm(Form):
-    question_id = HiddenField(validators=[ InputRequired() ])
-    answer = RadioField(validators=[ Optional() ])   # choices are added dynamically in views
+    question_id = HiddenField(
+        validators=[ InputRequired() ]
+    )
+    answer = RadioField(
+        validators=[ Optional() ]
+    )   # choices are added dynamically in views
 
 
 def make_play_round_form(questions_per_quiz):

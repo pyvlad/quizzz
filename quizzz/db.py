@@ -2,11 +2,12 @@ import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker, mapper
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.event import listen
+from sqlalchemy.inspection import inspect
 
 
 Base = declarative_base()
@@ -78,6 +79,19 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 
 
+def instant_defaults_listener(target, args, kwargs):
+    """
+    https://stackoverflow.com/questions/14002631/why-isnt-sqlalchemy-default-column-value-available-before-object-is-committed/48097586
+    """
+    for key, column in inspect(target.__class__).columns.items():
+        if column.default is not None:
+            if callable(column.default.arg):
+                setattr(target, key, column.default.arg(target))
+            else:
+                setattr(target, key, column.default.arg)
+
+
+
 def init_app(app):
     """
     Configure database binding, establish session registry, register handlers.
@@ -90,6 +104,7 @@ def init_app(app):
 
     if app.config["DATABASE_URI"].startswith("sqlite"):
         listen(Engine, "connect", set_sqlite_pragma)
+    listen(mapper, 'init', instant_defaults_listener)
 
     app.before_request(add_db_session)
     app.teardown_request(remove_db_session)

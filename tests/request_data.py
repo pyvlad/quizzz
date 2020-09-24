@@ -7,7 +7,6 @@ LATER = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
 
 QUIZ_REQUEST_PAYLOAD = {
     "topic": "Quiz 2",
-    "is_finalized": "0",
     "questions-0-text": "What is love?",
     "questions-0-answer": "3",
     "questions-0-options-0-text": "baby, don't hurt me",

@@ -51,33 +51,50 @@ def index():
 
 @bp.route('/<int:quiz_id>/edit', methods=('GET', 'POST'))
 def edit(quiz_id):
-    # load or initialize quiz object with questions
+    # 1. load/initialize quiz object with questions
     if quiz_id:
         quiz = query_quiz_by_id(quiz_id, with_questions=True)
         if quiz.author_id != g.user.id:
-            abort(403, "What do you think you're doing?")
+            abort(403, "This is not your quiz!")
+        if quiz.group_id != g.group.id:
+            abort(403, "This quiz belongs to another group!")
     else:
         quiz = Quiz()
-        quiz.is_finalized = False
+        quiz.author = g.user
+        quiz.group = g.group
         quiz.num_questions = current_app.config["QUESTIONS_PER_QUIZ"]
         quiz.num_options = current_app.config["OPTIONS_PER_QUESTION"]
         quiz.init_questions()
 
-    # create appropriate form class based on quiz configuration
-    QuizForm = make_quiz_form(quiz.num_questions, quiz.num_options)
-
+    # 2. handle form submission
     if request.method == 'POST':
-        # bail out of updating if submitted
+
+        # 2a. already submitted quiz cannot be modified
         if quiz.is_finalized:
             abort(403, "Cannot update submitted quiz.")
 
-        # otherwise initialize form (implicitly loads data from request.POST)
+        # 2b. identify which button was clicked
+        is_being_submitted = request.form.get("finalize_me", False)
+
+        # 2c. create appropriate form class based on quiz configuration and user action
+        QuizForm = make_quiz_form(quiz.num_questions, quiz.num_options, finalize=is_being_submitted)
+
+        # 2d. initialize form (implicitly loads data from request.POST)
         form = QuizForm()
 
-        # if data is valid, populate ORM object from form data and save
+        # 2e. if data is valid, populate ORM object from form data and save
         if form.validate():
-            quiz.populate_from_wtform(form)
+            # 2f. populate quiz object from wtform
+            quiz.topic = form.topic.data
+            quiz.is_finalized = True if is_being_submitted else False
+            for qnum, question in enumerate(quiz.questions):
+                question_subform = form.questions[qnum].form
+                question.text = question_subform.text.data
+                for optnum, option in enumerate(question.options):
+                    option.text = question_subform.options[optnum].form.text.data
+                    option.is_correct = (question_subform.answer.data == str(optnum))
 
+            # 2g. save
             try:
                 g.db.add(quiz)
                 g.db.commit()
@@ -90,21 +107,28 @@ def edit(quiz_id):
                     flash("Submitted!", Flashing.SUCCESS)
                     return redirect(url_for('quizzes.index'))
                 else:
-                    flash("Saved!", Flashing.MESSAGE)
+                    flash("Saved!", Flashing.SUCCESS)
                     return redirect(url_for('quizzes.edit', quiz_id=quiz.id))
         else:
-            flash("Bad form was submitted!", Flashing.ERROR)
+            flash("Bad quiz was submitted. Please correct the errors below and save/submit again.",
+                Flashing.ERROR)
+            # proceed to re-render form with appropriate validation: submit/save
 
-    # if this is GET request, populate form from loaded/initialized ORM objects
+    # 3. handle GET request
     else:
+        # 3a. create appropriate form class based on quiz configuration
+        QuizForm = make_quiz_form(quiz.num_questions, quiz.num_options, finalize=False)
+
+        # 3b. populate form from loaded/initialized ORM objects
         form = QuizForm(
             topic=quiz.topic,
-            is_finalized="1" if quiz.is_finalized else "0",
             questions=[
                 {
                     "text": question.text,
                     "options": [
-                        {"text": opt.text} for opt in question.options
+                        {
+                            "text": opt.text
+                        } for opt in question.options
                     ],
                     "answer": {
                         opt.is_correct: str(num)
@@ -114,7 +138,7 @@ def edit(quiz_id):
             ]
         )
 
-    # some extra params to render template correctly
+    # 4. some extra params to render template correctly
     data = {
         "quiz_id": quiz.id,
         "read_only": quiz.is_finalized,
@@ -129,8 +153,13 @@ def edit(quiz_id):
       ((data["quiz_id"] and "Edit") or "New", "")
     ]
 
-    return render_template('quizzes/edit.html', form=form, delete_form=delete_form,
-        data=data, navbar_items=navbar_items)
+    return render_template(
+        'quizzes/edit.html',
+        form=form,
+        delete_form=delete_form,
+        data=data,
+        navbar_items=navbar_items
+    )
 
 
 

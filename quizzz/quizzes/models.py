@@ -10,7 +10,7 @@ class Quiz(Base):
     __tablename__ = 'quizzes'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    topic = sa.Column(sa.String(100), nullable=False)
+    topic = sa.Column(sa.String(100), default="Anonymous Quiz")
     is_finalized = sa.Column(sa.Boolean, default=False)
 
     num_questions = sa.Column(sa.Integer, default=0, nullable=False)
@@ -37,29 +37,13 @@ class Quiz(Base):
             for j in range(self.num_options):
                 option = Option(question=question)
 
-    def populate_from_wtform(self, form):
-        self.author = g.user
-        self.group = g.group
-
-        self.topic = form.topic.data
-        self.is_finalized = True if form.is_finalized.data == '1' else False
-
-        if not self.questions:
-            self.init_questions()
-
-        for qnum, question in enumerate(self.questions):
-            question_subform = form.questions[qnum].form
-            question.text = question_subform.text.data
-            for optnum, option in enumerate(question.options):
-                option.text = question_subform.options[optnum].form.text.data
-                option.is_correct = (question_subform.answer.data == str(optnum))
 
 
 class Question(Base):
     __tablename__ = 'questions'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    text = sa.Column(sa.String(1000), nullable=False)
+    text = sa.Column(sa.String(1000), default="")
     comment = sa.Column(sa.String(1000))
 
     quiz_id = sa.Column(sa.Integer, sa.ForeignKey('quizzes.id', ondelete='CASCADE'), nullable=False)
@@ -77,7 +61,7 @@ class Option(Base):
     __tablename__ = 'options'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    text = sa.Column(sa.String(100), nullable=False)
+    text = sa.Column(sa.String(100), default="")
     is_correct = sa.Column(sa.Boolean, nullable=False, default=False)
 
     question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id', ondelete='CASCADE'), nullable=False)

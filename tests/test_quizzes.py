@@ -173,7 +173,7 @@ def test_create_update_validate(client, auth, path):
     del request_payload["topic"] # will raise key error on request.form['topic']
 
     response = client.post(path, data=request_payload)
-    assert b'Bad form was submitted!' in response.data
+    assert b'Bad quiz was submitted.' in response.data
     # assert response.status_code == 400
 
 
@@ -190,12 +190,11 @@ def test_update_finalized(client, auth, app):
 
     # use new quiz data to update first quiz:
     request_payload = QUIZ_REQUEST_PAYLOAD.copy()
-    request_payload["is_finalized"] = "1"
+    request_payload["finalize_me"] = "1"
     response = client.post(f'/groups/1/quizzes/{quiz_id}/edit', data=request_payload)
 
     # try modifying it:
     request_payload = QUIZ_REQUEST_PAYLOAD.copy()
-    request_payload["is_finalized"] = "0"
     request_payload["topic"] = "blablabla"
 
     response = client.post(f'/groups/1/quizzes/{quiz_id}/edit', data=request_payload)

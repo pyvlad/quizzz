@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'macros.html' import render_form_errors %}
 
 {% block title %}
   {% if data.quiz_id %}Edit Quiz{% else %}New Quiz{% endif %}
@@ -29,49 +30,49 @@
             {{ form.topic.label() }}
           </div>
           {{ form.topic(class="form__input", disabled=data.read_only) }}
+          {{ render_form_errors(form.topic) }}
         </div>
 
         {% for question in form.questions %}
           {% set outer_loop = loop %}
           <div class="form__item">
             <div class="form__label">
-              <label for="{{'question_%s' % qnum}}">Question {{ loop.index }}</label>
+              Question {{ loop.index }}
             </div>
             {{ question.form.text(class="form__textarea", disabled=data.read_only) }}
+            {{ render_form_errors(question.form.text) }}
             <fieldset class="form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
               {% for subfield in question.form.answer %}
                 <div class="form__fieldset-item">
-                  {{ subfield(required=True) }}
+                  {{ subfield() }}
                   <label class="form__fieldset-item-input"
                          for="{{ 'questions-%s-answer-%s' % (outer_loop.index0, loop.index0) }}">
                      {{ question.form.options[loop.index0].form.text(
                           class="form__input", disabled=data.read_only) }}
                   </label>
                 </div>
+                {{ render_form_errors(question.form.options[loop.index0].form.text) }}
               {% endfor %}
+              {{ render_form_errors(question.form.answer) }}
             </fieldset>
           </div>
         {% endfor %}
 
-        <div class="form__item">
-          <div class="form__label">
-            {{ form.is_finalized.label }}
+        {% if not data.read_only %}
+          <div class='form__item bg-grey'>
+            <input class="btn btn--secondary btn--mw150" type="submit" name="draft" value="Save Draft">
+            <div class='form__help'>
+              Save the quiz and review/update it later if you are not finished yet.
+            </div>
           </div>
-          <div class="form__row">
-            <fieldset class="form__fieldset" {{ (data.read_only and 'disabled') or '' }}>
-              {% for subfield in form.is_finalized %}
-                <div class="form__fieldset-item">
-                  {{ subfield(required=True) }}
-                  {{ subfield.label(class="form__fieldset-item-input") }}
-                </div>
-              {% endfor %}
-            </fieldset>
-          </div>
-        </div>
+        {% endif %}
 
         {% if not data.read_only %}
-          <div class='form__item'>
-            <button class="btn btn--secondary btn--mw150">Save</button>
+          <div class='form__item bg-grey'>
+            <input class="btn btn--primary btn--mw150" type="submit" name="finalize_me" value="Submit">
+            <div class='form__help'>
+              Submit the quiz to the group's quiz pool if the quiz is ready.
+            </div>
           </div>
         {% endif %}
 
@@ -80,11 +81,14 @@
       {% if data.quiz_id and not data.read_only %}
         <form action="{{ url_for('quizzes.delete', quiz_id=data.quiz_id) }}" method="post">
           {{ delete_form.hidden_tag() }}
-          <div class='form__item'>
+          <div class='form__item bg-grey'>
             <button class="btn btn--red btn--mw150"
                     onclick="return confirm('Are you sure?');">
               Delete
             </button>
+            <div class='form__help'>
+              Delete the quiz.
+            </div>
           </div>
         </form>
       {% endif %}
