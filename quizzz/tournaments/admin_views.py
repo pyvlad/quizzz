@@ -1,4 +1,5 @@
 import traceback
+import datetime
 
 from flask import g, flash, request, redirect, url_for, abort, render_template
 
@@ -92,16 +93,28 @@ def edit_round(tournament_id, round_id):
     check_user_permissions(USER.IS_GROUP_ADMIN)
 
     tournament = query_tournament_by_id(tournament_id)
-    quiz_pool = query_quiz_pool(g.group_id)
+    quiz_pool_tuples = query_quiz_pool(g.group_id)
     round = Round() if not round_id else query_round_by_id(round_id)
 
-    choices = [
-        (quiz.id, "%s by %s" % (quiz.topic, author_name))
-        for quiz, author_id, author_name in quiz_pool
+    quiz_pool = [
+        {
+            "id": quiz.id,
+            "topic": quiz.topic,
+            "author": author_name,
+            "is_selected": False,
+            "time_submitted": quiz.time_created or quiz.time_updated,
+        }
+        for quiz, author_id, author_name in quiz_pool_tuples
     ]
     if round.quiz:
-        choices.insert(0, (round.quiz.id, "%s by %s" % (round.quiz.topic, round.quiz.author.name)))
-
+        quiz_pool.insert(0, {
+            "id": round.quiz.id,
+            "topic": round.quiz.topic,
+            "author": round.quiz.author.name,
+            "is_selected": True,
+            "time_submitted": quiz.time_created or quiz.time_updated,
+        })
+    choices = [(q["id"], "%s by %s" % (q["topic"], q["author"])) for q in quiz_pool]
 
     if request.method == 'POST':
         form = RoundForm()
@@ -116,47 +129,34 @@ def edit_round(tournament_id, round_id):
             except:
                 traceback.print_exc()
                 g.db.rollback()
-                flash("Quiz Round could not be updated!", Flashing.ERROR)
+                flash("Quiz round could not be updated!", Flashing.ERROR)
             else:
-                flash("Quiz Round has been created/updated.", Flashing.SUCCESS)
+                flash("Quiz round has been created/updated.", Flashing.SUCCESS)
                 return redirect(url_for('tournaments.show_tournament_page', tournament_id=tournament_id))
         else:
             flash("Invalid form submitted.")
-    else:
-        form = RoundForm(
-            quiz_id=round.quiz.id if round.quiz else None,
-            start_date=round.start_time,
-            start_time_hours=round.start_time.hour if round.start_time else 0,
-            start_time_minutes=round.start_time.minute if round.start_time else 0,
-            finish_date=round.finish_time,
-            finish_time_hours=round.finish_time.hour if round.start_time else 0,
-            finish_time_minutes=round.finish_time.minute if round.start_time else 0,
-        )
-        form.quiz_id.choices = choices
 
     data = {
         "tournament": {
             "id": tournament.id,
             "name": tournament.name
         },
-        "quiz_pool": [{
-            "id": quiz.id,
-            "topic": quiz.topic,
-            "author_name": author_name
-        } for quiz, author_id, author_name in quiz_pool],
         "round": {
             "id": round.id,
-            "start_time": round.start_time,
-            "finish_time": round.finish_time,
-            "quiz": {
-                "id": round.quiz.id,
-                "topic": round.quiz.topic,
-                "author_name": round.quiz.author.name
-            } if round.quiz else None
+        },
+        "quiz_pool": quiz_pool,
+        "selected": {
+            "quiz_id": round.quiz.id if round.quiz else None,
+            "start_time_utc": (round.start_time
+                if round.start_time
+                else datetime.datetime.utcnow().isoformat() + "Z"),
+            "finish_time_utc": (round.finish_time
+                if round.finish_time
+                else (datetime.datetime.utcnow() + datetime.timedelta(days=1)).isoformat() + "Z"),
         }
     }
 
-    delete_form = EmptyForm()
+    empty_form = EmptyForm()
 
     navbar_items = [
       ("Groups", url_for("groups.index")),
@@ -166,8 +166,8 @@ def edit_round(tournament_id, round_id):
       ("Edit Round" if round_id else "New Round", "")
     ]
 
-    return render_template('tournaments/edit_round.html', form=form, delete_form=delete_form,
-        data=data, navbar_items=navbar_items)
+    return render_template('tournaments/edit_round.html',
+        empty_form=empty_form, data=data, navbar_items=navbar_items)
 
 
 

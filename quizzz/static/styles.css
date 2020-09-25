@@ -1072,6 +1072,7 @@
   color: #4f3000;
   font-weight: bold;
   text-decoration: none;
+  cursor: pointer;
 }
 .link:hover {
   color: #824e00;
@@ -1115,6 +1116,10 @@
 
 .text-bold {
   font-weight: bold;
+}
+
+.text-small {
+  font-size: 0.8em;
 }
 
 .logo-home-page {

@@ -30,12 +30,8 @@ TOURNAMENT_REQUEST_PAYLOAD = {
 
 ROUND_REQUEST_PAYLOAD = {
     "quiz_id": 1,
-    "start_date": NOW.strftime("%Y-%m-%d"),
-    "start_time_hours": NOW.hour,
-    "start_time_minutes": NOW.minute,
-    "finish_date": LATER.strftime("%Y-%m-%d"),
-    "finish_time_hours": LATER.hour,
-    "finish_time_minutes": LATER.minute,
+    "start_time": NOW.strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "finish_time": LATER.strftime("%Y-%m-%dT%H:%M:%SZ")
 }
 
 

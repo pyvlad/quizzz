@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import Form
-from wtforms import StringField, BooleanField, SelectField, RadioField, FormField, FieldList, IntegerField, HiddenField
+from wtforms import (StringField, BooleanField, SelectField, RadioField, FormField, FieldList,
+    IntegerField, HiddenField, DateTimeField)
 from wtforms.fields.html5 import DateField
 from wtforms.widgets import TextArea
 from wtforms.widgets.html5 import NumberInput
@@ -19,24 +20,12 @@ class TournamentForm(FlaskForm):
 
 class RoundForm(FlaskForm):
     quiz_id = SelectField("Select Quiz", coerce=int)
-    start_date = DateField("Start Date")
-    start_time_hours = IntegerField("Start Hours",
-        validators=[ InputRequired(), NumberRange(min=0, max=23) ],
-        widget=NumberInput(min=0, max=23)
-    )
-    start_time_minutes = IntegerField("Start Minutes",
-        validators=[ InputRequired(), NumberRange(min=0, max=59) ],
-        widget=NumberInput(min=0, max=59)
-    )
-    finish_date = DateField("Finish Date")
-    finish_time_hours = IntegerField("Finish Hours",
-        validators=[ InputRequired(), NumberRange(min=0, max=23) ],
-        widget=NumberInput(min=0, max=23)
-    )
-    finish_time_minutes = IntegerField("Finish Minutes",
-        validators=[ InputRequired(), NumberRange(min=0, max=59) ],
-        widget=NumberInput(min=0, max=59)
-    )
+    start_time = DateTimeField("Start Time",
+        validators=[ InputRequired() ],
+        format='%Y-%m-%dT%H:%M:%SZ')
+    finish_time = DateTimeField("Finish Time",
+        validators=[ InputRequired() ],
+        format='%Y-%m-%dT%H:%M:%SZ')
 
 
 class QuestionForm(Form):

@@ -60,12 +60,12 @@ class Round(Base):
     def populate_from_wtform(self, form, tournament_id):
         self.tournament_id = tournament_id
         self.quiz_id = form.quiz_id.data
-        self.start_time = datetime.datetime.combine(form.start_date.data, datetime.datetime.min.time()) \
-            + datetime.timedelta(hours=form.start_time_hours.data) \
-            + datetime.timedelta(minutes=form.start_time_minutes.data)
-        self.finish_time = datetime.datetime.combine(form.finish_date.data, datetime.datetime.min.time()) \
-            + datetime.timedelta(hours=form.finish_time_hours.data) \
-            + datetime.timedelta(minutes=form.finish_time_minutes.data)
+        self.start_time = form.start_time.data
+        self.finish_time = form.finish_time.data
+        # maybe process time, something like this:
+        # self.start_time = datetime.datetime.combine(form.start_date.data, datetime.datetime.min.time()) \
+        #     + datetime.timedelta(hours=form.start_time_hours.data) \
+        #     + datetime.timedelta(minutes=form.start_time_minutes.data)
         return self
 
     @property

@@ -8,108 +8,220 @@
 {% block content %}
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 paper-sm bg-grey p-2 p-md-4 my-2">
-        <div class="form">
+      <div class="col-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+        <div class="paper-sm bg-grey p-2 p-md-4 my-2">
+          <div class="form">
 
-          <div class="form__header">
-            {{ (data.round.id and "Edit Round") or "New Round" }}
-          </div>
-
-          <div class="form__item">
-            <div class="form__help">
-              Please fill in the form below and hit 'save'.<br/>
-            </div>
-          </div>
-
-          <div class="form__item">
-            <div class="form__label">
-              <label for="tournament_name">Tournament Name</label>
-            </div>
-            <input class="form__input"
-              name="tournament_name"
-              id="tournament_name"
-              type="text"
-              value="{{ data.tournament.name }}"
-              disabled
-            />
-          </div>
-
-          <form action="" method="post">
-
-            {{ form.hidden_tag() }}
-
-            <div class='form__item'>
-              {{ form.quiz_id.label(class="form__label") }}
-              {{ form.quiz_id() }}
+            <div class="form__header">
+              {{ (data.round.id and "Edit Round") or "New Round" }}
             </div>
 
             <div class="form__item">
-              <div class="form__label">
-                Start Time
-              </div>
-              <div class="container">
-                <div class="row">
-                  <div class="col-6">
-                    <div class="form__input-help">date</div>
-                    {{ form.start_date(class="form__input") }}
-                  </div>
-                  <div class="col-offset-1 col-2">
-                    <div class="form__input-help">hours</div>
-                    {{ form.start_time_hours(class="form__input") }}
-                  </div>
-                  <div class="col-offset-1 col-2">
-                    <div class="form__input-help">minutes</div>
-                    {{ form.start_time_minutes(class="form__input") }}
-                  </div>
-                </div>
+              <div class="form__help">
+                Please fill in the form below and hit 'save'.<br/>
               </div>
             </div>
 
             <div class="form__item">
               <div class="form__label">
-                Finish Time
+                <label for="tournament_name">Tournament Name</label>
               </div>
-              <div class="container">
-                <div class="row">
-                  <div class="col-6">
-                    <div class="form__input-help">date</div>
-                    {{ form.finish_date(class="form__input") }}
-                  </div>
-                  <div class="col-offset-1 col-2">
-                    <div class="form__input-help">hours</div>
-                    {{ form.finish_time_hours(class="form__input") }}
-                  </div>
-                  <div class="col-offset-1 col-2">
-                    <div class="form__input-help">minutes</div>
-                    {{ form.finish_time_minutes(class="form__input") }}
-                  </div>
+              <input class="form__input"
+                name="tournament_name"
+                id="tournament_name"
+                type="text"
+                value="{{ data.tournament.name }}"
+                disabled
+              />
+            </div>
+
+            <form id="form" action="" method="post">
+
+              {{ empty_form.hidden_tag() }}
+
+              <div class='form__item'>
+                <label class="form__label" for="quiz_id">Select Quiz</label>
+                <div id="quiz_id"></div>
+              </div>
+
+              <div class="form__item">
+                <div class="form__label">
+                  Start Time
                 </div>
+                <div class="form__input-help">
+                  Select the time (your local time) when quiz will become available for play.
+                </div>
+                <div id="start_time"></div>
               </div>
-            </div>
 
-            <div class='form__item text-centered'>
-              <button class="btn btn--secondary btn--mw200">Save</button>
-            </div>
-
-          </form>
-
-          {% if data.round.id %}
-            <form action="{{ url_for('tournaments.delete_round', round_id=data.round.id) }}"
-                  method="post">
-
-              {{ delete_form.hidden_tag() }}
+              <div class="form__item">
+                <div class="form__label">
+                  Finish Time
+                </div>
+                <div class="form__input-help">
+                  Select the time (your local time) when quiz will stop being available for play.
+                </div>
+                <div id="finish_time"></div>
+              </div>
 
               <div class='form__item text-centered'>
-                <button class="btn btn--red btn--mw200"
-                        onclick="return confirm('Are you sure?');">
-                  Delete
-                </button>
+                <button class="btn btn--secondary btn--mw200">Save</button>
               </div>
-            </form>
-          {% endif %}
 
+            </form>
+
+            {% if data.round.id %}
+              <form action="{{ url_for('tournaments.delete_round', round_id=data.round.id) }}"
+                    method="post">
+
+                {{ empty_form.hidden_tag() }}
+
+                <div class='form__item text-centered'>
+                  <button class="btn btn--red btn--mw200"
+                          onclick="return confirm('Are you sure?');">
+                    Delete
+                  </button>
+                </div>
+              </form>
+            {% endif %}
+
+          </div>
         </div>
       </div>
     </div>
   </div>
+{% endblock %}
+
+
+{% block bottom %}
+<script>
+  const makeQuizSelector = (quizId, quizPool) => {
+    const select = document.createElement("select");
+    select.setAttribute("name", "quiz_id");
+
+    for (let quiz of quizPool) {
+      const option = document.createElement("option");
+      const momentObj = moment(quiz.time_submitted);
+      option.innerHTML = `${quiz.author}: ${quiz.topic} [${momentObj.format("YYYY-MM-DD HH:mm")}]`;
+      option.setAttribute("value", quiz.id);
+      if (quiz.id === quizId) option.defaultSelected = true;
+      select.append(option);
+    }
+
+    return select;
+  }
+
+
+  const setTimeToMidnight = (hoursInputId, minutesInputId) => {
+    /* Note:
+    Gecko notes
+    Using setAttribute() to modify certain attributes, most notably value in XUL,
+    works inconsistently, as the attribute specifies the default value.
+    To access or modify the current values, you should use the properties.
+    For example, use Element.value instead of Element.setAttribute().
+    https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute
+    */
+    document.querySelector(hoursInputId).value = "0";
+    document.querySelector(minutesInputId).value = "0";
+  }
+
+
+  const makeDateTimeSelectorHTML = (prefix, timestamp) => {
+    const obj = moment(timestamp);
+    const dateValue = obj.format("YYYY-MM-DD");
+    const hoursValue = obj.format("HH");
+    const minutesValue = obj.format("mm");
+
+    return (
+      `<div class="container">
+        <div class="row">
+        <div class="col-6">
+          <div class="form__input-help">date</div>
+          <input class="form__input" type="date"
+              id="${prefix}_date" name="${prefix}_date" value="${dateValue}">
+        </div>
+        <div class="col-offset-1 col-2">
+          <div class="form__input-help">hours</div>
+          <input class="form__input" type="number" min="0" max="23" required
+              id="${prefix}_hours" name="${prefix}_hours" value="${hoursValue}">
+        </div>
+        <div class="col-offset-1 col-2">
+          <div class="form__input-help">minutes</div>
+          <input class="form__input" type="number" min="0" max="59" required
+              id="${prefix}_minutes" name="${prefix}_minutes" value="${minutesValue}">
+        </div>
+        </div>
+        <div class="row">
+          <div class="col-offset-7 col-5">
+            <div class="link link--grey text-small text-centered"
+              onclick="setTimeToMidnight('#${prefix}_hours', '#${prefix}_minutes')">
+              set to midnight
+            </div>
+          </div>
+        </div>
+      </div>`
+    )
+  }
+
+
+  const getDateTimeValue = (prefix) => {
+    const dt = new Date(document.querySelector(`#${prefix}_date`).value);
+    dt.setHours(document.querySelector(`#${prefix}_hours`).value);
+    dt.setMinutes(document.querySelector(`#${prefix}_minutes`).value);
+    return dt.toISOString().split('.')[0] + "Z";
+  }
+
+
+  const getFormData = () => {
+    const quizSelector = document.querySelector("#quiz_id > select");
+
+    formData = {
+      "quiz_id": quizSelector.options[quizSelector.options.selectedIndex].value,
+      "start_time": getDateTimeValue("start_time"),
+      "finish_time": getDateTimeValue("finish_time"),
+    }
+
+    return formData;
+  }
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    let quizId = {{ data.selected.quiz_id|tojson }};
+    let startTimeUTC = {{ data.selected.start_time_utc|tojson }};
+    let finishTimeUTC = {{ data.selected.finish_time_utc|tojson }};
+    let quizPool = {{ data.quiz_pool|tojson }};
+
+    const quizSelector = makeQuizSelector(quizId, quizPool);
+    document.getElementById("quiz_id").append(quizSelector);
+
+    const startTimeSelectorHTML = makeDateTimeSelectorHTML("start_time", startTimeUTC);
+    document.getElementById("start_time").innerHTML = startTimeSelectorHTML;
+
+    const finishTimeSelectorHTML = makeDateTimeSelectorHTML("finish_time", finishTimeUTC);
+    document.getElementById("finish_time").innerHTML = finishTimeSelectorHTML;
+
+    const form = document.getElementById("form");
+    form.onsubmit = (e) => {
+      e.preventDefault();
+
+      // create new form using main form's data
+      let newForm = document.createElement('form');
+      newForm.action = form.action;
+      newForm.method = form.method;
+      let csrfToken = form.elements.csrf_token.value;
+      let formData = getFormData();
+      newForm.innerHTML = (
+        `<input name="csrf_token" type="hidden" value="${csrfToken}">
+        <input name="quiz_id" value="${formData.quiz_id}">
+        <input name="start_time" value="${formData.start_time}">
+        <input name="finish_time" value="${formData.finish_time}">`
+      );
+      // the form must be in the document to submit it
+      document.body.append(newForm);
+      // submit new form
+      newForm.submit();
+    }
+  });
+
+</script>
 {% endblock %}
