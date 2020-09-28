@@ -112,7 +112,7 @@ def edit_round(tournament_id, round_id):
             "topic": round.quiz.topic,
             "author": round.quiz.author.name,
             "is_selected": True,
-            "time_submitted": quiz.time_created or quiz.time_updated,
+            "time_submitted": round.quiz.time_created or round.quiz.time_updated,
         })
     choices = [(q["id"], "%s by %s" % (q["topic"], q["author"])) for q in quiz_pool]
 
@@ -134,7 +134,7 @@ def edit_round(tournament_id, round_id):
                 flash("Quiz round has been created/updated.", Flashing.SUCCESS)
                 return redirect(url_for('tournaments.show_tournament_page', tournament_id=tournament_id))
         else:
-            flash("Invalid form submitted.")
+            flash("Invalid form submitted. Please make sure that you have selected a quiz.", Flashing.ERROR)
 
     data = {
         "tournament": {
