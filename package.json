@@ -1,0 +1,17 @@
+{
+  "name": "quizzz-js",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "webpack": "webpack",
+    "debug": "node --inspect --inspect-brk ./node_modules/webpack/bin/webpack.js",
+    "dev": "npm run webpack -- --env.mode development --watch",
+    "prod": "npm run webpack -- --env.mode production",
+    "dev:debug": "npm run debug -- --env.mode development",
+    "prod:debug": "npm run debug -- --env.mode production"
+  },
+  "devDependencies": {
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  }
+}

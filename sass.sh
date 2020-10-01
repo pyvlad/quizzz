@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sass --watch quizzz/static/styles.scss quizzz/static/styles.css
+sass --watch css/styles.scss quizzz/static/styles.css
