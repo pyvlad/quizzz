@@ -4,7 +4,7 @@
   <meta charset='utf-8'/>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <title>{% block title %}{% endblock %} | Quizzz</title>
-  <script src='/static/js/moment.min.js'></script>
+  <script src="{{ url_for('static', filename='moment.min.js') }}"></script>
   <script src="{{ url_for('static', filename=(
       'bundle.min.js' if config.ENV == 'production' else 'bundle.js')) }}"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
