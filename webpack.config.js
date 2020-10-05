@@ -7,6 +7,7 @@ module.exports = (env = {mode: "production", presets: []}) => {
     output: {
         path: path.join(__dirname, './quizzz/static'),
         filename: (env.mode === 'production') ? 'bundle.min.js' : "bundle.js",
+        library: "jsFuncs"
     }
   }
 };

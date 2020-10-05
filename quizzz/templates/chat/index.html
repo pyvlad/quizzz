@@ -1,8 +1,4 @@
-{% extends 'base.html' %}=
-
-{% block head %}
-  <script defer src='/static/js/chat.js'></script>
-{% endblock %}
+{% extends 'base.html' %}
 
 {% block title %}Chat - {{ g.group.name }}{% endblock %}
 
@@ -24,6 +20,6 @@
 
   <script>
     const url = "{{ url_for('chat.api_index', page=1) }}";
-    document.addEventListener("DOMContentLoaded", () => loadChat(url));
+    document.addEventListener("DOMContentLoaded", () => jsFuncs.loadChat(url));
   </script>
 {% endblock %}

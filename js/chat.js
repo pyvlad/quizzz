@@ -1,3 +1,6 @@
+const renderMomentDate = require("./renderMomentDate");
+
+
 const makeChatMessageHTML = (msg) => {
     const article = document.createElement("article");
     article.className = "message";
@@ -141,3 +144,6 @@ const loadChat = (url) => {
       e => console.log(e)
     );
 }
+
+
+module.exports = loadChat;
