@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve the App
+After=network.target
+
+[Service]
+User={{ ansible_ssh_user }}
+Group=www-data
+WorkingDirectory={{ dir_root }}
+Environment="PATH={{ dir_venv }}/bin"
+EnvironmentFile={{ environment_file_path }}
+ExecStart={{ gunicorn_exe }} -c {{ gunicorn_config_path }} --chdir {{ remote_cloned_repo_path }} --pid {{ gunicorn_pid_file }} "{{ gunicorn_entry_point }}"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

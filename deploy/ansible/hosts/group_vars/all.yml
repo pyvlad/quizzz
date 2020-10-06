@@ -1,0 +1,45 @@
+# Ansible loads host and group variable files by searching paths
+# relative to the inventory file or the playbook file.
+# https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#organizing-host-and-group-variables
+# special folder names: "group_vars", "host_vars"
+
+# set this to repository name for clarity
+project_name: quizzz
+local_repository_path: "{{ inventory_dir | dirname | dirname | dirname }}"
+
+# DEFINE "dir_home" FOR TARGET HOST
+dir_root:     "{{ dir_home }}"
+dir_repos:    "{{ dir_root }}/repos"
+dir_packages: "{{ dir_root }}/packages"
+dir_venv:     "{{ dir_root }}/env"
+dir_gunicorn: "{{ dir_root }}/gunicorn"
+dir_static_files: "{{ dir_packages }}/{{ project_name }}/quizzz/static/"
+
+remote_bare_repo_path: "{{ dir_repos }}/{{ project_name }}.git"
+remote_cloned_repo_path: "{{ dir_packages }}/{{ project_name }}"
+
+python_major_version: 3.7
+python_minor_version: 6
+
+wsgi_server_host: localhost
+wsgi_server_port: 5000
+
+gunicorn_config_path: "{{ dir_gunicorn }}/config.py"
+gunicorn_pid_file: "{{ dir_gunicorn }}/pid"
+gunicorn_exe: "{{ dir_venv }}/bin/gunicorn"
+gunicorn_entry_point: quizzz:create_app()
+dir_app_instance: "{{ remote_cloned_repo_path }}/instance"
+requirements_filepath: "{{ remote_cloned_repo_path }}/requirements/main.txt"
+sqlite_db_filepath: "{{ dir_root }}/{{ project_name }}.db"
+service_name: "{{ project_name }}.service"
+environment_file_path: "{{ dir_root }}/environment.conf"
+
+# SSL
+dir_ssl_remote: "/etc/ssl/{{ project_name }}"
+# DEFINE "dir_ssl_local" FOR TARGET HOST
+ssl_key_local: "{{ dir_ssl_local }}/ssl.key"
+ssl_crt_local: "{{ dir_ssl_local }}/ssl.crt"
+ssl_key_remote: "{{ dir_ssl_remote }}/ssl.key"
+ssl_crt_remote: "{{ dir_ssl_remote }}/ssl.crt"
+
+nginx_use_ssl: yes

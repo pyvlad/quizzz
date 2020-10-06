@@ -1,0 +1,68 @@
+---
+# Each playbook is composed of one or more ‘plays’ in a list.
+# The goal of a play is to map a group of hosts to some tasks.
+# At a basic level, a task is just a call to an ansible module.
+
+- name: Prepare server directories
+  hosts: webserver
+  become: false
+  gather_facts: no
+
+  tasks:
+  - name: Delete existing directories
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop:
+      - "{{ dir_repos }}"
+      - "{{ dir_packages }}"
+
+  - name: Create directory for bare git repository
+    file:
+      path: "{{ dir_repos }}"
+      state: directory
+      mode: '0755'
+
+  - name: Create directory for cloned package code
+    file:
+      path: "{{ dir_packages }}"
+      state: directory
+      mode: '0755'
+
+  - name: Initialize bare repository
+    command: "git init --bare {{ remote_bare_repo_path }}"
+    args:
+      creates: "{{ remote_bare_repo_path }}/HEAD"
+
+
+
+- name: Push code from control machine to target host
+  hosts: this_machine
+  become: false
+  gather_facts: no
+
+  vars:
+    user: "{{ hostvars['webserver']['ansible_user'] }}"
+    host: "{{ hostvars['webserver']['ansible_host'] }}"
+    path: "{{ hostvars['webserver']['remote_bare_repo_path'] }}"
+
+  tasks:
+  - name: Push master branch of each repository to target host
+    command: "git push ssh://{{ user }}@{{ host }}:/{{ path }} master"
+    args:
+      chdir: "{{ local_repository_path }}"
+    environment:
+      GIT_SSH_COMMAND: "{{ hostvars['webserver']['git_ssh_command'] }}"
+
+
+
+- name: Clone bare repositories
+  hosts: webserver
+  become: false
+  gather_facts: no
+
+  tasks:
+  - name: Clone code from the repository
+    git:
+      repo: '{{ remote_bare_repo_path }}'
+      dest: '{{ remote_cloned_repo_path }}'

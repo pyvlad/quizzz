@@ -1,0 +1,83 @@
+---
+# Postgresql
+# Notes:
+# a. <postgresql> package depends on:
+#    libpq5 libsensors4 postgresql-client-10 postgresql-client-common postgresql-common ssl-cert sysstat
+# b. <libpq-dev> is required by psycopg2 and pg_config
+# c. Installation of <postgresql> includes:
+#    $ /usr/lib/postgresql/10/bin/initdb -D /var/lib/postgresql/10/main --auth-local peer --auth-host md5
+#    The files belonging to this database system will be owned by user "postgres".
+#    This user must also own the server process.
+
+- name: Install and configure PostgreSQL database
+  hosts: webserver
+  gather_facts: no
+  vars:
+    db_environment:
+      - key: PATH
+        value: /usr/lib/postgresql/10/bin:$PATH
+      - key: MANPATH
+        value: /usr/share/postgresql/10/man:$MANPATH
+      - key: PGDATA
+        value: /var/lib/postgresql/10/main
+    bash_profile_filepath: /var/lib/postgresql/.bash_profile
+    postgres_role: "{{ hostvars['webserver']['ansible_user'] }}"
+    postgres_database: "{{ project_name }}"
+
+
+  tasks:
+  - name: Ensure required PostgreSQL packages are installed
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    become: true
+    loop:
+      - postgresql-10
+      - libpq-dev
+
+  - name: Make sure postgres' bash_profile exists
+    file:
+      path: "{{ bash_profile_filepath }}"
+      state: touch
+    become: true
+
+  - name: Populate postgres' bash_profile
+    lineinfile:
+      dest: "{{ bash_profile_filepath }}"
+      state: present
+      regexp: "^{{ item.key }}="
+      line: "export {{ item.key }}={{ item.value}}"
+    with_items: "{{ db_environment }}"
+    become: true
+
+  - name: Check if user's role exists
+    shell: psql -tc "SELECT 1 FROM pg_roles WHERE rolname='{{ ansible_user }}'" | grep -q 1
+    register: is_role_created
+    ignore_errors: true
+    become: true
+    become_user: postgres
+    become_flags: '--login'
+
+  - name: Ensure user's role is created
+    shell: "createuser {{ ansible_user }}"
+    when: is_role_created is failed
+    become: true
+    become_user: postgres
+    become_flags: '--login'
+
+  - name: Check if app's database exists
+    shell: psql -tc "SELECT 1 FROM pg_database WHERE datname = '{{ project_name }}'" | grep -q 1
+    register: is_db_created
+    ignore_errors: true
+    become: true
+    become_user: postgres
+    become_flags: '--login'
+
+  # psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'my_db'" | grep -q 1 || psql -U postgres -c "CREATE DATABASE my_db"
+  - name: Ensure Postgres database is created
+    shell: "createdb {{ project_name }} -O {{ ansible_user }}"
+    when: is_db_created is failed
+    become: true
+    become_user: postgres
+    become_flags: '--login'

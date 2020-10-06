@@ -1,0 +1,24 @@
+---
+
+all:
+  hosts:
+    this_machine:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3
+  children:
+    webservers:
+      hosts:
+        webserver:
+          ansible_host: quizzz.su
+          ansible_user: vlad
+          ansible_python_interpreter: /usr/bin/python3
+
+          git_ssh_command: "ssh"
+          dir_home: "/home/{{ ansible_user }}"
+          dir_ssl_local: "{{ local_repository_path }}/deploy/ansible/playbooks/templates/production/.ssl"
+          environment_file_template: "production/.env"
+          db_initial_data: no
+
+          postfix_server_name: quizzz.su
+          server_name: quizzz.su
+          domain_name: quizzz.su

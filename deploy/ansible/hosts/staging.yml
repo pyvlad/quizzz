@@ -1,0 +1,31 @@
+---
+# YAML file has better formatting than INI
+# .yml extension is for VIM to format it correctly
+# Each host is a member of at least 2 groups: 'all' and 'ungrouped'/<some group>;
+# here this_machine: ('all', 'ungrouped'), target: ('all', 'webservers')
+
+all:
+  hosts:
+    this_machine:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3
+  children:
+    webservers:
+      hosts:
+        webserver:
+          ansible_host: localhost
+          ansible_port: 2222
+          ansible_user: vagrant
+          ansible_ssh_private_key_file: "{{ inventory_dir | dirname | dirname }}/.vagrant/machines/default/virtualbox/private_key"
+          ansible_ssh_common_args: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+          ansible_python_interpreter: /usr/bin/python3
+
+          git_ssh_command: "ssh -p {{ ansible_port }} -o IdentityFile={{ ansible_ssh_private_key_file }} {{ ansible_ssh_common_args }}"
+          dir_home: "/home/{{ ansible_user }}"
+          dir_ssl_local: "{{ local_repository_path }}/deploy/ansible/playbooks/templates/staging/.ssl"
+          environment_file_template: "staging/.env"
+          db_initial_data: yes
+
+          postfix_server_name: vagrant.vm
+          server_name: localhost
+          domain_name: localhost

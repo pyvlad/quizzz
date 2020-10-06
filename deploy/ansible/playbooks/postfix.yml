@@ -1,0 +1,48 @@
+---
+# Postfix
+# TODO: add mail forwarding from root to external email
+
+- name: Install and configure Postfix mail transfer agent
+  hosts: webserver
+  gather_facts: no
+  vars:
+    server_name: "{{ postfix_server_name }}"
+
+  tasks:
+  - name: Set Postfix option - type of configuration
+    debconf: 
+      name: postfix
+      question: postfix/main_mailer_type
+      value: 'Internet Site'
+      vtype: string
+    become: true
+
+  - name: Set Postfix option - default domain name
+    debconf: 
+      name: postfix
+      question: postfix/mailname
+      value: "{{ server_name }}"
+      vtype: string
+    become: true
+
+  - name: Install postfix
+    apt: 
+      name: postfix
+      state: present
+      update_cache: yes
+    become: true
+
+  - name: Upload Postfix configuration
+    template:
+      src: postfix.main.cf
+      dest: /etc/postfix/main.cf
+    become: true
+    notify:
+    - restart postfix
+
+  handlers:
+  - name: restart postfix
+    service:
+      name: postfix
+      state: restarted
+    become: yes

@@ -82,6 +82,6 @@
 
   <script>
     const url = "{{ url_for('chat.api_index', page=1, round_id=data.round.id)|safe }}";
-    document.addEventListener("DOMContentLoaded", () => loadChat(url));
+    document.addEventListener("DOMContentLoaded", () => jsFuncs.loadChat(url));
   </script>
 {% endblock %}

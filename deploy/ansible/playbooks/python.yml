@@ -1,0 +1,70 @@
+---
+
+- name: install Python from source
+  hosts: webserver
+  gather_facts: no
+
+  vars:
+    python_version: "{{ python_major_version }}.{{ python_minor_version }}"
+    python_md5: 3ef90f064506dd85b4b4ab87a7a83d44
+    python_filename: "Python-{{ python_version }}"
+    python_archive_filename: "{{ python_filename }}.tgz"
+    python_filepath: "{{ dir_home }}/{{ python_filename }}"
+    python_archive_filepath: "{{ dir_home }}/{{ python_archive_filename }}"
+
+
+  tasks:
+  - name: Check if python{{ python_major_version }} is present
+    command: which python{{ python_major_version }}
+    register: is_python_installed
+    ignore_errors: true
+
+  - name: Install absent Python{{ python_major_version }}
+    when: is_python_installed is failed
+    block:
+      - name: Add source repository to sources.list
+        apt_repository:
+          repo: deb-src http://archive.ubuntu.com/ubuntu/ bionic main
+          state: present
+        become: true
+
+      - name: Install python dependencies
+        apt:
+          name: python3.6
+          state: build-dep
+          update_cache: yes
+        become: true
+
+      - name: Install missing uuid dependency
+        apt:
+          name: uuid-dev
+          state: present
+        become: true
+
+      - name: Download file with check (md5)
+        get_url:
+          url: "https://www.python.org/ftp/python/{{ python_version }}/{{ python_archive_filename }}"
+          dest: "{{ python_archive_filepath }}"
+          checksum: "md5:{{ python_md5 }}"
+
+      - name: Unarchive Python
+        unarchive:
+          src: "{{ python_archive_filepath }}"
+          dest: "{{ python_filepath | dirname }}"
+          remote_src: yes
+
+      - name: Install Python
+        shell: "./configure && make && make altinstall"
+        args:
+          chdir: "{{ python_filepath }}/"
+          creates: "/usr/local/bin/python{{ python_major_version }}"
+        become: true
+
+      - name: Clean Up
+        file:
+          path: "{{ item }}"
+          state: absent
+        become: true
+        loop:
+          - "{{ python_filepath }}"
+          - "{{ python_archive_filepath }}"

@@ -1,0 +1,23 @@
+---
+# Configuration for Ubuntu
+
+- name: Configure Ubuntu
+  hosts: webserver
+  become: true
+  gather_facts: no
+
+  tasks:
+  - name: Configure firewall
+    ufw:
+      rule: allow
+      name: "{{ item }}"
+    loop:
+      - OpenSSH
+      - 'Nginx HTTP'
+      - 'Nginx HTTPS'
+    become: true
+
+  - name: Make Sure Firewall Is Enabled
+    ufw: 
+      state: enabled
+    become: true

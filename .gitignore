@@ -128,8 +128,15 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# python-dotenv file
-.flaskenv
-
 # node_modules
 node_modules/
+
+# local auto-generated vagrant configs
+deploy/.vagrant
+# vagrant log files
+deploy/*.log
+# ansible retry files
+deploy/*.retry
+
+# staging ssl certificates
+.ssl

@@ -1,0 +1,72 @@
+---
+
+- name: Install and Start App with Gunicorn
+  hosts: webserver
+  become: false
+  gather_facts: no
+
+  tasks:
+  # note: pip does not report "changed" status without version changes
+  - name: Create Virtual Environment and Install Dependencies
+    pip:
+      requirements: "{{ requirements_filepath }}"
+      virtualenv: "{{ dir_venv }}"
+      virtualenv_command: "/usr/local/bin/python{{ python_major_version }} -m venv"
+
+  - name: Make Sure App Instance Folder Exists
+    file:
+      path: "{{ dir_app_instance }}"
+      state: directory
+
+  - name: Move Production Config File to App Instance Folder
+    template:
+      src: "config.py"
+      dest: "{{ dir_app_instance }}"
+
+  - name: Move Environment Variables File to Remote Machine
+    template:
+      src: "{{ environment_file_template }}"
+      dest: "{{ environment_file_path }}"
+
+  - name: Initialize Database
+    command: "{{ dir_venv }}/bin/python -m flask init-db"
+    args:
+      chdir: "{{ remote_cloned_repo_path }}"
+
+  - name: Fill Database with Initial Dev Data
+    command: "{{ dir_venv}}/bin/python setup-dev-db.py"
+    args:
+      chdir: "{{ remote_cloned_repo_path }}"
+    when: db_initial_data | bool
+
+
+  - name: Create directory for Gunicorn stuff
+    file:
+      path: "{{ dir_gunicorn }}"
+      state: directory
+      mode: '0755'
+
+  - name: Fill in and Copy Gunicorn config
+    template:
+      src: "gunicorn.conf"
+      dest: "{{ gunicorn_config_path }}"
+
+  - name: Fill in and Copy systemd service config
+    template:
+      src: "{{ service_name }}"
+      dest: "/etc/systemd/system/{{ service_name }}"
+    become: true
+
+  # restart is necessary before enabling or erroneous service config won't be updated
+  - name: "Restart {{ service_name }} (temporary task)"
+    systemd:
+      daemon_reload: true
+      name: "{{ service_name }}"
+      state: restarted
+    become: true
+
+  - name: Enable {{ service_name }}
+    systemd:
+      name: "{{ service_name }}"
+      enabled: yes
+    become: true

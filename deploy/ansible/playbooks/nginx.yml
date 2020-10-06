@@ -1,0 +1,77 @@
+---
+# Configuration for Nginx web server
+
+- name: Configure Nginx web server
+  hosts: webserver
+  become: true
+  gather_facts: no
+
+  tasks:
+  - name: Ensure Nginx is installed via system package
+    apt:
+      name: nginx
+      state: present
+      update_cache: yes
+
+  - name: Configure SSL
+    when: nginx_use_ssl
+    become: true
+    block:
+      - name: Make sure private SSL directory exists
+        file:
+          path: "{{ dir_ssl_remote }}"
+          state: directory
+      
+      - name: Upload SSL certificate file
+        copy:
+          src: "{{ ssl_crt_local }}"
+          dest: "{{ ssl_crt_remote }}"
+
+      - name: Modify permissions for SSL certificate file
+        file:
+          path: "{{ ssl_crt_remote }}"
+          owner: root
+          group: root
+          mode: '644'
+
+      - name: Upload SSL key file
+        copy:
+          src: "{{ ssl_key_local }}"
+          dest: "{{ ssl_key_remote }}"
+
+      - name: Modify permissions for SSL key file
+        file:
+          path: "{{ ssl_key_remote }}"
+          owner: root
+          group: root
+          mode: '640'
+
+
+  - name: Remove default nginx site config
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify:
+    - restart nginx
+
+  - name: Upload Nginx configuration
+    template:
+      src: nginx.conf
+      dest: /etc/nginx/sites-available/{{ domain_name }}
+    notify:
+    - restart nginx
+
+  - name: Enable as available site for Nginx
+    file:
+      src: /etc/nginx/sites-available/{{ domain_name }}
+      dest: /etc/nginx/sites-enabled/{{ domain_name }}
+      state: link
+    notify:
+    - restart nginx
+
+  handlers:
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes

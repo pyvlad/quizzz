@@ -12,11 +12,8 @@ from quizzz.tournaments.models import Tournament, Round
 from quizzz import create_app
 
 
-app = create_app()
-with app.app_context():
-    init_db()
-    db_session = get_db_session()
 
+def make_db_objects():
     # add some users
     bob = User.from_credentials(name="bob", password="dog", email="bob@example.com",
         is_confirmed=True, can_create_groups=True)
@@ -165,5 +162,19 @@ with app.app_context():
         is_active=True
     )
 
-    db_session.add_all([main_group, other_group])
-    db_session.commit()
+    return [main_group, other_group]
+
+
+
+if __name__ == "__main__":
+    app = create_app()
+    with app.app_context():
+        init_db()
+        db_session = get_db_session()
+        user = db_session.query(User).filter(User.name == "bob").first()
+        if user:
+            print("DB is already filled with initial data.")
+        else:
+            db_objects = make_db_objects()
+            db_session.add_all(db_objects)
+            db_session.commit()

@@ -1,0 +1,9 @@
+---
+# Test we can logon to all machines and execute python with json lib.
+# ansible all -m ping
+- name: Provisioning with Ansible
+  hosts: all
+
+  tasks:
+  - name: Ping all machines
+    ping:

@@ -1,0 +1,12 @@
+---
+# Each playbook is composed of one or more ‘plays’ in a list.
+# The goal of a play is to map a group of hosts to some tasks.
+# At a basic level, a task is just a call to an ansible module.
+
+- import_playbook: playbooks/system.yml
+- import_playbook: playbooks/nginx.yml
+- import_playbook: playbooks/postfix.yml
+- import_playbook: playbooks/python.yml
+- import_playbook: playbooks/postgresql.yml
+- import_playbook: playbooks/app-deploy.yml
+- import_playbook: playbooks/app-start.yml
