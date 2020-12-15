@@ -7,14 +7,20 @@
   gather_facts: no
 
   tasks:
-  - name: Configure firewall
+  - name: Configure Firewall (Allow SSH) 
     ufw:
       rule: allow
-      name: "{{ item }}"
+      name: OpenSSH
+    become: true
+
+  - name: Configure Firewall (Allow HTTP/HTTPS)
+    ufw:
+      rule: allow
+      port: "{{ item }}"
+      proto: tcp
     loop:
-      - OpenSSH
-      - 'Nginx HTTP'
-      - 'Nginx HTTPS'
+      - 80
+      - 443
     become: true
 
   - name: Make Sure Firewall Is Enabled

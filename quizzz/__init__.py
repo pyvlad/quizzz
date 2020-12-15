@@ -1,8 +1,12 @@
 import os
 
 from flask import Flask, render_template, g, redirect, url_for
+from dotenv import load_dotenv
 from flask_mail import Mail
 from .momentjs import MomentJS
+
+basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+load_dotenv(os.path.join(basedir, '.env'))
 
 mail = Mail()
 momentjs = MomentJS()
@@ -12,25 +16,14 @@ def create_app(test_config=None):
     # create app
     app = Flask(__name__, instance_relative_config=True)
 
-    # configure app
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        WTF_CSRF_SECRET_KEY="dev",
-        SESSION_COOKIE_SAMESITE="Lax",
-        DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'db.sqlite'), # /// for absolute paths
-        QUESTIONS_PER_QUIZ=2,
-        OPTIONS_PER_QUESTION=4,
-        SQLALCHEMY_ECHO=True,
-        CHAT_MESSAGES_PER_PAGE=2,
-        MAIL_SERVER = os.environ.get('MAIL_SERVER'),
-        MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25),
-        MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') is not None,
-        MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None,
-        MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
-        MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD'),
-        MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER") or os.environ.get("MAIL_USERNAME"),
-        PASSWORD_RESET_TOKEN_VALIDITY=600
-    )
+    # apply default settings
+    from . import default_settings
+    app.config.from_object(default_settings)
+    # set up database uri separately (no access to instance_path in default_settings)
+    # below, /// is for an absolute path
+    app.config["DATABASE_URI"] = 'sqlite:///' + os.path.join(app.instance_path, 'db.sqlite')
+    
+    # override default settings
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)    # instance config if it exists
     else:

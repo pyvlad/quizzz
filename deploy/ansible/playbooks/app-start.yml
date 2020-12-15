@@ -23,7 +23,7 @@
       src: "config.py"
       dest: "{{ dir_app_instance }}"
 
-  - name: Move Environment Variables File to Remote Machine
+  - name: Move Dotenv File to Remote Machine
     template:
       src: "{{ environment_file_template }}"
       dest: "{{ environment_file_path }}"

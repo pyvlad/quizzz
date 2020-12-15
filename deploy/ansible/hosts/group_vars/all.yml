@@ -32,7 +32,7 @@ dir_app_instance: "{{ remote_cloned_repo_path }}/instance"
 requirements_filepath: "{{ remote_cloned_repo_path }}/requirements/main.txt"
 sqlite_db_filepath: "{{ dir_root }}/{{ project_name }}.db"
 service_name: "{{ project_name }}.service"
-environment_file_path: "{{ dir_root }}/environment.conf"
+environment_file_path: "{{ remote_cloned_repo_path }}/.env"
 
 # SSL
 dir_ssl_remote: "/etc/ssl/{{ project_name }}"
