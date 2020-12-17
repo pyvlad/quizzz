@@ -8,7 +8,13 @@
     "dev": "npm run webpack -- --env.mode development --watch",
     "prod": "npm run webpack -- --env.mode production",
     "dev:debug": "npm run debug -- --env.mode development",
-    "prod:debug": "npm run debug -- --env.mode production"
+    "prod:debug": "npm run debug -- --env.mode production",
+    "css": "sass --watch css/styles.scss quizzz/static/styles.css",
+    "app": "FLASK_ENV='development' FLASK_DEBUG=1 flask run",
+    "coverage": "coverage run -m pytest; coverage report",
+    "mail": "python -m smtpd -n -c DebuggingServer localhost:8025",
+    "deploy-vagrant": "cd deploy/ansible && ansible-playbook -i hosts/staging.yml main.yml; cd ../..",
+    "deploy-prod": "cd deploy/ansible && ansible-playbook -i hosts/production.yml main.yml -K; cd../.."
   },
   "devDependencies": {
     "webpack": "^4.44.2",

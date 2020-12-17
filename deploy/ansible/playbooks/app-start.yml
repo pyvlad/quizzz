@@ -34,7 +34,7 @@
       chdir: "{{ remote_cloned_repo_path }}"
 
   - name: Fill Database with Initial Dev Data
-    command: "{{ dir_venv}}/bin/python setup-dev-db.py"
+    command: "{{ dir_venv}}/bin/python -m scripts.setup_dev_db"
     args:
       chdir: "{{ remote_cloned_repo_path }}"
     when: db_initial_data | bool
