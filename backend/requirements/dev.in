@@ -2,3 +2,4 @@
 pip-tools
 coverage
 pytest
+pylint

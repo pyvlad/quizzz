@@ -140,3 +140,6 @@ deploy/*.retry
 
 # staging ssl certificates
 .ssl
+
+# vscode config
+.vscode
