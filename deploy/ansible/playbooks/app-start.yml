@@ -34,7 +34,7 @@
       chdir: "{{ dir_backend }}"
 
   - name: Fill Database with Initial Dev Data
-    command: "{{ dir_venv}}/bin/python -m scripts.setup_dev_db"
+    command: "{{ dir_venv}}/bin/python -m flask init-dev-db"
     args:
       chdir: "{{ dir_backend }}"
     when: db_initial_data | bool

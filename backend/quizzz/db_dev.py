@@ -3,13 +3,15 @@ Create dev DB with some data.
 """
 import datetime
 
+import click
+from flask.cli import with_appcontext
+
 from quizzz.db import init_db, get_db_session
 from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
 from quizzz.quizzes.models import Quiz, Question, Option
 from quizzz.tournaments.models import Tournament, Round
-from quizzz import create_app
 
 
 
@@ -166,15 +168,19 @@ def make_db_objects():
 
 
 
-if __name__ == "__main__":
-    app = create_app()
-    with app.app_context():
-        init_db()
-        db_session = get_db_session()
-        user = db_session.query(User).filter(User.name == "bob").first()
-        if user:
-            print("DB is already filled with initial data.")
-        else:
-            db_objects = make_db_objects()
-            db_session.add_all(db_objects)
-            db_session.commit()
+@click.command('init-dev-db')
+@with_appcontext
+def init_dev_db_command():
+    """
+    Create DB tables with some initial data.
+    """
+    init_db()
+    db_session = get_db_session()
+    user = db_session.query(User).filter(User.name == "bob").first()
+    if user:
+        click.echo('Fail! DB is already filled with initial data.')
+    else:
+        db_objects = make_db_objects()
+        db_session.add_all(db_objects)
+        db_session.commit()
+        click.echo('Success! DB is created and filled with initial data.')

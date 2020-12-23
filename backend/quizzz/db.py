@@ -53,19 +53,18 @@ def remove_db_session(exception=None):
 
 def init_db():
     """
-    Create new tables if they don't exist yet.
+    Create DB tables if they don't exist yet.
     """
     db = get_db_session()
     engine = db.bind
-    Base.metadata.create_all(db.bind)
+    Base.metadata.create_all(engine)
 
 
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
     """
-    Create new tables if they don't exist yet.
-    CLI command.
+    Create DB tables if they don't exist yet.
     """
     init_db()
     click.echo('Initialized the database.')
