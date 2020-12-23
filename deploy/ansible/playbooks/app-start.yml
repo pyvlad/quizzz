@@ -31,12 +31,12 @@
   - name: Initialize Database
     command: "{{ dir_venv }}/bin/python -m flask init-db"
     args:
-      chdir: "{{ remote_cloned_repo_path }}"
+      chdir: "{{ dir_backend }}"
 
   - name: Fill Database with Initial Dev Data
     command: "{{ dir_venv}}/bin/python -m scripts.setup_dev_db"
     args:
-      chdir: "{{ remote_cloned_repo_path }}"
+      chdir: "{{ dir_backend }}"
     when: db_initial_data | bool
 
 
