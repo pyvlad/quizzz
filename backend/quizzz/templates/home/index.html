@@ -3,5 +3,28 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-  <img src="{{ url_for('static', filename='images/logo.svg') }}" class="logo-home-page"/>
+  <div class="container bg-grey">
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-8 p-4">
+              <p class="heading--1">Welcome to Quizzz!</p>
+              <p class="heading--2 pt-3">Quizzz is a website to play self-made quizzes with people you know.</p>
+            </div>
+            <div class="col-xs-4 p-4">
+              <img src="{{ url_for('static', filename='images/logo.svg') }}" class="logo-home-page"/>
+            </div>
+          </div>
+        </div>
+        <ol class="m-4 px-4">
+          <li class="my-2">Set up an account and log in to the website.</li>
+          <li class="my-2">Create a group and send invitation code to other people to join the group (currently disabled - the website is functioning in the 'invite-only' mode). Or, if someone has sent you an invitation code, use it to join an existing group.</li>
+          <li class="my-2">Within a group, each group member can create quizzes and submit to group admins for use in tournaments.</li>
+          <li class="my-2">Group admins can set up quiz tournaments and schedule quizzes submitted by group members as tournament rounds.</li>
+          <li class="my-2">Group members can play quizzes submitted by others, view round and tournament standings, and discuss each quiz only with people who already took it.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
 {% endblock %}
