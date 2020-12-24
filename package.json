@@ -9,7 +9,7 @@
     "prod": "npm run webpack -- --env.mode production",
     "dev:debug": "npm run debug -- --env.mode development",
     "prod:debug": "npm run debug -- --env.mode production",
-    "css": "sass --watch css/styles.scss quizzz/static/styles.css",
+    "css": "sass --watch css/styles.scss backend/quizzz/static/styles.css",
     "app": "cd backend && FLASK_ENV='development' FLASK_DEBUG=1 flask run",
     "coverage": "cd backend; coverage run -m pytest; coverage report",
     "mail": "python -m smtpd -n -c DebuggingServer localhost:8025",
