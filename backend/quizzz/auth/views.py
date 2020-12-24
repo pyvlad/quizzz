@@ -114,15 +114,15 @@ def reset_password(token_id):
 
     token = g.db.query(PasswordResetToken).filter_by(uuid=token_id).first()
     if token is None:
-        flash("The link for password reset was broken.", flashing.ERROR)
+        flash("The link for password reset was broken.", Flashing.ERROR)
         return redirect(url_for('index'))
 
     if token.has_expired(valid_seconds=current_app.config["PASSWORD_RESET_TOKEN_VALIDITY"]):
-        flash("The link for password reset has expired.")
+        flash("The link for password reset has expired.", Flashing.ERROR)
         return redirect(url_for('index'))
 
     if token.was_used:
-        flash("The link for password reset cannot be used more than once.")
+        flash("The link for password reset cannot be used more than once.", Flashing.ERROR)
         return redirect(url_for('index'))
 
     form = ResetPasswordForm()
