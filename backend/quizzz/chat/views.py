@@ -40,9 +40,9 @@ def _retrieve_round_id_and_run_checks():
 @bp.route('/')
 def index():
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Chat", "")
+      ("Groups", url_for("groups.index"), False),
+      (g.group.name, url_for("group.show_group_page"), True),
+      ("Chat", "", False)
     ]
 
     return render_template('chat/index.html', navbar_items=navbar_items)
@@ -106,10 +106,10 @@ def edit(message_id):
     }
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Chat", url_for("chat.index")),
-      ("Message", "")
+      ("Groups", url_for("groups.index"), False),
+      (g.group.name, url_for("group.show_group_page"), True),
+      ("Chat", url_for("chat.index"), False),
+      ("Message", "", False)
     ]
 
     return render_template('chat/edit.html', form=form, delete_form=delete_form,

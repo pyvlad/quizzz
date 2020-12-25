@@ -55,10 +55,10 @@ def edit_tournament(tournament_id):
     delete_form = EmptyForm()
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Tournaments", url_for("tournaments.index")),
-      ((data["tournament"]["id"] and "Edit") or "New", "")
+      ("Groups", url_for("groups.index"), False),
+      (g.group.name, url_for("group.show_group_page"), True),
+      ("Tournaments", url_for("tournaments.index"), False),
+      ((data["tournament"]["id"] and "Edit") or "New", "", False)
     ]
 
     return render_template('tournaments/edit.html', form=form, delete_form=delete_form,
@@ -159,11 +159,13 @@ def edit_round(tournament_id, round_id):
     empty_form = EmptyForm()
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Tournaments", url_for("tournaments.index")),
-      (data["tournament"]["name"], url_for("tournaments.show_tournament_page", tournament_id=data["tournament"]["id"])),
-      ("Edit Round" if round_id else "New Round", "")
+      ("Groups", url_for("groups.index"), False),
+      (g.group.name, url_for("group.show_group_page"), True),
+      ("Tournaments", url_for("tournaments.index"), False),
+      (data["tournament"]["name"], 
+        url_for("tournaments.show_tournament_page", tournament_id=data["tournament"]["id"]), 
+        True),
+      ("Edit Round" if round_id else "New Round", "", False)
     ]
 
     return render_template('tournaments/edit_round.html',

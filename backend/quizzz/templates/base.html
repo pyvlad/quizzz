@@ -48,8 +48,9 @@
     <section class="page_section page__section--navbar">
       <div class="container-fluid-lg px-2 py-2">
         <header class="navbar">
-          {% for (text, link) in navbar_items %}
-            <a class="navbar__item" href="{{ link }}">{{ text }}</a>
+          {% for (text, link, is_name) in navbar_items %}
+            <a class="navbar__item {% if is_name %}navbar__item--name{% endif %}" 
+               href="{{ link }}">{{ text }}</a>
           {% endfor %}
         </header>
       </div>

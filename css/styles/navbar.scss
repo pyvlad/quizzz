@@ -26,4 +26,9 @@
   &__item:before {
     content: "/ "
   }
+
+  &__item--name {
+      color: $main-color-dark;
+      text-transform: uppercase;
+  }
 }

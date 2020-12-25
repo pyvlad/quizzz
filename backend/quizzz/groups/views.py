@@ -45,7 +45,7 @@ def index():
     form = InvitationCodeForm()
     leave_form = EmptyForm()
 
-    navbar_items = [('Groups', "")]
+    navbar_items = [('Groups', "", False)]
 
     return render_template('groups/index.html', form=form, leave_form=leave_form,
         data=data, navbar_items=navbar_items)
@@ -100,8 +100,8 @@ def edit():
     delete_form = EmptyForm()
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      ((data["group"]["id"] and "Edit Group") or "New Group", "")
+      ("Groups", url_for("groups.index"), False),
+      ((data["group"]["id"] and "Edit Group") or "New Group", "", False)
     ]
 
     return render_template('groups/edit.html', form=form, delete_form=delete_form,
@@ -208,9 +208,9 @@ def list_members():
     }
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Members", "")
+      ("Groups", url_for("groups.index"), False),
+      (g.group.name, url_for("group.show_group_page"), True),
+      ("Members", "", False)
     ]
 
     return render_template('groups/members.html', data=data, navbar_items=navbar_items)
@@ -259,10 +259,10 @@ def edit_member(user_id):
     }
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (g.group.name, url_for("group.show_group_page")),
-      ("Members", url_for("groups.list_members")),
-      (data["username"], "")
+      ("Groups", url_for("groups.index"), False),
+      (g.group.name, url_for("group.show_group_page"), True),
+      ("Members", url_for("groups.list_members"), False),
+      (data["username"], "", True)
     ]
 
     return render_template('groups/edit_member.html', form=form, data=data, navbar_items=navbar_items)

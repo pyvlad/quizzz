@@ -43,8 +43,8 @@ def show_group_page():
     }
 
     navbar_items = [
-      ("Groups", url_for("groups.index")),
-      (data["group"]["name"], ""),
+      ("Groups", url_for("groups.index"), False),
+      (data["group"]["name"], "", True),
     ]
 
     return render_template('group/group_page.html', data=data, navbar_items=navbar_items)

@@ -718,6 +718,10 @@
 .navbar__item:before {
   content: "/ ";
 }
+.navbar__item--name {
+  color: #4f3000;
+  text-transform: uppercase;
+}
 
 .flash-messages__item {
   font-weight: bold;
