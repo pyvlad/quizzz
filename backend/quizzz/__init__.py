@@ -55,8 +55,8 @@ def create_app(test_config=None):
     from . import groups
     app.register_blueprint(groups.bp)
 
-    from . import url_processors
-    url_processors.init_app(app)
+    from . import group_url_processors
+    group_url_processors.init_app(app)
 
     from . import chat
     app.register_blueprint(chat.bp)
