@@ -5,7 +5,6 @@ After=network.target
 [Service]
 User={{ ansible_ssh_user }}
 Group=www-data
-WorkingDirectory={{ dir_root }}
 Environment="PATH={{ dir_venv }}/bin"
 ExecStart={{ gunicorn_exe }} -c {{ gunicorn_config_path }} --chdir {{ dir_backend }} --pid {{ gunicorn_pid_file }} "{{ gunicorn_entry_point }}"
 Restart=always
