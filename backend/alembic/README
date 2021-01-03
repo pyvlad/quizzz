@@ -1,1 +1,15 @@
 Generic single-database configuration.
+
+Workflow:
+1. create automatically generated migration:
+    $ alembic revision --autogenerate -m "initial migration"
+2. revise created file in "versions" subfolder
+3. apply (all migrations up to the latest):
+    $ alembic upgrade head
+
+Useful commands:
+    $ alembic current   # show latest migration applied to the DB 
+    $ alembic history   # ordered list of migrations
+
+More: 
+https://alembic.sqlalchemy.org/en/latest/index.html

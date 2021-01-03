@@ -1,3 +1,8 @@
+# pylint: disable=no-member
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import logging
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -12,12 +17,17 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
+logger = logging.getLogger('alembic.env')
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+from quizzz import create_app   # pylint: disable=import-error
+from quizzz.db import Base      # pylint: disable=import-error
+app = create_app()
+config.set_main_option('sqlalchemy.url', app.config["DATABASE_URI"])
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -56,6 +66,17 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    # modification below was copied from flask-migrate
+    # this callback is used to prevent an auto-migration from being generated
+    # when there are no changes to the schema
+    # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
+    def process_revision_directives(context, revision, directives):
+        if getattr(config.cmd_opts, 'autogenerate', False):
+            script = directives[0]
+            if script.upgrade_ops.is_empty():
+                directives[:] = []
+                logger.info('No changes in schema detected.')
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
@@ -64,7 +85,9 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=target_metadata,
+            process_revision_directives=process_revision_directives
         )
 
         with context.begin_transaction():
