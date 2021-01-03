@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from flask_mail import Mail
 from .momentjs import MomentJS
 
-basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(basedir, '.env'))
 
 mail = Mail()
