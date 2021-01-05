@@ -79,4 +79,7 @@ def create_app(test_config=None):
     from .commands import promote_user
     app.cli.add_command(promote_user)
 
+    from .migrations import db_cmd
+    app.cli.add_command(db_cmd)
+
     return app
