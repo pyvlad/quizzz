@@ -11,7 +11,7 @@ class Quiz(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     topic = sa.Column(sa.String(100), default="Anonymous Quiz")
-    is_finalized = sa.Column(sa.Boolean, default=False)
+    is_finalized = sa.Column(sa.Boolean(name="is_finalized__bool"), default=False)
 
     num_questions = sa.Column(sa.Integer, default=0, nullable=False)
     num_options = sa.Column(sa.Integer, default=4, nullable=False)
@@ -62,7 +62,7 @@ class Option(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     text = sa.Column(sa.String(100), default="")
-    is_correct = sa.Column(sa.Boolean, nullable=False, default=False)
+    is_correct = sa.Column(sa.Boolean(name="is_correct__bool"), nullable=False, default=False)
 
     question_id = sa.Column(sa.Integer, sa.ForeignKey('questions.id', ondelete='CASCADE'), nullable=False)
 

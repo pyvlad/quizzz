@@ -13,7 +13,7 @@ class Group(Base):
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
-    confirmation_needed = sa.Column(sa.Boolean, default=False)
+    confirmation_needed = sa.Column(sa.Boolean(name="confirmation_needed__bool"), default=False)
 
     members = relationship("Member", back_populates="group", cascade="all, delete, delete-orphan")
     messages = relationship("Message", back_populates="group", cascade="all, delete, delete-orphan")
@@ -40,13 +40,13 @@ class Member(Base):
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
-    is_deleted = sa.Column(sa.Boolean, default=False)
-    is_admin = sa.Column(sa.Boolean, default=False)
+    is_deleted = sa.Column(sa.Boolean(name="is_deleted__bool"), default=False)
+    is_admin = sa.Column(sa.Boolean(name="is_admin__bool"), default=False)
 
     user = relationship("User", back_populates="memberships")
     group = relationship("Group", back_populates="members")
 
-    __table_args__ = (sa.UniqueConstraint('user_id', 'group_id', name='_user_group_uc'),)
+    __table_args__ = (sa.UniqueConstraint('user_id', 'group_id', name='uq_members_user_group'),)
 
     def __repr__(self):
         return "<Member %r of group %r>" % (self.user.name, self.group.name)

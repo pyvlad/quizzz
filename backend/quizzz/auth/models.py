@@ -21,9 +21,9 @@ class User(Base):
     password_hash = sa.Column(sa.String(120), unique=True, nullable=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
-    is_deleted = sa.Column(sa.Boolean, default=False)
-    is_confirmed = sa.Column(sa.Boolean, default=False)
-    can_create_groups = sa.Column(sa.Boolean, default=False)
+    is_deleted = sa.Column(sa.Boolean(name="is_deleted__bool"), default=False)
+    is_confirmed = sa.Column(sa.Boolean(name="is_confirmed__bool"), default=False)
+    can_create_groups = sa.Column(sa.Boolean(name="can_create_groups__bool"), default=False)
 
     memberships = relationship("Member", back_populates="user")
     messages = relationship("Message", back_populates="user")
@@ -77,7 +77,7 @@ class PasswordResetToken(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     uuid = sa.Column(sa.String(36), unique=True, index=True, nullable=False)
     time_created = sa.Column(sa.DateTime, nullable=False, server_default=func.now())
-    was_used = sa.Column(sa.Boolean, default=False)
+    was_used = sa.Column(sa.Boolean(name="was_used__bool"), default=False)
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     user = relationship("User", back_populates="tokens")

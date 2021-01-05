@@ -14,7 +14,7 @@ class Tournament(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String(100), nullable=False)
-    is_active = sa.Column(sa.Boolean, default=False)
+    is_active = sa.Column(sa.Boolean(name="is_active__bool"), default=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
 
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
@@ -103,7 +103,7 @@ class Play(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
 
-    is_submitted = sa.Column(sa.Boolean, default=False)
+    is_submitted = sa.Column(sa.Boolean(name="is_submitted__bool"), default=False)
     result = sa.Column(sa.Integer)
     server_started = sa.Column(sa.DateTime, default=datetime.datetime.utcnow)
     server_updated = sa.Column(sa.DateTime, onupdate=datetime.datetime.utcnow)

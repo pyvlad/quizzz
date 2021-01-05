@@ -21,7 +21,8 @@ def create_app(test_config=None):
     app.config.from_object(default_settings)
     # set up database uri separately (no access to instance_path in default_settings)
     # below, /// is for an absolute path
-    app.config["DATABASE_URI"] = 'sqlite:///' + os.path.join(app.instance_path, 'db.sqlite')
+    app.config["DATABASE_URI"] = os.environ.get("DATABASE_URI") or (
+        'sqlite:///' + os.path.join(app.instance_path, 'db.sqlite'))
     
     # override default settings
     if test_config is None:
