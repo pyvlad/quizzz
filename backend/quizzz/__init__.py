@@ -74,8 +74,8 @@ def create_app(test_config=None):
     app.add_url_rule('/', endpoint='index')
 
     # CLI commands and scripts
-    from .db_dev import init_dev_db_command
-    app.cli.add_command(init_dev_db_command)
+    from .db_dev_data import add_dev_data
+    app.cli.add_command(add_dev_data)
 
     from .commands import promote_user
     app.cli.add_command(promote_user)

@@ -24,7 +24,7 @@ all:
           dir_home: "/home/{{ ansible_user }}"
           dir_ssl_local: "{{ local_repository_path }}/deploy/ansible/playbooks/templates/staging/.ssl"
           environment_file_template: "staging/.env"
-          db_initial_data: yes
+          db_add_dev_data: yes
 
           postfix_server_name: vagrant.vm
           server_name: localhost

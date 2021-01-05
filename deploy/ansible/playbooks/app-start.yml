@@ -28,16 +28,16 @@
       src: "{{ environment_file_template }}"
       dest: "{{ environment_file_path }}"
 
-  - name: Initialize Database
-    command: "{{ dir_venv }}/bin/python -m flask init-db"
+  - name: Create Database Tables and Apply All Migrations
+    command: "{{ dir_venv }}/bin/python -m flask db upgrade"
     args:
       chdir: "{{ dir_backend }}"
 
   - name: Fill Database with Initial Dev Data
-    command: "{{ dir_venv}}/bin/python -m flask init-dev-db"
+    command: "{{ dir_venv}}/bin/python -m flask add-dev-data"
     args:
       chdir: "{{ dir_backend }}"
-    when: db_initial_data | bool
+    when: db_add_dev_data | bool
 
 
   - name: Create directory for Gunicorn stuff

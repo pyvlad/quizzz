@@ -60,6 +60,7 @@ def remove_db_session(exception=None):
     g.db = None
 
 
+# This is used in tests.
 def init_db():
     """
     Create DB tables if they don't exist yet.
@@ -69,14 +70,15 @@ def init_db():
     Base.metadata.create_all(engine)
 
 
-@click.command('init-db')
-@with_appcontext
-def init_db_command():
-    """
-    Create DB tables if they don't exist yet.
-    """
-    init_db()
-    click.echo('Initialized the database.')
+# this command is replaced with migrations
+# @click.command('init-db')
+# @with_appcontext
+# def init_db_command():
+#     """
+#     Create DB tables if they don't exist yet.
+#     """
+#     init_db()
+#     click.echo('Initialized the database.')
 
 
 
@@ -117,4 +119,4 @@ def init_app(app):
     app.before_request(add_db_session)
     app.teardown_request(remove_db_session)
     app.teardown_appcontext(discard_db_session)
-    app.cli.add_command(init_db_command)
+    # app.cli.add_command(init_db_command)

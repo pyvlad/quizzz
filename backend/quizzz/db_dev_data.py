@@ -6,7 +6,7 @@ import datetime
 import click
 from flask.cli import with_appcontext
 
-from quizzz.db import init_db, get_db_session
+from quizzz.db import get_db_session
 from quizzz.auth.models import User
 from quizzz.groups.models import Group, Member
 from quizzz.chat.models import Message
@@ -33,7 +33,7 @@ def make_db_objects():
     other_group = Group(name="Other", invitation_code="no")
 
     # add some messages to chat
-    messages = [
+    messages = [                    # pylint: disable=unused-variable
         Message(text="Hello, world!", user=bob, group=main_group),
         Message(text="This is a great chat!", user=alice, group=main_group),
         Message(text="Pretty lame. All I gotta say.", user=alice, group=main_group)
@@ -153,7 +153,7 @@ def make_db_objects():
 
     now = datetime.datetime.utcnow()
     now = now.replace(second=0, microsecond=0)
-    tournament = Tournament(
+    tournament = Tournament(                        # pylint: disable=unused-variable
         name="First Tournament",
         group=main_group,
         rounds=[
@@ -168,13 +168,12 @@ def make_db_objects():
 
 
 
-@click.command('init-dev-db')
+@click.command('add-dev-data')
 @with_appcontext
-def init_dev_db_command():
+def add_dev_data():
     """
-    Create DB tables with some initial data.
+    Fill DB tables with some initial data for development.
     """
-    init_db()
     db_session = get_db_session()
     user = db_session.query(User).filter(User.name == "bob").first()
     if user:

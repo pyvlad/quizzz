@@ -37,19 +37,19 @@ def test_session_rollback_on_context_teardown(app):
         assert len(res) == len(USERS)
 
 
-def test_init_db_command(runner, monkeypatch):
-    """
-    The init-db command should call the init_db function and output a message.
-    This test uses Pytest’s monkeypatch fixture to replace the init_db function
-    with one that records that it’s been called.
-    """
-    class Recorder():
-        called = False
+# def test_init_db_command(runner, monkeypatch):
+#     """
+#     The init-db command should call the init_db function and output a message.
+#     This test uses Pytest’s monkeypatch fixture to replace the init_db function
+#     with one that records that it’s been called.
+#     """
+#     class Recorder():
+#         called = False
 
-    def fake_init_db():
-        Recorder.called = True
+#     def fake_init_db():
+#         Recorder.called = True
 
-    monkeypatch.setattr('quizzz.db.init_db', fake_init_db)
-    result = runner.invoke(args=['init-db'])
-    assert 'Initialized' in result.output
-    assert Recorder.called
+#     monkeypatch.setattr('quizzz.db.init_db', fake_init_db)
+#     result = runner.invoke(args=['init-db'])
+#     assert 'Initialized' in result.output
+#     assert Recorder.called
