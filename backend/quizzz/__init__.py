@@ -3,6 +3,8 @@ import os
 from flask import Flask, render_template, g, redirect, url_for
 from dotenv import load_dotenv
 from flask_mail import Mail
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 from .momentjs import MomentJS
 
 basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +37,16 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    # initialize sentry
+    DISABLE_SENTRY = os.environ.get("DISABLE_SENTRY")
+    # "DISABLE_SENTRY" lets having one .env file for development and testing
+    if not DISABLE_SENTRY:
+        sentry_sdk.init(
+            dsn=os.environ["SENTRY_DSN"],
+            integrations=[FlaskIntegration()],
+            traces_sample_rate=1.0
+        )
 
     # initialize database functionality
     from . import db

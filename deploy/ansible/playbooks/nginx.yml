@@ -12,6 +12,11 @@
       name: nginx
       state: present
       update_cache: yes
+  
+  - name: Ensure Goaccess is installed via system package
+    apt:
+      name: goaccess
+      state: present
 
   - name: Configure SSL
     when: nginx_use_ssl
