@@ -99,7 +99,11 @@ def reset_password_request():
     if form.validate_on_submit():
         user = g.db.query(User).filter(User.email==form.email.data.lower()).first()
         if user:
-            send_password_reset_email(user)
+            if user.is_superuser:
+                flash('Superuser password cannot be reset. This incident will be reported.')
+                return redirect(url_for('auth.login'))
+            else:
+                send_password_reset_email(user)
         flash('Instructions to reset your password have been sent to your email.')
         return redirect(url_for('auth.login'))
 

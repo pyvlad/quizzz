@@ -24,6 +24,7 @@ class User(Base):
     is_deleted = sa.Column(sa.Boolean(name="is_deleted__bool"), default=False)
     is_confirmed = sa.Column(sa.Boolean(name="is_confirmed__bool"), default=False)
     can_create_groups = sa.Column(sa.Boolean(name="can_create_groups__bool"), default=False)
+    is_superuser = sa.Column(sa.Boolean(name="is_superuser__bool"), default=False)
 
     memberships = relationship("Member", back_populates="user")
     messages = relationship("Message", back_populates="user")
