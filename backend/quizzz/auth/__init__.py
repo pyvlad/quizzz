@@ -27,5 +27,5 @@ def load_logged_in_user():
         if g.user:
             if not g.user.is_confirmed and request.blueprint != 'auth':
                 return redirect(url_for('auth.unconfirmed'))
-            if g.user.is_deleted:
+            if g.user.is_disabled:
                 g.user = None

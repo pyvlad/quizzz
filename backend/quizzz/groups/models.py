@@ -40,7 +40,7 @@ class Member(Base):
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
-    is_deleted = sa.Column(sa.Boolean(name="is_deleted__bool"), default=False)
+    is_disabled = sa.Column(sa.Boolean(name="is_disabled__bool"), default=False)
     is_admin = sa.Column(sa.Boolean(name="is_admin__bool"), default=False)
 
     user = relationship("User", back_populates="memberships")

@@ -21,7 +21,8 @@ class User(Base):
     password_hash = sa.Column(sa.String(120), unique=True, nullable=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
-    is_deleted = sa.Column(sa.Boolean(name="is_deleted__bool"), default=False)
+    
+    is_disabled = sa.Column(sa.Boolean(name="is_disabled__bool"), default=False)
     is_confirmed = sa.Column(sa.Boolean(name="is_confirmed__bool"), default=False)
     can_create_groups = sa.Column(sa.Boolean(name="can_create_groups__bool"), default=False)
     is_superuser = sa.Column(sa.Boolean(name="is_superuser__bool"), default=False)
