@@ -1,0 +1,10 @@
+{% extends 'admin/base.html' %}
+
+{% block brand %}
+  <a href="{{ url_for('index') }}">
+    <img style="height: 50px; padding: 3px;"
+      src="{{ url_for('static', filename='images/logo.svg') }}"
+      alt="Website Logo Cat"
+    />
+  </a>
+{% endblock brand %}

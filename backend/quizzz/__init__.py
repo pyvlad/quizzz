@@ -85,6 +85,10 @@ def create_app(test_config=None):
 
     app.add_url_rule('/', endpoint='index')
 
+    # admin interface
+    from .admin import admin
+    admin.init_app(app)
+
     # CLI commands and scripts
     from .db_dev_data import add_dev_data
     app.cli.add_command(add_dev_data)
