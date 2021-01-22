@@ -46,3 +46,4 @@ admin = Admin(
 
 # Register views
 from . import users
+from . import groups

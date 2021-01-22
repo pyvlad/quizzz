@@ -22,7 +22,7 @@ class Group(Base):
         order_by="Tournament.time_created.desc()", cascade="all, delete, delete-orphan")
 
     def __repr__(self):
-        return "<Group %r>" % self.name
+        return "<Group %r [%r]>" % (self.name, self.id)
 
     def populate_from_wtform(self, form):
         self.name = form.name.data
@@ -49,4 +49,5 @@ class Member(Base):
     __table_args__ = (sa.UniqueConstraint('user_id', 'group_id', name='uq_members_user_group'),)
 
     def __repr__(self):
-        return "<Member %r of group %r>" % (self.user.name, self.group.name)
+        return "<Member %r [%r] of Group %r [%r]>" % (
+            self.user.name, self.user_id, self.group.name, self.group_id)
