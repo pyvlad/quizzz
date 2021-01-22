@@ -42,3 +42,7 @@ admin = Admin(
     template_mode='bootstrap3',
     index_view=IndexView(url=URL_PREFIX)
 )
+
+
+# Register views
+from . import users
