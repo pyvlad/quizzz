@@ -23,4 +23,4 @@ class Message(Base):
     round = relationship("Round", back_populates="messages")
 
     def __repr__(self):
-        return "<Message (%r)>" % self.text[:20]
+        return "<Message %r [%r]>" % (self.text[:10], self.id)
