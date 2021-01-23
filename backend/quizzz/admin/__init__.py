@@ -48,3 +48,4 @@ admin = Admin(
 from . import users
 from . import groups
 from . import messages
+from . import quizzes

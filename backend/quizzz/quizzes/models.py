@@ -29,13 +29,13 @@ class Quiz(Base):
     round = relationship("Round", back_populates="quiz", uselist=False)
 
     def __repr__(self):
-        return "<Quiz (%r) by (%r)>" % (self.topic, self.author.name)
+        return "<Quiz: %r [%r]>" % (self.topic[:20], self.id)
 
     def init_questions(self):
-        for i in range(self.num_questions):
+        for _ in range(self.num_questions):             
             question = Question(quiz=self)
-            for j in range(self.num_options):
-                option = Option(question=question)
+            for _ in range(self.num_options):
+                option = Option(question=question)  # pylint: disable=unused-variable
 
 
 
@@ -53,7 +53,7 @@ class Question(Base):
         passive_deletes=True)
 
     def __repr__(self):
-        return "<Question (%r) from quiz id (%r)>" % (self.text[:20], self.quiz_id)
+        return "<Question: %r [%r]>" % (self.text[:20], self.id)
 
 
 
@@ -70,4 +70,5 @@ class Option(Base):
     answers = relationship("PlayAnswer", back_populates="option")
 
     def __repr__(self):
-        return "<Option (%r)%r>" % (self.text[:20], " (correct)" if self.is_correct else "")
+        return "<Option %r [%r]>" % (
+            self.text[:20] + (" (correct)" if self.is_correct else ""), self.id)
