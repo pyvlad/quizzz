@@ -49,3 +49,4 @@ from . import users
 from . import groups
 from . import messages
 from . import quizzes
+from . import tournaments

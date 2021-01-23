@@ -24,7 +24,7 @@ class Tournament(Base):
         cascade="all, delete-orphan", order_by="Round.finish_time.desc()")
 
     def __repr__(self):
-        return "<Tournament (%r) in (%r)>" % (self.name, self.group_id)
+        return "<Tournament %r [%r]>" % (self.name, self.id)
 
     def populate_from_wtform(self, form):
         self.group = g.group
@@ -55,7 +55,7 @@ class Round(Base):
         passive_deletes=True)
 
     def __repr__(self):
-        return "<Round (%r) of (%r) at (%r)>" % (self.id, self.quiz_id, self.tournament_id)
+        return "<Round [%r]>" % self.id
 
     def populate_from_wtform(self, form, tournament_id):
         self.tournament_id = tournament_id
@@ -126,7 +126,7 @@ class Play(Base):
         passive_deletes=True)
 
     def __repr__(self):
-        return "<RoundPlayed %r by %r>" % (self.round_id, self.user_id)
+        return "<Play of %r by %r [%r]>" % (self.round_id, self.user.name, self.user_id)
 
     def get_server_time(self):
         if self.server_updated is None or self.server_started is None:
@@ -189,5 +189,4 @@ class PlayAnswer(Base):
     option = relationship("Option", back_populates="answers")
 
     def __repr__(self):
-        return "<AnswerSelected [%r] %r by %r>" % (
-            "V" if self.option.is_correct else "X", self.option.text, self.play.user.name)
+        return "<AnswerSelected [%r]>" % self.id
