@@ -41,7 +41,8 @@ def test_join_group(app, client, auth):
     Test the <join> view:
     a. it should not be available to anonymous users;
     b. 400 is returned if incorrect form data is submitted;
-    c. friendly messages are shown on joining joined group or on invalid invitation code;
+    c. friendly messages are shown on joining a joined group, submitting 
+       invalid invitation code, or joining a group that reached its member limit;
     d. joining another group works;
     """
     response = client.post('/groups/join')
@@ -70,6 +71,23 @@ def test_join_group(app, client, auth):
     response = client.post('/groups/join',
         data={"invitation_code": "some wrong code"}, follow_redirects=True)
     assert b"Invalid invitation code!" in response.data
+
+    # test limit on group members
+    with app.app_context():
+        db = get_db_session()
+        member_count = db.query(Member).filter(Member.group_id == GROUPS["group2"]["id"]).count()
+    assert member_count == GROUPS["group2"]["max_members"]    # make sure limit is already reached
+    auth.login_as("lucy")
+    response = client.post('/groups/join', 
+        data={"invitation_code": GROUPS["group2"]["invitation_code"]}, follow_redirects=True)
+
+    # explanation is shown to the user:
+    assert b"Too many members" in response.data
+    # member count hasn't changed:
+    with app.app_context():
+        db = get_db_session()
+        member_count = db.query(Member).filter(Member.group_id == GROUPS["group2"]["id"]).count()
+    assert member_count == GROUPS["group2"]["max_members"]    
 
 
 

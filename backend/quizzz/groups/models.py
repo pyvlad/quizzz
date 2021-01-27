@@ -14,6 +14,7 @@ class Group(Base):
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
     confirmation_needed = sa.Column(sa.Boolean(name="confirmation_needed__bool"), default=False)
+    max_members = sa.Column(sa.Integer)           # null means 'unlimited'
 
     members = relationship("Member", back_populates="group", cascade="all, delete, delete-orphan")
     messages = relationship("Message", back_populates="group", cascade="all, delete, delete-orphan")

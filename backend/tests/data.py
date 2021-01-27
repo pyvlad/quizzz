@@ -19,6 +19,13 @@ USERS = {
         "password": "frog",
         "email": "ben@example.com",
         "is_confirmed": True,
+    },
+    "lucy": {
+        "id": 4,
+        "name": "lucy",
+        "password": "pony",
+        "email": "lucy@example.com",
+        "is_confirmed": True, 
     }
 }
 
@@ -27,12 +34,14 @@ GROUPS = {
     "group1": {
         "id": 1,
         "name": "group1",
-        "invitation_code": "code1"
+        "invitation_code": "code1",
+        "max_members": None
     },
     "group2": {
         "id": 2,
         "name": "group2",
-        "invitation_code": "code2"
+        "invitation_code": "code2",
+        "max_members": 3
     }
 }
 

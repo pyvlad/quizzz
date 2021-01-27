@@ -1,7 +1,7 @@
 import traceback
 
 from sqlalchemy.orm import selectinload
-from flask import g, flash, request, redirect, url_for, abort, render_template
+from flask import g, flash, request, redirect, url_for, abort, render_template, current_app
 
 from quizzz.auth import login_required
 from quizzz.auth.models import User
@@ -63,7 +63,12 @@ def edit():
     else:
         check_user_permissions(USER.IS_GROUP_ADMIN)
 
-    group = (Group() if not g.group_id else g.group)
+    group = None
+    if g.group_id:
+        group = g.group
+    else:
+        group = Group(max_members=current_app.config["MAX_MEMBERS_PER_GROUP"])
+
     membership = (Member(user=g.user, group=group, is_admin=True)
         if not g.group_membership else g.group_membership)
 
@@ -146,15 +151,24 @@ def join():
         group = g.db.query(Group).filter(Group.invitation_code == invitation_code).first()
         if not group:
             flash("Invalid invitation code!", Flashing.ERROR)
-        else:
-            user_group_ids = { m.group_id for m in g.user.memberships }
-            if group.id not in user_group_ids:
-                member = Member(group=group, user=g.user)
-                g.db.add(member)
-                g.db.commit()
-                flash("Joined!", Flashing.SUCCESS)
-            else:
-                flash("You are already a member of this group!", Flashing.ERROR)
+            return redirect(url_for('groups.index'))
+
+        user_group_ids = { m.group_id for m in g.user.memberships }
+        if group.id in user_group_ids:
+            flash("You are already a member of this group!", Flashing.ERROR)
+            return redirect(url_for('groups.index'))
+
+        if group.max_members is not None:     # None means 'unlimited'
+            member_count = g.db.query(Member).filter(Member.group_id == group.id).count()
+            if member_count >= group.max_members:
+                flash("Cannot join. Too many members: %s." % group.max_members, Flashing.ERROR)
+                return redirect(url_for('groups.index'))
+
+        member = Member(group=group, user=g.user)
+        g.db.add(member)
+        g.db.commit()
+        flash("Joined!", Flashing.SUCCESS)
+
     else:
         flash("Invalid form submitted.", Flashing.ERROR)
 
