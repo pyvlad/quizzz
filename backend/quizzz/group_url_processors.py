@@ -16,8 +16,9 @@ In short:
   (before the before_request() function);
 - URL defaults let you automatically inject values into url_for() calls.
 """
-from flask import g, request, abort
+from flask import g, request, abort, redirect, url_for, flash
 from quizzz.groups.models import Group, Member
+from quizzz.flashing import Flashing
 
 
 
@@ -85,6 +86,16 @@ def init_app(app):
                     abort(403, "You are not a member of this group.")
                 else:
                     g.group, g.group_membership = result
+                    
+                    if g.group_membership.is_disabled:
+                        flash('Your membership in group "%s" was revoked.' % g.group.name, 
+                            Flashing.ERROR)
+                        return redirect(url_for('groups.index'))
+                    
+                    if not g.group_membership.is_approved:
+                        flash(('Your membership in group "%s" is pending. '
+                            'Please wait until you are approved.') % g.group.name)
+                        return redirect(url_for('groups.index'))
 
         else:
             g.group, g.group_membership = (None, None)

@@ -11,7 +11,7 @@ from quizzz.permissions import USER, check_user_permissions
 
 from . import bp
 from .models import Group, Member
-from .forms import InvitationCodeForm, GroupForm
+from .forms import InvitationCodeForm, GroupForm, MemberForm
 
 
 
@@ -164,7 +164,7 @@ def join():
                 flash("Cannot join. Too many members: %s." % group.max_members, Flashing.ERROR)
                 return redirect(url_for('groups.index'))
 
-        member = Member(group=group, user=g.user)
+        member = Member(group=group, user=g.user, is_approved=(not group.confirmation_needed))
         g.db.add(member)
         g.db.commit()
         flash("Joined!", Flashing.SUCCESS)
@@ -215,6 +215,8 @@ def list_members():
                 "name": username,
                 "time_created": time_created,
                 "is_admin": m.is_admin,
+                "is_approved": m.is_approved,
+                "is_disabled": m.is_disabled,
                 "edit_url": url_for("groups.edit_member", user_id=m.user_id),
             } for m, username, time_created in members
         ],
@@ -255,28 +257,69 @@ def edit_member(user_id):
     if not membership:
         abort(400, "User is not a member of this group.")
 
-    form = EmptyForm()
     if request.method == 'POST':
-        if form.validate():
-            if membership.is_admin:
-                abort(403, "Group admin cannot be removed!")
+        form = MemberForm()
+        membership.is_approved = form.is_approved.data
 
-            g.db.delete(membership)
-            g.db.commit()
-            flash("User %s has been removed." % user.name, Flashing.SUCCESS)
-            return redirect(url_for('groups.list_members'))
-        else:
-            flash("Invalid form submitted.", Flashing.ERROR)
+        g.db.add(membership)
+        g.db.commit()
+
+        flash("User %s has been %s." % (user.name, 
+            "approved" if form.is_approved.data else "disabled"), Flashing.SUCCESS)
+        return redirect(url_for('groups.list_members'))
+    else:
+        form = MemberForm(is_approved=membership.is_approved)
 
     data = {
-        "username": user.name
+        "user": {
+            "name": user.name,
+            "id": user.id,
+        }
     }
+
+    delete_form = EmptyForm()
 
     navbar_items = [
       ("Groups", url_for("groups.index"), False),
       (g.group.name, url_for("group.show_group_page"), True),
       ("Members", url_for("groups.list_members"), False),
-      (data["username"], "", True)
+      (data["user"]["name"], "", True)
     ]
 
-    return render_template('groups/edit_member.html', form=form, data=data, navbar_items=navbar_items)
+    return render_template('groups/edit_member.html', form=form, delete_form=delete_form, 
+        data=data, navbar_items=navbar_items)
+
+
+
+@bp.route('/<int:group_id>/members/<int:user_id>/delete', methods=('POST',))
+def delete_member(user_id):
+    """
+    Delete member from group.
+    """
+    check_user_permissions(USER.IS_GROUP_ADMIN)
+
+    form = EmptyForm()
+
+    if form.validate():
+        result = g.db.query(User, Member)\
+            .join(Member, User.id == Member.user_id)\
+            .filter(User.id == user_id)\
+            .filter(Member.group_id == g.group_id)\
+            .first()
+
+        if result is None:
+            abort(400, "No such user.")
+        user, membership = result
+        if not membership:
+            abort(400, "User is not a member of this group.")
+        if membership.is_admin:
+            abort(403, "Group admin cannot be deleted.")
+
+        g.db.delete(membership)
+        g.db.commit()
+        
+        flash("User %s has been removed from group <%s>." % (user.name, g.group.name), Flashing.SUCCESS)
+    else:
+        flash("Invalid form submitted.", Flashing.ERROR)
+
+    return redirect(url_for('groups.list_members'))

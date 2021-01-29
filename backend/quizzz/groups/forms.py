@@ -40,3 +40,8 @@ class GroupForm(FlaskForm):
         group = g.db.query(Group).filter(Group.invitation_code == invitation_code).first()
         if group:
             raise ValidationError(f'Invitation code {invitation_code} is used by another group.')
+
+
+
+class MemberForm(FlaskForm):
+    is_approved = BooleanField("Accept this user as group member?")

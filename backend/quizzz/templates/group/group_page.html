@@ -50,7 +50,10 @@
                 <h3 class="heading heading--2">
                   <a class="link" href="{{ url_for('groups.list_members') }}">Members</a>
                 </h3>
-                <p>The group contains <strong>{{ data.num_members }}</strong> members.</p>
+                {% if data.num_pending_members %}
+                  <p>You have <strong>{{ data.num_pending_members }}</strong> pending member(s).</p>
+                {% endif %}
+                <p>The group contains <strong>{{ data.num_active_members }}</strong> active member(s).</p>
               </div>
             </div>
           </div>

@@ -12,6 +12,7 @@ class Group(Base):
     name = sa.Column(sa.String(100), nullable=False, unique=True)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
+    
     invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
     confirmation_needed = sa.Column(sa.Boolean(name="confirmation_needed__bool"), default=False)
     max_members = sa.Column(sa.Integer)           # null means 'unlimited'
@@ -41,8 +42,10 @@ class Member(Base):
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
-    is_disabled = sa.Column(sa.Boolean(name="is_disabled__bool"), default=False)
+    
     is_admin = sa.Column(sa.Boolean(name="is_admin__bool"), default=False)
+    is_approved = sa.Column(sa.Boolean(name="is_approved__bool"), default=True)
+    is_disabled = sa.Column(sa.Boolean(name="is_disabled__bool"), default=False)
 
     user = relationship("User", back_populates="memberships")
     group = relationship("Group", back_populates="members")

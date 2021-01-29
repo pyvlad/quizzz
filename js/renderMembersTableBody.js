@@ -33,7 +33,7 @@ const makeRow = (rowData, num, isAdmin) => {
 
   const td5 = document.createElement("td");
   td5.className = "table__td table__td--centered";
-  td5.innerHTML = rowData.is_admin ? "admin" : "";
+  td5.innerHTML = rowData.is_admin ? "admin" : (rowData.is_approved ? "" : "❓");
   tr.append(td5);
 
   const td6 = document.createElement("td");
