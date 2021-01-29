@@ -216,7 +216,6 @@ def list_members():
                 "time_created": time_created,
                 "is_admin": m.is_admin,
                 "is_approved": m.is_approved,
-                "is_disabled": m.is_disabled,
                 "edit_url": url_for("groups.edit_member", user_id=m.user_id),
             } for m, username, time_created in members
         ],

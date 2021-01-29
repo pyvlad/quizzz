@@ -87,11 +87,6 @@ def init_app(app):
                 else:
                     g.group, g.group_membership = result
                     
-                    if g.group_membership.is_disabled:
-                        flash('Your membership in group "%s" was revoked.' % g.group.name, 
-                            Flashing.ERROR)
-                        return redirect(url_for('groups.index'))
-                    
                     if not g.group_membership.is_approved:
                         flash(('Your membership in group "%s" is pending. '
                             'Please wait until you are approved.') % g.group.name)

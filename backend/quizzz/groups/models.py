@@ -45,7 +45,6 @@ class Member(Base):
     
     is_admin = sa.Column(sa.Boolean(name="is_admin__bool"), default=False)
     is_approved = sa.Column(sa.Boolean(name="is_approved__bool"), default=True)
-    is_disabled = sa.Column(sa.Boolean(name="is_disabled__bool"), default=False)
 
     user = relationship("User", back_populates="memberships")
     group = relationship("Group", back_populates="members")
