@@ -261,7 +261,10 @@ def test_start_round(app, client, auth):
 
     # another user should be able to start his play as well
     auth.login_as("ben")
-    client.post('/groups/join', data={"invitation_code": GROUPS["group1"]["invitation_code"]})
+    client.post('/groups/join', data={
+            "group_name": GROUPS["group1"]["name"],
+            "password": GROUPS["group1"]["password"]
+        })
     response = client.post("/groups/1/rounds/1/start", data={})
     assert response.status_code == 302
     assert response.headers['Location'] == "http://localhost/groups/1/rounds/1/play"
@@ -482,7 +485,10 @@ def test_review_round(app, client, auth):
 
     # other group members who have not played yet still cannot review round
     auth.login_as("ben")
-    client.post('/groups/join', data={"invitation_code": GROUPS["group1"]["invitation_code"]})
+    client.post('/groups/join', data={
+            "group_name": GROUPS["group1"]["name"],
+            "password": GROUPS["group1"]["password"]
+        })
     assert client.get("/groups/1/rounds/1/review").status_code == 403
 
 

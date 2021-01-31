@@ -24,13 +24,13 @@ def make_db_objects():
     # add some groups
     main_group = Group(
         name="Main",
-        invitation_code="hello",
+        password="hello",
         members = [
             Member(user=bob, is_admin=True),
             Member(user=alice)
         ]
     )
-    other_group = Group(name="Other", invitation_code="no")
+    other_group = Group(name="Other")
 
     # add some messages to chat
     messages = [                    # pylint: disable=unused-variable

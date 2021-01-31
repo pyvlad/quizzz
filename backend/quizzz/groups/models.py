@@ -13,7 +13,7 @@ class Group(Base):
     time_created = sa.Column(sa.DateTime, server_default=func.now())
     time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     
-    invitation_code = sa.Column(sa.String(10), nullable=False, unique=True)
+    password = sa.Column(sa.String(20), nullable=True)
     confirmation_needed = sa.Column(sa.Boolean(name="confirmation_needed__bool"), default=False)
     max_members = sa.Column(sa.Integer)           # null means 'unlimited'
 
@@ -28,7 +28,7 @@ class Group(Base):
 
     def populate_from_wtform(self, form):
         self.name = form.name.data
-        self.invitation_code = form.invitation_code.data
+        self.password = form.password.data
         self.confirmation_needed = bool(form.confirmation_needed.data)
         return self
 

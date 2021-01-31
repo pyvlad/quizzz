@@ -73,12 +73,19 @@
             <div class="form__header">Join</div>
             <div class="form__item">
               <div class="form__help">
-                To join an existing group, enter invitation code below and click submit.
+                To join an existing group, enter group name and click submit. 
+                Enter password if the group is password-protected.
               </div>
             </div>
             <div class="form__item">
-              {{ form.invitation_code.label(class="form__label") }}
-              {{ form.invitation_code(class="form__input") }}
+              <div class="form__label">
+                {{ form.group_name.label }}
+              </div>
+              {{ form.group_name(class="form__input") }}
+            </div>
+            <div class="form__item">
+              {{ form.password.label(class="form__label") }}
+              {{ form.password(class="form__input") }}
             </div>
             <div class="form__item">
               <button class="btn btn--primary btn--block">Submit</button>

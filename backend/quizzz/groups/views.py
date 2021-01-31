@@ -1,5 +1,6 @@
 import traceback
 
+from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 from flask import g, flash, request, redirect, url_for, abort, render_template, current_app
 
@@ -11,7 +12,7 @@ from quizzz.permissions import USER, check_user_permissions
 
 from . import bp
 from .models import Group, Member
-from .forms import InvitationCodeForm, GroupForm, MemberForm
+from .forms import JoinGroupForm, GroupForm, MemberForm
 
 
 
@@ -42,7 +43,7 @@ def index():
         "has_edit_permissions": g.user.can_create_groups,
     }
 
-    form = InvitationCodeForm()
+    form = JoinGroupForm()
     leave_form = EmptyForm()
 
     navbar_items = [('Groups', "", False)]
@@ -75,6 +76,14 @@ def edit():
     if request.method == 'POST':
         form = GroupForm()
         group.populate_from_wtform(form)
+        
+        with g.db.no_autoflush:
+            repeat_group = g.db.query(Group)\
+                .filter(func.lower(Group.name) == (group.name or "").lower())\
+                .first()
+            if repeat_group and repeat_group.id != group.id:
+                flash("Group name already in use. Choose another one.", Flashing.ERROR)
+                return redirect(url_for('groups.edit', group_id=g.group_id))
 
         try:
             g.db.add(group)
@@ -91,7 +100,7 @@ def edit():
     else:
         form = GroupForm(
             name=group.name,
-            invitation_code=group.invitation_code,
+            password=group.password,
             confirmation_needed=group.confirmation_needed,
         )
 
@@ -140,22 +149,26 @@ def delete():
 @login_required
 def join():
     """
-    Join an existing group by a known invitation code.
+    Join an existing group by its name and (optional) password.
     Creates a new basic membership.
     """
-    form = InvitationCodeForm()
+    form = JoinGroupForm()
 
     if form.validate():
-        invitation_code = form.invitation_code.data
+        group_name = form.group_name.data
 
-        group = g.db.query(Group).filter(Group.invitation_code == invitation_code).first()
+        group = g.db.query(Group).filter(Group.name == group_name).first()
         if not group:
-            flash("Invalid invitation code!", Flashing.ERROR)
+            flash("Group does not exist!", Flashing.ERROR)
             return redirect(url_for('groups.index'))
 
         user_group_ids = { m.group_id for m in g.user.memberships }
         if group.id in user_group_ids:
             flash("You are already a member of this group!", Flashing.ERROR)
+            return redirect(url_for('groups.index'))
+
+        if group.password and (group.password != form.password.data):
+            flash("Wrong password!", Flashing.ERROR)
             return redirect(url_for('groups.index'))
 
         if group.max_members is not None:     # None means 'unlimited'

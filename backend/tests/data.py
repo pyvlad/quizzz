@@ -34,13 +34,13 @@ GROUPS = {
     "group1": {
         "id": 1,
         "name": "group1",
-        "invitation_code": "code1",
+        "password": "code1",
         "max_members": None
     },
     "group2": {
         "id": 2,
         "name": "group2",
-        "invitation_code": "code2",
+        "password": "code2",
         "max_members": 3
     }
 }

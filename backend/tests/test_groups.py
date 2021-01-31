@@ -37,53 +37,63 @@ def test_user_groups(client, auth):
 
 
 def test_join_group(app, client, auth):
+    """ 
+    Test the <join> view 
     """
-    Test the <join> view:
-    a. it should not be available to anonymous users;
-    b. 400 is returned if incorrect form data is submitted;
-    c. friendly messages are shown on joining a joined group, submitting 
-       invalid invitation code, or joining a group that reached its member limit;
-    d. joining another group works;
-    """
+    # not available to anonymous users
     response = client.post('/groups/join')
     assert response.status_code == 401
 
+    # incorrect form submitted
     auth.login_as("bob")
     response = client.post('/groups/join', data={})
     assert response.status_code == 302
     assert b'Invalid form submitted.' in client.get(response.headers["LOCATION"]).data
 
-    initial_user_groups = [m["group_id"] for m in MEMBERSHIPS if m["user_id"] == USERS["bob"]["id"]]
+    # joining a joined group should fail
+    response = client.post('/groups/join', data={
+            "group_name": GROUPS["group1"]["name"],
+            "password": GROUPS["group1"]["password"]
+        }, follow_redirects=True)
+    assert b"You are already a member of this group!" in response.data
 
-    response = client.post('/groups/join',
-        data={"invitation_code": GROUPS["group2"]["invitation_code"]}, follow_redirects=True)
+    # submitting invalid group password should fail
+    response = client.post('/groups/join', data={
+            "group_name": GROUPS["group2"]["name"],
+            "password": "some wrong password"
+        }, follow_redirects=True)
+    assert b"Wrong password!" in response.data
+
+    # test that properly joining a group actually works
+    # - user is not a member of that group:
+    initial_user_groups = [m["group_id"] for m in MEMBERSHIPS if m["user_id"] == USERS["bob"]["id"]]
+    assert GROUPS["group2"]["id"] not in initial_user_groups
+    # - submission succeeds:
+    response = client.post('/groups/join', data={
+            "group_name": GROUPS["group2"]["name"],
+            "password": GROUPS["group2"]["password"]
+        }, follow_redirects=True)
     assert b"Joined!" in response.data
+    # - new membership is in database now:
     with app.app_context():
-        # new membership should be in database now
         db = get_db_session()
         new_user_groups = db.query(Member.group_id).filter(Member.user_id == USERS["bob"]["id"]).all()
         assert len(new_user_groups) == len(initial_user_groups) + 1
 
-    response = client.post('/groups/join',
-        data={"invitation_code": GROUPS["group1"]["invitation_code"]}, follow_redirects=True)
-    assert b"You are already a member of this group!" in response.data
-
-    response = client.post('/groups/join',
-        data={"invitation_code": "some wrong code"}, follow_redirects=True)
-    assert b"Invalid invitation code!" in response.data
-
     # test limit on group members
+    # - make sure limit is already reached
     with app.app_context():
         db = get_db_session()
         member_count = db.query(Member).filter(Member.group_id == GROUPS["group2"]["id"]).count()
-    assert member_count == GROUPS["group2"]["max_members"]    # make sure limit is already reached
+    assert member_count == GROUPS["group2"]["max_members"]
+    # - make an attempt to join the group
     auth.login_as("lucy")
-    response = client.post('/groups/join', 
-        data={"invitation_code": GROUPS["group2"]["invitation_code"]}, follow_redirects=True)
-
-    # explanation is shown to the user:
+    response = client.post('/groups/join', data={
+            "group_name": GROUPS["group2"]["name"],
+            "password": GROUPS["group2"]["password"]
+        }, follow_redirects=True)   
     assert b"Too many members" in response.data
-    # member count hasn't changed:
+    # - member count hasn't changed:
     with app.app_context():
         db = get_db_session()
         member_count = db.query(Member).filter(Member.group_id == GROUPS["group2"]["id"]).count()
