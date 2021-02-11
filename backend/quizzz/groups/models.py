@@ -1,18 +1,15 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from quizzz.db import Base
+from quizzz.db import Base, TimeStampedModel
 
 
-class Group(Base):
+class Group(TimeStampedModel, Base):
     __tablename__ = "groups"
 
     id = sa.Column(sa.Integer, primary_key=True)
-
-    name = sa.Column(sa.String(100), nullable=False, unique=True)
-    time_created = sa.Column(sa.DateTime, server_default=func.now())
-    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     
+    name = sa.Column(sa.String(100), nullable=False, unique=True)
     password = sa.Column(sa.String(20), nullable=True)
     confirmation_needed = sa.Column(sa.Boolean(name="confirmation_needed__bool"), default=False)
     max_members = sa.Column(sa.Integer)           # null means 'unlimited'
@@ -33,15 +30,13 @@ class Group(Base):
         return self
 
 
-class Member(Base):
+class Member(TimeStampedModel, Base):
     __tablename__ = "members"
 
     id = sa.Column(sa.Integer, primary_key=True)
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
-    time_created = sa.Column(sa.DateTime, server_default=func.now())
-    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     
     is_admin = sa.Column(sa.Boolean(name="is_admin__bool"), default=False)
     is_approved = sa.Column(sa.Boolean(name="is_approved__bool"), default=True)

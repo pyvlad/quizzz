@@ -8,10 +8,10 @@ import sqlalchemy as sa
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
-from quizzz.db import Base
+from quizzz.db import Base, TimeStampedModel
 
 
-class User(Base):
+class User(TimeStampedModel, Base):
     __tablename__ = 'users'
 
     id = sa.Column(sa.Integer, primary_key=True)
@@ -19,8 +19,6 @@ class User(Base):
     name = sa.Column(sa.String(50), unique=True, index=True, nullable=False)
     email = sa.Column(sa.String(120), index=True, unique=True, nullable=False)
     password_hash = sa.Column(sa.String(120), unique=True, nullable=False)
-    time_created = sa.Column(sa.DateTime, server_default=func.now())
-    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
     
     is_disabled = sa.Column(sa.Boolean(name="is_disabled__bool"), default=False)
     is_confirmed = sa.Column(sa.Boolean(name="is_confirmed__bool"), default=False)

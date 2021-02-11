@@ -3,10 +3,10 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask import current_app, g
 
-from quizzz.db import Base
+from quizzz.db import Base, TimeStampedModel
 
 
-class Quiz(Base):
+class Quiz(TimeStampedModel,Base):
     __tablename__ = 'quizzes'
 
     id = sa.Column(sa.Integer, primary_key=True)
@@ -15,9 +15,6 @@ class Quiz(Base):
 
     num_questions = sa.Column(sa.Integer, default=0, nullable=False)
     num_options = sa.Column(sa.Integer, default=4, nullable=False)
-
-    time_created = sa.Column(sa.DateTime, server_default=func.now())
-    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
 
     author_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)

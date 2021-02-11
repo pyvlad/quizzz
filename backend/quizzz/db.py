@@ -1,6 +1,8 @@
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
+import sqlalchemy as sa
+from sqlalchemy.sql import func
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import scoped_session, sessionmaker, mapper
 from sqlalchemy.ext.declarative import declarative_base
@@ -120,3 +122,13 @@ def init_app(app):
     app.teardown_request(remove_db_session)
     app.teardown_appcontext(discard_db_session)
     # app.cli.add_command(init_db_command)
+
+
+class TimeStampedModel:
+    time_created = sa.Column(sa.DateTime, server_default=func.now())
+    time_updated = sa.Column(sa.DateTime, onupdate=func.now())
+    # The declarative extension creates a copy of each Column object 
+    # encountered on a class that is detected as a mixin
+    # There’s no fixed convention over whether a mixin precedes Base or not. 
+    # Normal Python method resolution rules apply
+    # source: https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/mixins.html
