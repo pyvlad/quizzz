@@ -22,12 +22,7 @@ class Group(TimeStampedModel, Base):
 
     def __repr__(self):
         return "<Group %r [%r]>" % (self.name, self.id)
-
-    def populate_from_wtform(self, form):
-        self.name = form.name.data
-        self.password = form.password.data
-        self.confirmation_needed = bool(form.confirmation_needed.data)
-        return self
+        
 
 
 class Member(TimeStampedModel, Base):

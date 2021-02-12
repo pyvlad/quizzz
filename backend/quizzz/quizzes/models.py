@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from flask import current_app, g
 
 from quizzz.db import Base, TimeStampedModel
 

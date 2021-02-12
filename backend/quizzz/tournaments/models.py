@@ -3,7 +3,6 @@ import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from flask import g, request, abort
 
 from quizzz.db import Base
 
@@ -25,14 +24,6 @@ class Tournament(Base):
 
     def __repr__(self):
         return "<Tournament %r [%r]>" % (self.name, self.id)
-
-    def populate_from_wtform(self, form):
-        self.group = g.group
-
-        self.name = form.tournament_name.data
-        self.is_active = bool(form.is_active.data)
-
-        return self
 
 
 
@@ -56,17 +47,6 @@ class Round(Base):
 
     def __repr__(self):
         return "<Round [%r]>" % self.id
-
-    def populate_from_wtform(self, form, tournament_id):
-        self.tournament_id = tournament_id
-        self.quiz_id = form.quiz_id.data
-        self.start_time = form.start_time.data
-        self.finish_time = form.finish_time.data
-        # maybe process time, something like this:
-        # self.start_time = datetime.datetime.combine(form.start_date.data, datetime.datetime.min.time()) \
-        #     + datetime.timedelta(hours=form.start_time_hours.data) \
-        #     + datetime.timedelta(minutes=form.start_time_minutes.data)
-        return self
 
     @property
     def time_left(self):
@@ -96,6 +76,7 @@ class Round(Base):
 
     def is_authored_by(self, user_id):
         return self.quiz.author_id == user_id
+
 
 
 class Play(Base):
@@ -146,33 +127,6 @@ class Play(Base):
             return max(0, 100 * self.result - self.get_server_time())
         else:
             return 0
-
-    def populate_from_wtform(self, form):
-        quiz = self.round.quiz
-
-        available_answers = {
-            str(question.id): { str(option.id): option for option in question.options}
-            for question in quiz.questions
-        }
-
-        answers = []
-        for q in form.questions:
-            # submitted question_id and option_id:
-            question_id = q.form.question_id.data       # string
-            option_id = q.form.answer.data              # string
-
-            options = available_answers.get(question_id)
-            if options is None:
-                abort(400, "Question ID from another quiz was submitted.")
-
-            selected_option = options.get(option_id, None)
-            answers += [PlayAnswer(play=self, question_id=int(question_id), option=selected_option)]
-
-        self.answers = answers
-        self.is_submitted = True
-        self.result = len([answer for answer in answers if (answer.option and answer.option.is_correct)])
-
-        return self
 
 
 

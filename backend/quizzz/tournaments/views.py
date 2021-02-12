@@ -15,7 +15,7 @@ from .preps import (
     prep_tournament_standings,
     prep_round_standings
 )
-from .forms import make_play_round_form
+from .forms import make_play_round_form, QuestionIdMismatch
 
 
 TOURNAMENT_FILTERS = ["active", "inactive", "all"]
@@ -180,7 +180,10 @@ def play_round(round_id):
             # (a) add <play.answers>
             # (b) toggle <play.is_submitted>
             # (c) calculate <play.result>
-            play.populate_from_wtform(form) # wrong question_id will lead to abort here
+            try:
+                form.populate_object(play) # wrong question_id will lead to abort here
+            except QuestionIdMismatch:
+                abort(400, "Question ID from another quiz was submitted.")
             g.db.commit()
             return redirect(url_for("tournaments.review_round", round_id=round_id))
         else:

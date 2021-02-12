@@ -25,7 +25,7 @@ def edit_tournament(tournament_id):
 
     if request.method == 'POST':
         form = TournamentForm()
-        tournament.populate_from_wtform(form)
+        form.populate_object(tournament, g.group)
 
         try:
             g.db.add(tournament)
@@ -121,7 +121,7 @@ def edit_round(tournament_id, round_id):
         form.quiz_id.choices = choices
 
         if form.validate():
-            round.populate_from_wtform(form, tournament_id)
+            form.populate_object(round, tournament_id)
 
             try:
                 g.db.add(round)

@@ -75,7 +75,7 @@ def edit():
 
     if request.method == 'POST':
         form = GroupForm()
-        group.populate_from_wtform(form)
+        form.populate_object(group)
         
         with g.db.no_autoflush:
             repeat_group = g.db.query(Group)\

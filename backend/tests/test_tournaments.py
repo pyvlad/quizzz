@@ -418,6 +418,7 @@ def test_play_round_errors(app, client, auth):
         quiz2 = db.query(Quiz).filter(Quiz.id == 2).first()
         question_id = quiz2.questions[0].id
         correct_option_id = [opt for opt in quiz2.questions[0].options if opt.is_correct][0].id
+    
     # plugging that question into another quiz triggers an error
     auth.login_as("alice")
     invalid_play_data = VALID_PLAY_DATA.copy()
@@ -426,6 +427,15 @@ def test_play_round_errors(app, client, auth):
     response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
     assert response.status_code == 400
     assert_play_not_in_db()
+
+    # plugging question_id from another quiz with values for a valid question_id
+    invalid_play_data = VALID_PLAY_DATA.copy()
+    invalid_play_data["questions-1-question_id"] = str(question_id)
+    response = client.post("/groups/1/rounds/1/play", data=invalid_play_data)
+    assert response.status_code == 400
+    assert b"Question ID from another quiz was submitted." in response.data
+    assert_play_not_in_db()
+
 
     # (g) extra repeats are stripped off
     # correct submission happens

@@ -34,6 +34,11 @@ class GroupForm(FlaskForm):
         if group:
             raise ValidationError(f'Group {group_name} already exists. Choose another name.')
 
+    def populate_object(self, obj):
+        obj.name = self.name.data
+        obj.password = self.password.data
+        obj.confirmation_needed = bool(self.confirmation_needed.data)
+        return obj
 
 
 class MemberForm(FlaskForm):
